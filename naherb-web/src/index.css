@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-herb-50: #f3f8f2;
+  --color-herb-100: #e4f0e2;
+  --color-herb-500: #4f8a4c;
+  --color-herb-600: #3d713b;
+  --color-herb-700: #315a30;
+  --color-herb-900: #203b20;
+}
+
+@layer base {
+  body {
+    @apply m-0 min-w-80 bg-stone-50 text-stone-800 antialiased;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+}

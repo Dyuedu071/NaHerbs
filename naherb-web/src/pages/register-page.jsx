@@ -1,0 +1,83 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { getApiError } from '../api/http'
+import { useAuthStore } from '../stores/auth-store'
+
+export function RegisterPage() {
+  const register = useAuthStore((state) => state.register)
+  const loading = useAuthStore((state) => state.loading)
+  const navigate = useNavigate()
+  const [message, setMessage] = useState('')
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+
+    try {
+      await register({
+        name: form.get('name'),
+        email: form.get('email'),
+        password: form.get('password'),
+      })
+      navigate('/dashboard', { replace: true })
+    } catch (error) {
+      setMessage(getApiError(error, 'Đăng ký không thành công'))
+    }
+  }
+
+  return (
+    <section className="mx-auto max-w-md rounded-2xl bg-white p-8 shadow-sm ring-1 ring-stone-200">
+      <h1 className="text-2xl font-bold text-herb-900">Tạo tài khoản</h1>
+
+      <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
+        <label className="block text-sm font-medium">
+          Tên hiển thị
+          <input
+            autoComplete="name"
+            className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 outline-none focus:border-herb-500 focus:ring-2 focus:ring-herb-100"
+            maxLength="100"
+            name="name"
+            required
+          />
+        </label>
+        <label className="block text-sm font-medium">
+          Email
+          <input
+            autoComplete="email"
+            className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 outline-none focus:border-herb-500 focus:ring-2 focus:ring-herb-100"
+            name="email"
+            required
+            type="email"
+          />
+        </label>
+        <label className="block text-sm font-medium">
+          Mật khẩu
+          <input
+            autoComplete="new-password"
+            className="mt-2 w-full rounded-xl border border-stone-300 px-4 py-3 outline-none focus:border-herb-500 focus:ring-2 focus:ring-herb-100"
+            minLength="8"
+            name="password"
+            required
+            type="password"
+          />
+        </label>
+
+        {message && <p className="text-sm text-red-600">{message}</p>}
+        <button
+          className="w-full rounded-xl bg-herb-600 px-4 py-3 font-semibold text-white hover:bg-herb-700 disabled:opacity-60"
+          disabled={loading}
+          type="submit"
+        >
+          {loading ? 'Đang tạo tài khoản...' : 'Đăng ký'}
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-stone-500">
+        Đã có tài khoản?{' '}
+        <Link className="font-semibold text-herb-600 hover:underline" to="/login">
+          Đăng nhập
+        </Link>
+      </p>
+    </section>
+  )
+}

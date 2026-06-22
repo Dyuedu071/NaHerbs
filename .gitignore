@@ -1,0 +1,76 @@
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Java / Maven / Spring Boot
+**/target/
+*.class
+**/.mvn/wrapper/maven-wrapper.jar
+**/HELP.md
+hs_err_pid*
+replay_pid*
+
+# Node / Vite
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/coverage/
+.npm/
+.pnpm-store/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDEs and editors
+.idea/
+**/.idea/
+.vscode/
+**/.vscode/
+.settings/
+**/.settings/
+.classpath
+**/.classpath
+.project
+**/.project
+.factorypath
+**/.factorypath
+.apt_generated/
+**/.apt_generated/
+.sts4-cache/
+**/.sts4-cache/
+*.iml
+*.iws
+*.ipr
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+
+# OS metadata
+.DS_Store
+**/.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+.cache/
+**/.cache/
+
+# Optional local Docker bind-mount data
+.docker-data/
