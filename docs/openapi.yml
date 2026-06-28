@@ -2,7 +2,9 @@ openapi: 3.0.3
 info:
   title: NaHerbs Website MVP API
   version: 2.2.0
-  description: 'API contract for naherb-api (Spring Boot) used by naherb-web (Next.js). Updated for UUID IDs across accounts/profile/address/order/cart and Vietnam two-level address fields: province/city and ward/commune only.'
+  description: 'API contract for naherb-api (Spring Boot) used by naherb-web (Next.js).
+    Updated for UUID IDs across accounts/profile/address/order/cart and Vietnam two-level
+    address fields: province/city and ward/commune only.'
 servers:
 - url: http://localhost:8080/api/v1
   description: Local Spring Boot API
@@ -258,8 +260,8 @@ paths:
                   properties:
                     data:
                       $ref: '#/components/schemas/AuthResponse'
-      description: Creates an account used for authentication. Profile/contact details are stored separately in account_profiles
-        and account_addresses.
+      description: Creates an account used for authentication. Profile/contact 
+        details are stored separately in account_profiles and account_addresses.
   /auth/login:
     post:
       tags:
@@ -1065,6 +1067,56 @@ paths:
           $ref: '#/components/responses/Ok'
         '404':
           $ref: '#/components/responses/NotFound'
+  /auth/google:
+    post:
+      tags:
+      - auth
+      summary: Login or Register with Google
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - idToken
+              properties:
+                idToken:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUser'
+  /auth/register-otp:
+    post:
+      tags:
+      - auth
+      summary: Send OTP for registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 components:
   securitySchemes:
     bearerAuth:
@@ -1323,11 +1375,13 @@ components:
           type: boolean
     RegisterRequest:
       type: object
-      description: Creates an account for authentication. User profile data is stored separately in account_profiles.
+      description: Creates an account for authentication. User profile data is 
+        stored separately in account_profiles.
       required:
       - email
       - password
       - name
+      - otp
       properties:
         email:
           type: string
@@ -1340,11 +1394,16 @@ components:
         name:
           type: string
           maxLength: 100
-          description: Display name stored on accounts to match current Account entity; profile stores customer contact data. It should also initialize profile.fullName.
+          description: Display name stored on accounts to match current Account 
+            entity; profile stores customer contact data. It should also 
+            initialize profile.fullName.
         phone:
           type: string
           nullable: true
           description: Optional initial profile phone.
+        otp:
+          type: string
+          example: '123456'
     LoginRequest:
       type: object
       required:
@@ -1371,7 +1430,8 @@ components:
     CustomerProfile:
       type: object
       deprecated: true
-      description: Deprecated. Use CurrentUser or AccountProfile. accountId is UUID.
+      description: Deprecated. Use CurrentUser or AccountProfile. accountId is 
+        UUID.
       properties:
         accountId:
           type: string
@@ -1445,8 +1505,9 @@ components:
           type: integer
     CheckoutRequest:
       type: object
-      description: Create order from current cart. Use either shippingAddressId from saved account_addresses or provide shippingAddress
-        inline. Address uses province/city and ward/commune only; no district field.
+      description: Create order from current cart. Use either shippingAddressId 
+        from saved account_addresses or provide shippingAddress inline. Address 
+        uses province/city and ward/commune only; no district field.
       required:
       - paymentMethod
       properties:
@@ -1461,7 +1522,8 @@ components:
         saveAddress:
           type: boolean
           default: false
-          description: If true and shippingAddress is provided, backend may save it to account_addresses.
+          description: If true and shippingAddress is provided, backend may save
+            it to account_addresses.
         note:
           type: string
           nullable: true
@@ -2000,7 +2062,9 @@ components:
           $ref: '#/components/schemas/AccountProfile'
     AccountProfile:
       type: object
-      description: Profile data separated from accounts. accounts is used for login/security; profile stores user contact information. accountId is UUID.
+      description: Profile data separated from accounts. accounts is used for 
+        login/security; profile stores user contact information. accountId is 
+        UUID.
       properties:
         accountId:
           type: string
@@ -2045,8 +2109,8 @@ components:
           nullable: true
     AccountAddress:
       type: object
-      description: 'Shipping address using Vietnam two-level administrative model: province/city and ward/commune. No district
-        field.'
+      description: 'Shipping address using Vietnam two-level administrative model:
+        province/city and ward/commune. No district field.'
       properties:
         id:
           type: string
@@ -2122,7 +2186,8 @@ components:
           default: false
     ShippingAddressSnapshot:
       type: object
-      description: Address snapshot stored on orders at checkout time. No district field.
+      description: Address snapshot stored on orders at checkout time. No 
+        district field.
       properties:
         receiverName:
           type: string
@@ -2143,6 +2208,7 @@ components:
           nullable: true
         fullAddress:
           type: string
-          description: Formatted address for display, composed from addressDetail, wardCommune, provinceCity.
+          description: Formatted address for display, composed from 
+            addressDetail, wardCommune, provinceCity.
 security:
 - bearerAuth: []

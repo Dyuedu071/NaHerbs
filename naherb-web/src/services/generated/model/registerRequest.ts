@@ -24,4 +24,5 @@ export interface RegisterRequest {
    * @nullable
    */
   phone?: string | null;
+  otp: string;
 }

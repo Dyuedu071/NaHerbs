@@ -32,14 +32,8 @@ public class AccountAddress extends BaseEntity {
     @Column(name = "receiver_email", length = 254)
     private String receiverEmail;
 
-    @Column(name = "province_code", length = 30)
-    private String provinceCode;
-
     @Column(name = "province_name", nullable = false)
     private String provinceName;
-
-    @Column(name = "ward_code", length = 30)
-    private String wardCode;
 
     @Column(name = "ward_name", nullable = false)
     private String wardName;

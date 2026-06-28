@@ -11,7 +11,7 @@ import vn.io.naherb.common.entity.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatbotConfig extends BaseEntity {
 
-    @Column(name = "config_key", nullable = false, unique = true, length = 100)
+    @Column(name = "config_key", unique = true, length = 100)
     private String configKey;
 
     @Column(name = "config_value", columnDefinition = "TEXT")

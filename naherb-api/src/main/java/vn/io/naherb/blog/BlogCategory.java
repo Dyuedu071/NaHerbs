@@ -20,6 +20,6 @@ public class BlogCategory extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "display_order", nullable = false)
+    @Column(name = "display_order", nullable = false, columnDefinition = "integer default 0")
     private Integer displayOrder = 0;
 }

@@ -74,6 +74,8 @@ public class SecurityConfig {
                         "/api/auth/csrf",
                         "/api/auth/login",
                         "/api/auth/register",
+                        "/api/auth/register-otp",
+                        "/api/auth/google",
                         "/api/auth/refresh")));
         jwtFilter.setAuthenticationEntryPoint((request, response, exception) ->
                 writeError(response, 401, "Bạn chưa đăng nhập hoặc phiên đã hết hạn"));
@@ -82,7 +84,13 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfRepository)
-                        .csrfTokenRequestHandler(csrfHandler))
+                        .csrfTokenRequestHandler(csrfHandler)
+                        .ignoringRequestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/register-otp",
+                                "/api/auth/google",
+                                "/api/auth/refresh"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(cache -> cache.disable())
                 .formLogin(form -> form.disable())
@@ -99,6 +107,8 @@ public class SecurityConfig {
                                 "/api/auth/csrf",
                                 "/api/auth/login",
                                 "/api/auth/register",
+                                "/api/auth/register-otp",
+                                "/api/auth/google",
                                 "/api/auth/refresh",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -173,7 +183,7 @@ public class SecurityConfig {
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(properties.getCors().getAllowedOrigins());
         cors.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        cors.setAllowedHeaders(List.of("Content-Type", "Accept", "X-XSRF-TOKEN"));
+        cors.setAllowedHeaders(List.of("Content-Type", "Accept", "X-XSRF-TOKEN", "Authorization", "Origin"));
         cors.setAllowCredentials(true);
         cors.setMaxAge(3600L);
 

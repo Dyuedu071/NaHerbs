@@ -13,8 +13,8 @@ import vn.io.naherb.account.Account;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cart extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", unique = true)
     private Account account;
 
     @Column(name = "session_id", unique = true, length = 100)
@@ -22,4 +22,9 @@ public class Cart extends BaseEntity {
 
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount = BigDecimal.ZERO;
+
+    public Cart(Account account) {
+        this.account = account;
+        this.totalAmount = BigDecimal.ZERO;
+    }
 }

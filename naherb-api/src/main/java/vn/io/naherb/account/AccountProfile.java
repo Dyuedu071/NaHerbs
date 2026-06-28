@@ -34,4 +34,12 @@ public class AccountProfile extends BaseEntity {
 
     @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
+
+    public AccountProfile(Account account, String fullName, String phone, String contactEmail, String avatarUrl) {
+        this.account = account;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.contactEmail = contactEmail;
+        this.avatarUrl = avatarUrl;
+    }
 }

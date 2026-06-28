@@ -39,6 +39,26 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
+    @PostMapping("/register-otp")
+    public ResponseEntity<Map<String, String>> sendRegisterOtp(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
+        }
+        authService.sendRegisterOtp(email);
+        return ResponseEntity.ok(Map.of("message", "OTP sent successfully"));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<UserResponse> loginWithGoogle(@RequestBody Map<String, String> body) {
+        String idToken = body.get("idToken");
+        if (idToken == null || idToken.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return sessionResponse(authService.loginWithGoogle(idToken));
+    }
+
+
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(
             @Valid @RequestBody LoginRequest loginRequest,
