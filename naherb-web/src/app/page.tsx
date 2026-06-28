@@ -1,6 +1,18 @@
+"use client";
+
 import Link from 'next/link';
+import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
 
 export default function Home() {
+  const { data } = useGetAuthMe({
+    query: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    }
+  });
+
+  const user = data as unknown as { id: string; email: string; name: string; role: string; avatarUrl?: string } | undefined;
+
   return (
     <>
 
@@ -32,15 +44,32 @@ export default function Home() {
                     <span className="material-symbols-outlined"
                         style={{ fontVariationSettings: "'FILL' 0" }}>shopping_cart</span>
                 </button>
-                <Link href="/login" className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 hidden md:block">
-                    <span className="material-symbols-outlined"
-                        style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
-                </Link>
-                <Link
-                    href="/login"
-                    className="border border-primary text-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-success-bg transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
-                    Đăng nhập
-                </Link>
+                {user ? (
+                    <div className="flex items-center gap-xs hidden md:flex">
+                        <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 hover:scale-105 transition-transform duration-200 shadow-sm cursor-pointer">
+                            <img
+                                src={user.avatarUrl || '/images/avatars/default-avatar.jpg'}
+                                alt="User Avatar"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <span className="font-label-md text-label-md text-primary font-semibold max-w-[120px] truncate">
+                            {user.name}
+                        </span>
+                    </div>
+                ) : (
+                    <>
+                        <Link href="/login" className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 hidden md:block">
+                            <span className="material-symbols-outlined"
+                                style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
+                        </Link>
+                        <Link
+                            href="/login"
+                            className="border border-primary text-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-success-bg transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
+                            Đăng nhập
+                        </Link>
+                    </>
+                )}
                 <button
                     className="bg-primary text-on-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
                     Tư vấn ngay

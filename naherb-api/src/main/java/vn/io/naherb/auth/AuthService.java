@@ -172,7 +172,11 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public UserResponse currentUser(String email) {
-        return UserResponse.from(findByEmail(email));
+        Account account = findByEmail(email);
+        String avatarUrl = accountProfileRepository.findByAccountId(account.getId())
+                .map(profile -> profile.getAvatarUrl())
+                .orElse(null);
+        return UserResponse.from(account, avatarUrl);
     }
 
     private Account findByEmail(String email) {
@@ -187,8 +191,11 @@ public class AuthService {
     private SessionResult createSession(
             Account account,
             RefreshTokenService.IssuedRefreshToken refreshToken) {
+        String avatarUrl = accountProfileRepository.findByAccountId(account.getId())
+                .map(profile -> profile.getAvatarUrl())
+                .orElse(null);
         return new SessionResult(
-                UserResponse.from(account),
+                UserResponse.from(account, avatarUrl),
                 jwtService.createToken(account),
                 refreshToken.token());
     }
