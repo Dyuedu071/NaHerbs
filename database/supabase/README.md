@@ -1,47 +1,44 @@
-# Supabase Database Scripts – NaHerbs
+# NaHerbs UUID Schema + OpenAPI
 
-NaHerbs dùng PostgreSQL trên Supabase làm database chung, vì vậy **không dùng Flyway tự động chạy migration khi Spring Boot start**.
+Bộ file này đã được chỉnh theo yêu cầu: **dùng UUID cho tất cả khóa chính/khóa ngoại nghiệp vụ**, bao gồm `accounts.id`, `account_profiles.account_id`, `account_addresses.account_id`, `carts.account_id`, `orders.account_id`, `leads.account_id`, `payments.verified_by_account_id`, và `chatbot_conversations.account_id`.
 
-## Cách dùng
+## File
 
-Chạy theo thứ tự trong Supabase SQL Editor hoặc Supabase CLI:
+- `001_init_schema.sql`: schema Supabase PostgreSQL dùng `uuid primary key default gen_random_uuid()` cho `accounts` và các bảng nghiệp vụ.
+- `002_seed_minimal.sql`: seed tối thiểu, tương thích UUID.
+- `openapi.yml` / `openapi.yaml`: API contract đã đổi các `accountId`, `addressId`, `shippingAddressId` sang `string` `format: uuid`.
 
-```text
-001_init_schema.sql
-002_seed_minimal.sql
+## Lưu ý bắt buộc cho Spring Boot
+
+Entity `Account` hiện tại của bạn đang dùng:
+
+```java
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
 ```
 
-Khi cần thay đổi schema sau này, tạo script mới:
+Nếu database dùng UUID thì entity cần đổi sang dạng tương tự:
 
-```text
-003_add_xxx.sql
-004_alter_yyy.sql
+```java
+@Id
+@GeneratedValue(strategy = GenerationType.UUID)
+private UUID id;
 ```
 
-## Vì sao dùng schema `naherb`?
+Hoặc nếu muốn để database tự sinh `gen_random_uuid()`, có thể bỏ generator Java và để Hibernate đọc UUID sau insert tùy cách mapping/cấu hình. Cách đơn giản với Hibernate 6/Spring Boot 3 là dùng `GenerationType.UUID`.
 
-Database Supabase là database dùng chung. Schema riêng giúp tránh đụng tên bảng với các project khác.
+Các entity khác có FK tới account cũng phải đổi `Long accountId` / `Account.id` sang `UUID`.
 
-Backend nên dùng:
+## Thứ tự chạy Supabase
 
-```yaml
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        default_schema: naherb
+1. Nếu database đang là bản thử nghiệm, drop schema cũ trước:
+
+```sql
+drop schema if exists naherb cascade;
 ```
 
-JDBC URL có thể thêm current schema:
+2. Chạy `001_init_schema.sql`.
+3. Chạy `002_seed_minimal.sql`.
 
-```text
-jdbc:postgresql://<host>:5432/postgres?currentSchema=naherb
-```
-
-## RLS
-
-Hiện tại `naherb-web` không kết nối trực tiếp Supabase. Toàn bộ request đi qua `naherb-api`, vì vậy authorization nằm ở Spring Security.
-
-Nếu sau này frontend dùng Supabase client trực tiếp, phải bật RLS và viết policy trước.
+Dự án này vẫn giữ nguyên quy ước: **không dùng Flyway auto migration**, schema được chạy thủ công bằng Supabase SQL Editor hoặc Supabase CLI.

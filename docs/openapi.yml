@@ -1,33 +1,36 @@
 openapi: 3.0.3
 info:
   title: NaHerbs Website MVP API
-  version: 2.0.0
-  description: API contract for naherb-api used by naherb-web Next.js.
+  version: 2.2.0
+  description: 'API contract for naherb-api (Spring Boot) used by naherb-web (Next.js). Updated for UUID IDs across accounts/profile/address/order/cart and Vietnam two-level address fields: province/city and ward/commune only.'
 servers:
-  - url: http://localhost:8080/api/v1
-    description: Local Spring Boot API
-  - url: https://api.naherbs.vn/api/v1
-    description: Production API placeholder
+- url: http://localhost:8080/api/v1
+  description: Local Spring Boot API
+- url: https://api.naherbs.vn/api/v1
+  description: Production API placeholder
 tags:
-  - name: Health
-  - name: Public Products
-  - name: Public Blog
-  - name: SEO
-  - name: Customer Auth
-  - name: Cart
-  - name: Checkout
-  - name: Customer Orders
-  - name: Chatbot
-  - name: Admin Auth
-  - name: Admin Products
-  - name: Admin Orders
-  - name: Admin Blog
-  - name: Admin Chatbot
-  - name: Admin Settings
+- name: Health
+- name: Public Products
+- name: Public Blog
+- name: SEO
+- name: Customer Auth
+- name: Customer Profile
+- name: Customer Addresses
+- name: Cart
+- name: Checkout
+- name: Customer Orders
+- name: Chatbot
+- name: Admin Auth
+- name: Admin Products
+- name: Admin Orders
+- name: Admin Blog
+- name: Admin Chatbot
+- name: Admin Settings
 paths:
   /health:
     get:
-      tags: [Health]
+      tags:
+      - Health
       security: []
       summary: Health check
       responses:
@@ -39,7 +42,8 @@ paths:
                 $ref: '#/components/schemas/ApiResponseHealth'
   /site-settings/public:
     get:
-      tags: [SEO]
+      tags:
+      - SEO
       security: []
       summary: Get public site settings
       responses:
@@ -49,14 +53,15 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/PublicSiteSettings'
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PublicSiteSettings'
   /product-categories:
     get:
-      tags: [Public Products]
+      tags:
+      - Public Products
       security: []
       summary: List published product categories
       responses:
@@ -66,40 +71,54 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ProductCategorySummary'
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ProductCategorySummary'
   /products:
     get:
-      tags: [Public Products]
+      tags:
+      - Public Products
       security: []
       summary: List published products
       parameters:
-        - in: query
-          name: keyword
-          schema: { type: string }
-        - in: query
-          name: categorySlug
-          schema: { type: string }
-        - in: query
-          name: need
-          schema: { type: string }
-        - in: query
-          name: inStockOnly
-          schema: { type: boolean }
-        - in: query
-          name: sort
-          schema: { type: string, enum: [latest, price_asc, price_desc] }
-        - in: query
-          name: page
-          schema: { type: integer, default: 0 }
-        - in: query
-          name: size
-          schema: { type: integer, default: 12 }
+      - in: query
+        name: keyword
+        schema:
+          type: string
+      - in: query
+        name: categorySlug
+        schema:
+          type: string
+      - in: query
+        name: need
+        schema:
+          type: string
+      - in: query
+        name: inStockOnly
+        schema:
+          type: boolean
+      - in: query
+        name: sort
+        schema:
+          type: string
+          enum:
+          - latest
+          - price_asc
+          - price_desc
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 12
       responses:
         '200':
           description: OK
@@ -107,21 +126,23 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/ProductPage'
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/ProductPage'
   /products/{slug}:
     get:
-      tags: [Public Products]
+      tags:
+      - Public Products
       security: []
       summary: Get product detail by slug
       parameters:
-        - in: path
-          name: slug
-          required: true
-          schema: { type: string }
+      - in: path
+        name: slug
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: OK
@@ -129,27 +150,34 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/ProductDetail'
-        '404': { $ref: '#/components/responses/NotFound' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/ProductDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /blog-posts:
     get:
-      tags: [Public Blog]
+      tags:
+      - Public Blog
       security: []
       summary: List published blog posts
       parameters:
-        - in: query
-          name: keyword
-          schema: { type: string }
-        - in: query
-          name: page
-          schema: { type: integer, default: 0 }
-        - in: query
-          name: size
-          schema: { type: integer, default: 10 }
+      - in: query
+        name: keyword
+        schema:
+          type: string
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 10
       responses:
         '200':
           description: OK
@@ -157,21 +185,23 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/BlogPostPage'
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/BlogPostPage'
   /blog-posts/{slug}:
     get:
-      tags: [Public Blog]
+      tags:
+      - Public Blog
       security: []
       summary: Get blog post detail
       parameters:
-        - in: path
-          name: slug
-          required: true
-          schema: { type: string }
+      - in: path
+        name: slug
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: OK
@@ -179,15 +209,17 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/BlogPostDetail'
-        '404': { $ref: '#/components/responses/NotFound' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/BlogPostDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /seo/sitemap-data:
     get:
-      tags: [SEO]
+      tags:
+      - SEO
       security: []
       summary: Data for Next.js sitemap.ts
       responses:
@@ -197,21 +229,23 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/SitemapData'
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SitemapData'
   /auth/register:
     post:
-      tags: [Customer Auth]
+      tags:
+      - Customer Auth
       security: []
-      summary: Register customer
+      summary: Register customer account and initialize profile
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/RegisterRequest' }
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
       responses:
         '201':
           description: Registered
@@ -219,20 +253,25 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/AuthResponse' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/AuthResponse'
+      description: Creates an account used for authentication. Profile/contact details are stored separately in account_profiles
+        and account_addresses.
   /auth/login:
     post:
-      tags: [Customer Auth]
+      tags:
+      - Customer Auth
       security: []
       summary: Login customer
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/LoginRequest' }
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
           description: OK
@@ -240,14 +279,16 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/AuthResponse' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/AuthResponse'
   /auth/me:
     get:
-      tags: [Customer Auth]
-      summary: Get current customer
+      tags:
+      - Customer Profile
+      summary: Get current account and profile
       responses:
         '200':
           description: OK
@@ -255,13 +296,15 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/CustomerProfile' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/CurrentUser'
   /cart:
     get:
-      tags: [Cart]
+      tags:
+      - Cart
       summary: Get current customer's cart
       responses:
         '200':
@@ -270,24 +313,29 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/Cart' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/Cart'
     delete:
-      tags: [Cart]
+      tags:
+      - Cart
       summary: Clear cart
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
   /cart/items:
     post:
-      tags: [Cart]
+      tags:
+      - Cart
       summary: Add item to cart
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/AddCartItemRequest' }
+            schema:
+              $ref: '#/components/schemas/AddCartItemRequest'
       responses:
         '200':
           description: Cart updated
@@ -295,25 +343,31 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/Cart' }
-        '409': { $ref: '#/components/responses/Conflict' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/Cart'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /cart/items/{itemId}:
     patch:
-      tags: [Cart]
+      tags:
+      - Cart
       summary: Update cart item quantity
       parameters:
-        - in: path
-          name: itemId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: itemId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateCartItemRequest' }
+            schema:
+              $ref: '#/components/schemas/UpdateCartItemRequest'
       responses:
         '200':
           description: Cart updated
@@ -321,18 +375,22 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/Cart' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/Cart'
     delete:
-      tags: [Cart]
+      tags:
+      - Cart
       summary: Remove cart item
       parameters:
-        - in: path
-          name: itemId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: itemId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: Cart updated
@@ -340,19 +398,22 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/Cart' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/Cart'
   /checkout:
     post:
-      tags: [Checkout]
+      tags:
+      - Checkout
       summary: Create order from cart
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CheckoutRequest' }
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
       responses:
         '201':
           description: Order created
@@ -360,22 +421,29 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/CheckoutResponse' }
-        '409': { $ref: '#/components/responses/Conflict' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/CheckoutResponse'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /orders/my:
     get:
-      tags: [Customer Orders]
+      tags:
+      - Customer Orders
       summary: List current customer's orders
       parameters:
-        - in: query
-          name: page
-          schema: { type: integer, default: 0 }
-        - in: query
-          name: size
-          schema: { type: integer, default: 10 }
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 10
       responses:
         '200':
           description: OK
@@ -383,19 +451,23 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/OrderPage' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/OrderPage'
   /orders/my/{orderId}:
     get:
-      tags: [Customer Orders]
+      tags:
+      - Customer Orders
       summary: Get current customer's order detail
       parameters:
-        - in: path
-          name: orderId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: orderId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: OK
@@ -403,13 +475,15 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/OrderDetail' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/OrderDetail'
   /chatbot/config/public:
     get:
-      tags: [Chatbot]
+      tags:
+      - Chatbot
       security: []
       summary: Get public chatbot config
       responses:
@@ -419,20 +493,23 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/PublicChatbotConfig' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PublicChatbotConfig'
   /chatbot/conversations:
     post:
-      tags: [Chatbot]
+      tags:
+      - Chatbot
       security: []
       summary: Create chatbot conversation
       requestBody:
         required: false
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateConversationRequest' }
+            schema:
+              $ref: '#/components/schemas/CreateConversationRequest'
       responses:
         '201':
           description: Created
@@ -440,20 +517,23 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/ChatbotConversation' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/ChatbotConversation'
   /chatbot/messages:
     post:
-      tags: [Chatbot]
+      tags:
+      - Chatbot
       security: []
       summary: Send chatbot message
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ChatbotMessageRequest' }
+            schema:
+              $ref: '#/components/schemas/ChatbotMessageRequest'
       responses:
         '200':
           description: Answer
@@ -461,20 +541,23 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/ChatbotMessageResponse' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/ChatbotMessageResponse'
   /admin/auth/login:
     post:
-      tags: [Admin Auth]
+      tags:
+      - Admin Auth
       security: []
       summary: Login admin
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/LoginRequest' }
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
           description: OK
@@ -482,27 +565,35 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/AuthResponse' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/AuthResponse'
   /admin/products:
     get:
-      tags: [Admin Products]
+      tags:
+      - Admin Products
       summary: List products for admin
       parameters:
-        - in: query
-          name: keyword
-          schema: { type: string }
-        - in: query
-          name: status
-          schema: { $ref: '#/components/schemas/ProductStatus' }
-        - in: query
-          name: page
-          schema: { type: integer, default: 0 }
-        - in: query
-          name: size
-          schema: { type: integer, default: 20 }
+      - in: query
+        name: keyword
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          $ref: '#/components/schemas/ProductStatus'
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
       responses:
         '200':
           description: OK
@@ -510,18 +601,21 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/ProductPage' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/ProductPage'
     post:
-      tags: [Admin Products]
+      tags:
+      - Admin Products
       summary: Create product
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpsertProductRequest' }
+            schema:
+              $ref: '#/components/schemas/UpsertProductRequest'
       responses:
         '201':
           description: Created
@@ -529,123 +623,162 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/ProductDetail' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/ProductDetail'
   /admin/products/{productId}:
     put:
-      tags: [Admin Products]
+      tags:
+      - Admin Products
       summary: Update product
       parameters:
-        - in: path
-          name: productId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: productId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpsertProductRequest' }
+            schema:
+              $ref: '#/components/schemas/UpsertProductRequest'
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
     delete:
-      tags: [Admin Products]
+      tags:
+      - Admin Products
       summary: Archive product
       parameters:
-        - in: path
-          name: productId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: productId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
   /admin/products/{productId}/versions:
     post:
-      tags: [Admin Products]
+      tags:
+      - Admin Products
       summary: Create product version
       parameters:
-        - in: path
-          name: productId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: productId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpsertProductVersionRequest' }
+            schema:
+              $ref: '#/components/schemas/UpsertProductVersionRequest'
       responses:
-        '201': { $ref: '#/components/responses/Ok' }
+        '201':
+          $ref: '#/components/responses/Ok'
   /admin/products/{productId}/skus:
     post:
-      tags: [Admin Products]
+      tags:
+      - Admin Products
       summary: Create product SKU
       parameters:
-        - in: path
-          name: productId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: productId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpsertProductSkuRequest' }
+            schema:
+              $ref: '#/components/schemas/UpsertProductSkuRequest'
       responses:
-        '201': { $ref: '#/components/responses/Ok' }
+        '201':
+          $ref: '#/components/responses/Ok'
   /admin/product-skus/{skuId}:
     put:
-      tags: [Admin Products]
+      tags:
+      - Admin Products
       summary: Update SKU
       parameters:
-        - in: path
-          name: skuId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: skuId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpsertProductSkuRequest' }
+            schema:
+              $ref: '#/components/schemas/UpsertProductSkuRequest'
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
   /admin/product-skus/{skuId}/stock:
     patch:
-      tags: [Admin Products]
+      tags:
+      - Admin Products
       summary: Update SKU stock
       parameters:
-        - in: path
-          name: skuId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: skuId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateStockRequest' }
+            schema:
+              $ref: '#/components/schemas/UpdateStockRequest'
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
   /admin/orders:
     get:
-      tags: [Admin Orders]
+      tags:
+      - Admin Orders
       summary: List orders for admin
       parameters:
-        - in: query
-          name: keyword
-          schema: { type: string }
-        - in: query
-          name: orderStatus
-          schema: { $ref: '#/components/schemas/OrderStatus' }
-        - in: query
-          name: paymentStatus
-          schema: { $ref: '#/components/schemas/PaymentStatus' }
-        - in: query
-          name: paymentMethod
-          schema: { $ref: '#/components/schemas/PaymentMethod' }
-        - in: query
-          name: page
-          schema: { type: integer, default: 0 }
-        - in: query
-          name: size
-          schema: { type: integer, default: 20 }
+      - in: query
+        name: keyword
+        schema:
+          type: string
+      - in: query
+        name: orderStatus
+        schema:
+          $ref: '#/components/schemas/OrderStatus'
+      - in: query
+        name: paymentStatus
+        schema:
+          $ref: '#/components/schemas/PaymentStatus'
+      - in: query
+        name: paymentMethod
+        schema:
+          $ref: '#/components/schemas/PaymentMethod'
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 0
+      - in: query
+        name: size
+        schema:
+          type: integer
+          default: 20
       responses:
         '200':
           description: OK
@@ -653,19 +786,23 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/OrderPage' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/OrderPage'
   /admin/orders/{orderId}:
     get:
-      tags: [Admin Orders]
+      tags:
+      - Admin Orders
       summary: Admin get order detail
       parameters:
-        - in: path
-          name: orderId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: orderId
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: OK
@@ -673,90 +810,261 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/OrderDetail' }
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/OrderDetail'
   /admin/orders/{orderId}/status:
     patch:
-      tags: [Admin Orders]
+      tags:
+      - Admin Orders
       summary: Update order status
       parameters:
-        - in: path
-          name: orderId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: orderId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateOrderStatusRequest' }
+            schema:
+              $ref: '#/components/schemas/UpdateOrderStatusRequest'
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
   /admin/orders/{orderId}/payment-status:
     patch:
-      tags: [Admin Orders]
+      tags:
+      - Admin Orders
       summary: Manually update payment status, used for QR confirmation
       parameters:
-        - in: path
-          name: orderId
-          required: true
-          schema: { type: string, format: uuid }
+      - in: path
+        name: orderId
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdatePaymentStatusRequest' }
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentStatusRequest'
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
   /admin/blog-posts:
     get:
-      tags: [Admin Blog]
+      tags:
+      - Admin Blog
       summary: List blog posts admin
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
     post:
-      tags: [Admin Blog]
+      tags:
+      - Admin Blog
       summary: Create blog post
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpsertBlogPostRequest' }
+            schema:
+              $ref: '#/components/schemas/UpsertBlogPostRequest'
       responses:
-        '201': { $ref: '#/components/responses/Ok' }
+        '201':
+          $ref: '#/components/responses/Ok'
   /admin/chatbot/config:
     get:
-      tags: [Admin Chatbot]
+      tags:
+      - Admin Chatbot
       summary: Get chatbot config
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
     put:
-      tags: [Admin Chatbot]
+      tags:
+      - Admin Chatbot
       summary: Update chatbot config
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateChatbotConfigRequest' }
+            schema:
+              $ref: '#/components/schemas/UpdateChatbotConfigRequest'
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
   /admin/site-settings:
     get:
-      tags: [Admin Settings]
+      tags:
+      - Admin Settings
       summary: Get site settings
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
     put:
-      tags: [Admin Settings]
+      tags:
+      - Admin Settings
       summary: Update site settings
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UpdateSiteSettingsRequest' }
+            schema:
+              $ref: '#/components/schemas/UpdateSiteSettingsRequest'
       responses:
-        '200': { $ref: '#/components/responses/Ok' }
+        '200':
+          $ref: '#/components/responses/Ok'
+  /account/profile:
+    get:
+      tags:
+      - Customer Profile
+      summary: Get current account profile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/AccountProfile'
+    put:
+      tags:
+      - Customer Profile
+      summary: Update current account profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/AccountProfile'
+  /account/addresses:
+    get:
+      tags:
+      - Customer Addresses
+      summary: List current account shipping addresses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccountAddress'
+    post:
+      tags:
+      - Customer Addresses
+      summary: Create shipping address for current account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertAddressRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/AccountAddress'
+  /account/addresses/{addressId}:
+    put:
+      tags:
+      - Customer Addresses
+      summary: Update shipping address
+      parameters:
+      - in: path
+        name: addressId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertAddressRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/AccountAddress'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Customer Addresses
+      summary: Delete shipping address
+      parameters:
+      - in: path
+        name: addressId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /account/addresses/{addressId}/default:
+    patch:
+      tags:
+      - Customer Addresses
+      summary: Set address as default
+      parameters:
+      - in: path
+        name: addressId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '404':
+          $ref: '#/components/responses/NotFound'
 components:
   securitySchemes:
     bearerAuth:
@@ -774,473 +1082,1067 @@ components:
       description: Not found
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiResponse' }
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
     Conflict:
       description: Conflict
       content:
         application/json:
-          schema: { $ref: '#/components/schemas/ApiResponse' }
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
   schemas:
     ApiResponse:
       type: object
       properties:
-        success: { type: boolean }
-        message: { type: string }
-        data: { nullable: true }
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          nullable: true
         errors:
           type: array
-          items: { $ref: '#/components/schemas/ApiError' }
+          items:
+            $ref: '#/components/schemas/ApiError'
     ApiResponseHealth:
       allOf:
-        - $ref: '#/components/schemas/ApiResponse'
-        - type: object
-          properties:
-            data:
-              type: object
-              properties:
-                status: { type: string, example: UP }
+      - $ref: '#/components/schemas/ApiResponse'
+      - type: object
+        properties:
+          data:
+            type: object
+            properties:
+              status:
+                type: string
+                example: UP
     ApiError:
       type: object
       properties:
-        field: { type: string, nullable: true }
-        code: { type: string, nullable: true }
-        message: { type: string }
+        field:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        message:
+          type: string
     ProductStatus:
       type: string
-      enum: [DRAFT, PUBLISHED, HIDDEN, ARCHIVED]
+      enum:
+      - DRAFT
+      - PUBLISHED
+      - HIDDEN
+      - ARCHIVED
     SkuStatus:
       type: string
-      enum: [ACTIVE, HIDDEN, OUT_OF_STOCK]
+      enum:
+      - ACTIVE
+      - HIDDEN
+      - OUT_OF_STOCK
     StockStatus:
       type: string
-      enum: [IN_STOCK, LOW_STOCK, OUT_OF_STOCK]
+      enum:
+      - IN_STOCK
+      - LOW_STOCK
+      - OUT_OF_STOCK
     PaymentMethod:
       type: string
-      enum: [COD, BANK_QR]
+      enum:
+      - COD
+      - BANK_QR
     PaymentStatus:
       type: string
-      enum: [UNPAID, COD_PENDING, WAITING_BANK_TRANSFER, PAID, FAILED, REFUNDED]
+      enum:
+      - UNPAID
+      - COD_PENDING
+      - WAITING_BANK_TRANSFER
+      - PAID
+      - FAILED
+      - REFUNDED
     OrderStatus:
       type: string
-      enum: [PENDING_CONFIRMATION, CONFIRMED, PACKING, SHIPPING, COMPLETED, CANCELLED]
+      enum:
+      - PENDING_CONFIRMATION
+      - CONFIRMED
+      - PACKING
+      - SHIPPING
+      - COMPLETED
+      - CANCELLED
     ProductCategorySummary:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        name: { type: string }
-        slug: { type: string }
-        description: { type: string, nullable: true }
-        imageUrl: { type: string, nullable: true }
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
     ProductSummary:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        name: { type: string }
-        slug: { type: string }
-        thumbnailUrl: { type: string, nullable: true }
-        shortDescription: { type: string, nullable: true }
-        minSalePrice: { type: number }
-        maxSalePrice: { type: number }
-        stockStatus: { $ref: '#/components/schemas/StockStatus' }
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        thumbnailUrl:
+          type: string
+          nullable: true
+        shortDescription:
+          type: string
+          nullable: true
+        minSalePrice:
+          type: number
+        maxSalePrice:
+          type: number
+        stockStatus:
+          $ref: '#/components/schemas/StockStatus'
     ProductPage:
       type: object
       properties:
         items:
           type: array
-          items: { $ref: '#/components/schemas/ProductSummary' }
-        page: { type: integer }
-        size: { type: integer }
-        totalItems: { type: integer }
-        totalPages: { type: integer }
+          items:
+            $ref: '#/components/schemas/ProductSummary'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
     ProductDetail:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        name: { type: string }
-        slug: { type: string }
-        category: { $ref: '#/components/schemas/ProductCategorySummary' }
-        shortDescription: { type: string }
-        detailDescription: { type: string }
-        usageInstruction: { type: string, nullable: true }
-        safetyNote: { type: string, nullable: true }
-        seoTitle: { type: string, nullable: true }
-        seoDescription: { type: string, nullable: true }
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        category:
+          $ref: '#/components/schemas/ProductCategorySummary'
+        shortDescription:
+          type: string
+        detailDescription:
+          type: string
+        usageInstruction:
+          type: string
+          nullable: true
+        safetyNote:
+          type: string
+          nullable: true
+        seoTitle:
+          type: string
+          nullable: true
+        seoDescription:
+          type: string
+          nullable: true
         versions:
           type: array
-          items: { $ref: '#/components/schemas/ProductVersion' }
+          items:
+            $ref: '#/components/schemas/ProductVersion'
         images:
           type: array
-          items: { $ref: '#/components/schemas/ProductImage' }
+          items:
+            $ref: '#/components/schemas/ProductImage'
         relatedProducts:
           type: array
-          items: { $ref: '#/components/schemas/ProductSummary' }
+          items:
+            $ref: '#/components/schemas/ProductSummary'
     ProductVersion:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        name: { type: string }
-        displayOrder: { type: integer }
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        displayOrder:
+          type: integer
         skus:
           type: array
-          items: { $ref: '#/components/schemas/ProductSku' }
+          items:
+            $ref: '#/components/schemas/ProductSku'
     ProductSku:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        skuCode: { type: string }
-        name: { type: string }
-        color: { type: string, nullable: true }
-        scent: { type: string, nullable: true }
-        type: { type: string, nullable: true }
-        originalPrice: { type: number, nullable: true }
-        salePrice: { type: number }
-        stockQuantity: { type: integer }
-        stockStatus: { $ref: '#/components/schemas/StockStatus' }
-        status: { $ref: '#/components/schemas/SkuStatus' }
-        thumbnailUrl: { type: string, nullable: true }
+        id:
+          type: string
+          format: uuid
+        skuCode:
+          type: string
+        name:
+          type: string
+        color:
+          type: string
+          nullable: true
+        scent:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        originalPrice:
+          type: number
+          nullable: true
+        salePrice:
+          type: number
+        stockQuantity:
+          type: integer
+        stockStatus:
+          $ref: '#/components/schemas/StockStatus'
+        status:
+          $ref: '#/components/schemas/SkuStatus'
+        thumbnailUrl:
+          type: string
+          nullable: true
     ProductImage:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        url: { type: string }
-        altText: { type: string, nullable: true }
-        isThumbnail: { type: boolean }
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+        altText:
+          type: string
+          nullable: true
+        isThumbnail:
+          type: boolean
     RegisterRequest:
       type: object
-      required: [fullName, password]
+      description: Creates an account for authentication. User profile data is stored separately in account_profiles.
+      required:
+      - email
+      - password
+      - name
       properties:
-        fullName: { type: string }
-        email: { type: string, nullable: true }
-        phone: { type: string, nullable: true }
-        password: { type: string, format: password }
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          format: password
+          minLength: 8
+        name:
+          type: string
+          maxLength: 100
+          description: Display name stored on accounts to match current Account entity; profile stores customer contact data. It should also initialize profile.fullName.
+        phone:
+          type: string
+          nullable: true
+          description: Optional initial profile phone.
     LoginRequest:
       type: object
-      required: [login, password]
+      required:
+      - login
+      - password
       properties:
-        login: { type: string }
-        password: { type: string, format: password }
+        login:
+          type: string
+        password:
+          type: string
+          format: password
     AuthResponse:
       type: object
       properties:
-        accessToken: { type: string }
-        tokenType: { type: string, example: Bearer }
-        expiresIn: { type: integer }
-        user: { $ref: '#/components/schemas/CustomerProfile' }
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+        user:
+          $ref: '#/components/schemas/CurrentUser'
     CustomerProfile:
       type: object
+      deprecated: true
+      description: Deprecated. Use CurrentUser or AccountProfile. accountId is UUID.
       properties:
-        id: { type: string, format: uuid }
-        fullName: { type: string }
-        email: { type: string, nullable: true }
-        phone: { type: string, nullable: true }
+        accountId:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        phone:
+          type: string
+          nullable: true
     AddCartItemRequest:
       type: object
-      required: [skuId, quantity]
+      required:
+      - skuId
+      - quantity
       properties:
-        skuId: { type: string, format: uuid }
-        quantity: { type: integer, minimum: 1 }
+        skuId:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
     UpdateCartItemRequest:
       type: object
-      required: [quantity]
+      required:
+      - quantity
       properties:
-        quantity: { type: integer, minimum: 1 }
+        quantity:
+          type: integer
+          minimum: 1
     Cart:
       type: object
       properties:
-        id: { type: string, format: uuid }
+        id:
+          type: string
+          format: uuid
         items:
           type: array
-          items: { $ref: '#/components/schemas/CartItem' }
-        subtotal: { type: number }
+          items:
+            $ref: '#/components/schemas/CartItem'
+        subtotal:
+          type: number
     CartItem:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        skuId: { type: string, format: uuid }
-        productName: { type: string }
-        productSlug: { type: string }
-        skuName: { type: string }
-        thumbnailUrl: { type: string, nullable: true }
-        unitPrice: { type: number }
-        quantity: { type: integer }
-        lineTotal: { type: number }
-        stockQuantity: { type: integer }
+        id:
+          type: string
+          format: uuid
+        skuId:
+          type: string
+          format: uuid
+        productName:
+          type: string
+        productSlug:
+          type: string
+        skuName:
+          type: string
+        thumbnailUrl:
+          type: string
+          nullable: true
+        unitPrice:
+          type: number
+        quantity:
+          type: integer
+        lineTotal:
+          type: number
+        stockQuantity:
+          type: integer
     CheckoutRequest:
       type: object
-      required: [receiverName, receiverPhone, receiverAddress, paymentMethod]
+      description: Create order from current cart. Use either shippingAddressId from saved account_addresses or provide shippingAddress
+        inline. Address uses province/city and ward/commune only; no district field.
+      required:
+      - paymentMethod
       properties:
-        receiverName: { type: string }
-        receiverPhone: { type: string }
-        receiverAddress: { type: string }
-        note: { type: string, nullable: true }
-        paymentMethod: { $ref: '#/components/schemas/PaymentMethod' }
+        shippingAddressId:
+          type: string
+          format: uuid
+          nullable: true
+        shippingAddress:
+          allOf:
+          - $ref: '#/components/schemas/UpsertAddressRequest'
+          nullable: true
+        saveAddress:
+          type: boolean
+          default: false
+          description: If true and shippingAddress is provided, backend may save it to account_addresses.
+        note:
+          type: string
+          nullable: true
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
     CheckoutResponse:
       type: object
       properties:
-        orderId: { type: string, format: uuid }
-        orderCode: { type: string }
-        orderStatus: { $ref: '#/components/schemas/OrderStatus' }
-        paymentMethod: { $ref: '#/components/schemas/PaymentMethod' }
-        paymentStatus: { $ref: '#/components/schemas/PaymentStatus' }
-        totalAmount: { type: number }
+        orderId:
+          type: string
+          format: uuid
+        orderCode:
+          type: string
+        orderStatus:
+          $ref: '#/components/schemas/OrderStatus'
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        paymentStatus:
+          $ref: '#/components/schemas/PaymentStatus'
+        totalAmount:
+          type: number
         qrInstruction:
           $ref: '#/components/schemas/QrInstruction'
     QrInstruction:
       type: object
       nullable: true
       properties:
-        bankName: { type: string }
-        accountName: { type: string }
-        accountNumber: { type: string }
-        qrImageUrl: { type: string }
-        transferContent: { type: string }
+        bankName:
+          type: string
+        accountName:
+          type: string
+        accountNumber:
+          type: string
+        qrImageUrl:
+          type: string
+        transferContent:
+          type: string
     OrderSummary:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        orderCode: { type: string }
-        orderStatus: { $ref: '#/components/schemas/OrderStatus' }
-        paymentMethod: { $ref: '#/components/schemas/PaymentMethod' }
-        paymentStatus: { $ref: '#/components/schemas/PaymentStatus' }
-        totalAmount: { type: number }
-        createdAt: { type: string, format: date-time }
+        id:
+          type: string
+          format: uuid
+        orderCode:
+          type: string
+        orderStatus:
+          $ref: '#/components/schemas/OrderStatus'
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        paymentStatus:
+          $ref: '#/components/schemas/PaymentStatus'
+        totalAmount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
     OrderPage:
       type: object
       properties:
         items:
           type: array
-          items: { $ref: '#/components/schemas/OrderSummary' }
-        page: { type: integer }
-        size: { type: integer }
-        totalItems: { type: integer }
-        totalPages: { type: integer }
+          items:
+            $ref: '#/components/schemas/OrderSummary'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
     OrderDetail:
       allOf:
-        - $ref: '#/components/schemas/OrderSummary'
-        - type: object
-          properties:
-            receiverName: { type: string }
-            receiverPhone: { type: string }
-            receiverAddress: { type: string }
-            note: { type: string, nullable: true }
+      - $ref: '#/components/schemas/OrderSummary'
+      - type: object
+        properties:
+          note:
+            type: string
+            nullable: true
+          items:
+            type: array
             items:
-              type: array
-              items: { $ref: '#/components/schemas/OrderItem' }
-            qrInstruction: { $ref: '#/components/schemas/QrInstruction' }
+              $ref: '#/components/schemas/OrderItem'
+          qrInstruction:
+            $ref: '#/components/schemas/QrInstruction'
+          shippingAddress:
+            $ref: '#/components/schemas/ShippingAddressSnapshot'
     OrderItem:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        skuId: { type: string, format: uuid }
-        productNameSnapshot: { type: string }
-        skuNameSnapshot: { type: string }
-        unitPrice: { type: number }
-        quantity: { type: integer }
-        lineTotal: { type: number }
+        id:
+          type: string
+          format: uuid
+        skuId:
+          type: string
+          format: uuid
+        productNameSnapshot:
+          type: string
+        skuNameSnapshot:
+          type: string
+        unitPrice:
+          type: number
+        quantity:
+          type: integer
+        lineTotal:
+          type: number
     BlogPostSummary:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        title: { type: string }
-        slug: { type: string }
-        excerpt: { type: string, nullable: true }
-        thumbnailUrl: { type: string, nullable: true }
-        publishedAt: { type: string, format: date-time, nullable: true }
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+          nullable: true
+        thumbnailUrl:
+          type: string
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
     BlogPostPage:
       type: object
       properties:
         items:
           type: array
-          items: { $ref: '#/components/schemas/BlogPostSummary' }
-        page: { type: integer }
-        size: { type: integer }
-        totalItems: { type: integer }
-        totalPages: { type: integer }
+          items:
+            $ref: '#/components/schemas/BlogPostSummary'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
     BlogPostDetail:
       allOf:
-        - $ref: '#/components/schemas/BlogPostSummary'
-        - type: object
-          properties:
-            content: { type: string }
-            seoTitle: { type: string, nullable: true }
-            seoDescription: { type: string, nullable: true }
-            relatedProducts:
-              type: array
-              items: { $ref: '#/components/schemas/ProductSummary' }
+      - $ref: '#/components/schemas/BlogPostSummary'
+      - type: object
+        properties:
+          content:
+            type: string
+          seoTitle:
+            type: string
+            nullable: true
+          seoDescription:
+            type: string
+            nullable: true
+          relatedProducts:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProductSummary'
     SitemapData:
       type: object
       properties:
         staticPages:
           type: array
-          items: { type: string }
+          items:
+            type: string
         products:
           type: array
-          items: { $ref: '#/components/schemas/SitemapItem' }
+          items:
+            $ref: '#/components/schemas/SitemapItem'
         categories:
           type: array
-          items: { $ref: '#/components/schemas/SitemapItem' }
+          items:
+            $ref: '#/components/schemas/SitemapItem'
         blogPosts:
           type: array
-          items: { $ref: '#/components/schemas/SitemapItem' }
+          items:
+            $ref: '#/components/schemas/SitemapItem'
     SitemapItem:
       type: object
       properties:
-        slug: { type: string }
-        updatedAt: { type: string, format: date-time, nullable: true }
+        slug:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
     PublicSiteSettings:
       type: object
       properties:
-        brandName: { type: string }
-        hotline: { type: string, nullable: true }
-        zaloUrl: { type: string, nullable: true }
-        facebookUrl: { type: string, nullable: true }
-        email: { type: string, nullable: true }
-        address: { type: string, nullable: true }
-        defaultDisclaimer: { type: string, nullable: true }
+        brandName:
+          type: string
+        hotline:
+          type: string
+          nullable: true
+        zaloUrl:
+          type: string
+          nullable: true
+        facebookUrl:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        defaultDisclaimer:
+          type: string
+          nullable: true
     PublicChatbotConfig:
       type: object
       properties:
-        enabled: { type: boolean }
-        welcomeMessage: { type: string }
-        disclaimer: { type: string }
+        enabled:
+          type: boolean
+        welcomeMessage:
+          type: string
+        disclaimer:
+          type: string
         suggestedQuestions:
           type: array
-          items: { type: string }
+          items:
+            type: string
     CreateConversationRequest:
       type: object
       properties:
-        sessionId: { type: string, nullable: true }
-        sourcePage: { type: string, nullable: true }
+        sessionId:
+          type: string
+          nullable: true
+        sourcePage:
+          type: string
+          nullable: true
     ChatbotConversation:
       type: object
       properties:
-        id: { type: string, format: uuid }
-        sessionId: { type: string, nullable: true }
-        status: { type: string }
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          nullable: true
+        status:
+          type: string
     ChatbotMessageRequest:
       type: object
-      required: [message]
+      required:
+      - message
       properties:
-        conversationId: { type: string, format: uuid, nullable: true }
-        sessionId: { type: string, nullable: true }
-        message: { type: string }
-        sourcePage: { type: string, nullable: true }
+        conversationId:
+          type: string
+          format: uuid
+          nullable: true
+        sessionId:
+          type: string
+          nullable: true
+        message:
+          type: string
+        sourcePage:
+          type: string
+          nullable: true
     ChatbotMessageResponse:
       type: object
       properties:
-        conversationId: { type: string, format: uuid }
-        answer: { type: string }
-        disclaimer: { type: string, nullable: true }
+        conversationId:
+          type: string
+          format: uuid
+        answer:
+          type: string
+        disclaimer:
+          type: string
+          nullable: true
         recommendedProducts:
           type: array
-          items: { $ref: '#/components/schemas/RecommendedProduct' }
+          items:
+            $ref: '#/components/schemas/RecommendedProduct'
         suggestedActions:
           type: array
-          items: { $ref: '#/components/schemas/SuggestedAction' }
+          items:
+            $ref: '#/components/schemas/SuggestedAction'
     RecommendedProduct:
       type: object
       properties:
-        productId: { type: string, format: uuid }
-        skuId: { type: string, format: uuid, nullable: true }
-        name: { type: string }
-        slug: { type: string }
-        skuName: { type: string, nullable: true }
-        salePrice: { type: number, nullable: true }
-        stockStatus: { $ref: '#/components/schemas/StockStatus' }
-        thumbnailUrl: { type: string, nullable: true }
-        reason: { type: string }
+        productId:
+          type: string
+          format: uuid
+        skuId:
+          type: string
+          format: uuid
+          nullable: true
+        name:
+          type: string
+        slug:
+          type: string
+        skuName:
+          type: string
+          nullable: true
+        salePrice:
+          type: number
+          nullable: true
+        stockStatus:
+          $ref: '#/components/schemas/StockStatus'
+        thumbnailUrl:
+          type: string
+          nullable: true
+        reason:
+          type: string
     SuggestedAction:
       type: object
       properties:
-        type: { type: string, enum: [VIEW_PRODUCT, CREATE_LEAD, CONTACT_ZALO, CALL_HOTLINE] }
-        label: { type: string }
-        url: { type: string, nullable: true }
+        type:
+          type: string
+          enum:
+          - VIEW_PRODUCT
+          - CREATE_LEAD
+          - CONTACT_ZALO
+          - CALL_HOTLINE
+        label:
+          type: string
+        url:
+          type: string
+          nullable: true
     UpsertProductRequest:
       type: object
-      required: [name, slug, status]
+      required:
+      - name
+      - slug
+      - status
       properties:
-        categoryId: { type: string, format: uuid, nullable: true }
-        name: { type: string }
-        slug: { type: string }
-        shortDescription: { type: string, nullable: true }
-        detailDescription: { type: string, nullable: true }
-        usageInstruction: { type: string, nullable: true }
-        safetyNote: { type: string, nullable: true }
-        seoTitle: { type: string, nullable: true }
-        seoDescription: { type: string, nullable: true }
-        status: { $ref: '#/components/schemas/ProductStatus' }
+        categoryId:
+          type: string
+          format: uuid
+          nullable: true
+        name:
+          type: string
+        slug:
+          type: string
+        shortDescription:
+          type: string
+          nullable: true
+        detailDescription:
+          type: string
+          nullable: true
+        usageInstruction:
+          type: string
+          nullable: true
+        safetyNote:
+          type: string
+          nullable: true
+        seoTitle:
+          type: string
+          nullable: true
+        seoDescription:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/ProductStatus'
     UpsertProductVersionRequest:
       type: object
-      required: [name]
+      required:
+      - name
       properties:
-        name: { type: string }
-        displayOrder: { type: integer, default: 0 }
-        status: { type: string, enum: [ACTIVE, HIDDEN], default: ACTIVE }
+        name:
+          type: string
+        displayOrder:
+          type: integer
+          default: 0
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - HIDDEN
+          default: ACTIVE
     UpsertProductSkuRequest:
       type: object
-      required: [versionId, skuCode, name, salePrice, stockQuantity, status]
+      required:
+      - versionId
+      - skuCode
+      - name
+      - salePrice
+      - stockQuantity
+      - status
       properties:
-        versionId: { type: string, format: uuid }
-        skuCode: { type: string }
-        name: { type: string }
-        color: { type: string, nullable: true }
-        scent: { type: string, nullable: true }
-        type: { type: string, nullable: true }
-        originalPrice: { type: number, nullable: true }
-        salePrice: { type: number }
-        stockQuantity: { type: integer }
-        status: { $ref: '#/components/schemas/SkuStatus' }
+        versionId:
+          type: string
+          format: uuid
+        skuCode:
+          type: string
+        name:
+          type: string
+        color:
+          type: string
+          nullable: true
+        scent:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        originalPrice:
+          type: number
+          nullable: true
+        salePrice:
+          type: number
+        stockQuantity:
+          type: integer
+        status:
+          $ref: '#/components/schemas/SkuStatus'
     UpdateStockRequest:
       type: object
-      required: [stockQuantity]
+      required:
+      - stockQuantity
       properties:
-        stockQuantity: { type: integer, minimum: 0 }
-        note: { type: string, nullable: true }
+        stockQuantity:
+          type: integer
+          minimum: 0
+        note:
+          type: string
+          nullable: true
     UpdateOrderStatusRequest:
       type: object
-      required: [orderStatus]
+      required:
+      - orderStatus
       properties:
-        orderStatus: { $ref: '#/components/schemas/OrderStatus' }
-        note: { type: string, nullable: true }
+        orderStatus:
+          $ref: '#/components/schemas/OrderStatus'
+        note:
+          type: string
+          nullable: true
     UpdatePaymentStatusRequest:
       type: object
-      required: [paymentStatus]
+      required:
+      - paymentStatus
       properties:
-        paymentStatus: { $ref: '#/components/schemas/PaymentStatus' }
-        note: { type: string, nullable: true }
+        paymentStatus:
+          $ref: '#/components/schemas/PaymentStatus'
+        note:
+          type: string
+          nullable: true
     UpsertBlogPostRequest:
       type: object
-      required: [title, slug, content]
+      required:
+      - title
+      - slug
+      - content
       properties:
-        title: { type: string }
-        slug: { type: string }
-        excerpt: { type: string, nullable: true }
-        content: { type: string }
-        thumbnailUrl: { type: string, nullable: true }
-        seoTitle: { type: string, nullable: true }
-        seoDescription: { type: string, nullable: true }
-        status: { $ref: '#/components/schemas/ProductStatus' }
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+          nullable: true
+        content:
+          type: string
+        thumbnailUrl:
+          type: string
+          nullable: true
+        seoTitle:
+          type: string
+          nullable: true
+        seoDescription:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/ProductStatus'
     UpdateChatbotConfigRequest:
       type: object
       properties:
-        enabled: { type: boolean }
-        welcomeMessage: { type: string }
-        disclaimer: { type: string }
+        enabled:
+          type: boolean
+        welcomeMessage:
+          type: string
+        disclaimer:
+          type: string
         suggestedQuestions:
           type: array
-          items: { type: string }
-        fallbackMessage: { type: string }
+          items:
+            type: string
+        fallbackMessage:
+          type: string
     UpdateSiteSettingsRequest:
       type: object
       properties:
-        hotline: { type: string, nullable: true }
-        zaloUrl: { type: string, nullable: true }
-        facebookUrl: { type: string, nullable: true }
-        email: { type: string, nullable: true }
-        address: { type: string, nullable: true }
-        bankName: { type: string, nullable: true }
-        bankAccountName: { type: string, nullable: true }
-        bankAccountNumber: { type: string, nullable: true }
-        bankQrImageUrl: { type: string, nullable: true }
+        hotline:
+          type: string
+          nullable: true
+        zaloUrl:
+          type: string
+          nullable: true
+        facebookUrl:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        bankName:
+          type: string
+          nullable: true
+        bankAccountName:
+          type: string
+          nullable: true
+        bankAccountNumber:
+          type: string
+          nullable: true
+        bankQrImageUrl:
+          type: string
+          nullable: true
+    Role:
+      type: string
+      enum:
+      - USER
+      - ADMIN
+    AccountSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+        enabled:
+          type: boolean
+    CurrentUser:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountSummary'
+        profile:
+          $ref: '#/components/schemas/AccountProfile'
+    AccountProfile:
+      type: object
+      description: Profile data separated from accounts. accounts is used for login/security; profile stores user contact information. accountId is UUID.
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        contactEmail:
+          type: string
+          format: email
+          nullable: true
+        avatarUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateProfileRequest:
+      type: object
+      required:
+      - fullName
+      properties:
+        fullName:
+          type: string
+          maxLength: 100
+        phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        contactEmail:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        avatarUrl:
+          type: string
+          nullable: true
+    AccountAddress:
+      type: object
+      description: 'Shipping address using Vietnam two-level administrative model: province/city and ward/commune. No district
+        field.'
+      properties:
+        id:
+          type: string
+          format: uuid
+        accountId:
+          type: string
+          format: uuid
+        receiverName:
+          type: string
+        receiverPhone:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        provinceCity:
+          type: string
+          description: Tỉnh / Thành phố
+        wardCommune:
+          type: string
+          description: Phường / Xã
+        addressDetail:
+          type: string
+          description: Số nhà, tên đường, tòa nhà, ghi chú địa chỉ cụ thể
+        note:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpsertAddressRequest:
+      type: object
+      required:
+      - receiverName
+      - receiverPhone
+      - provinceCity
+      - wardCommune
+      - addressDetail
+      properties:
+        receiverName:
+          type: string
+          maxLength: 100
+        receiverPhone:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        provinceCity:
+          type: string
+          maxLength: 100
+          description: Tỉnh / Thành phố
+        wardCommune:
+          type: string
+          maxLength: 100
+          description: Phường / Xã
+        addressDetail:
+          type: string
+          maxLength: 255
+          description: Số nhà, tên đường, tòa nhà, địa chỉ cụ thể
+        note:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
+          default: false
+    ShippingAddressSnapshot:
+      type: object
+      description: Address snapshot stored on orders at checkout time. No district field.
+      properties:
+        receiverName:
+          type: string
+        receiverPhone:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+        provinceCity:
+          type: string
+        wardCommune:
+          type: string
+        addressDetail:
+          type: string
+        note:
+          type: string
+          nullable: true
+        fullAddress:
+          type: string
+          description: Formatted address for display, composed from addressDetail, wardCommune, provinceCity.
 security:
-  - bearerAuth: []
+- bearerAuth: []

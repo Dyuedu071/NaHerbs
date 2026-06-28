@@ -1,5 +1,5 @@
 -- =============================================================
--- NaHerbs Supabase PostgreSQL Schema v1
+-- NaHerbs Supabase PostgreSQL Schema v3 - UUID IDs
 -- File: 001_init_schema.sql
 -- Usage: Run manually in Supabase SQL Editor or via Supabase CLI.
 -- Important: This project does NOT use Flyway auto migration.
@@ -26,13 +26,7 @@ $$ language plpgsql;
 -- 2. Enum types
 -- =============================================================
 
-do $$ begin
-  create type naherb.admin_status as enum ('ACTIVE', 'DISABLED');
-exception when duplicate_object then null; end $$;
 
-do $$ begin
-  create type naherb.customer_status as enum ('ACTIVE', 'DISABLED');
-exception when duplicate_object then null; end $$;
 
 do $$ begin
   create type naherb.content_status as enum ('DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED');
@@ -79,62 +73,80 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 -- =============================================================
--- 3. Auth and users
+-- 3. Auth, profile and shipping address
 -- =============================================================
+-- accounts maps to vn.io.naherb.account.Account with UUID primary key.
+-- This table is for login/security only. Current Java entity may still contain `name`,
+-- so SQL keeps it until the entity is refactored. Business/customer data
+-- belongs to account_profiles and account_addresses.
+-- Java entity must use UUID id to match this schema.
 
-create table if not exists naherb.admin_users (
+create table if not exists naherb.accounts (
   id uuid primary key default gen_random_uuid(),
-  email varchar(255) not null unique,
-  password_hash varchar(255) not null,
-  full_name varchar(255) not null,
-  status naherb.admin_status not null default 'ACTIVE',
-  last_login_at timestamptz,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-drop trigger if exists trg_admin_users_updated_at on naherb.admin_users;
-create trigger trg_admin_users_updated_at
-before update on naherb.admin_users
-for each row execute function naherb.set_updated_at();
-
-create table if not exists naherb.customers (
-  id uuid primary key default gen_random_uuid(),
-  full_name varchar(255) not null,
-  phone varchar(30),
-  email varchar(255),
-  password_hash varchar(255) not null,
-  status naherb.customer_status not null default 'ACTIVE',
-  last_login_at timestamptz,
+  email varchar(254) not null unique,
+  password varchar(255) not null,
+  name varchar(100) not null,
+  role varchar(20) not null default 'USER',
+  enabled boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint customers_phone_or_email_chk check (phone is not null or email is not null),
-  constraint customers_phone_unique unique (phone),
-  constraint customers_email_unique unique (email)
+  constraint accounts_role_chk check (role in ('USER', 'ADMIN'))
 );
 
-drop trigger if exists trg_customers_updated_at on naherb.customers;
-create trigger trg_customers_updated_at
-before update on naherb.customers
+create index if not exists idx_accounts_role on naherb.accounts(role);
+create index if not exists idx_accounts_enabled on naherb.accounts(enabled);
+
+drop trigger if exists trg_accounts_updated_at on naherb.accounts;
+create trigger trg_accounts_updated_at
+before update on naherb.accounts
 for each row execute function naherb.set_updated_at();
 
-create table if not exists naherb.customer_addresses (
+-- Customer/admin profile information. For ADMIN, this can store display/contact info.
+-- For USER, this stores customer profile separate from login credentials.
+create table if not exists naherb.account_profiles (
   id uuid primary key default gen_random_uuid(),
-  customer_id uuid not null references naherb.customers(id) on delete cascade,
+  account_id uuid not null unique references naherb.accounts(id) on delete cascade,
+  full_name varchar(255),
+  phone varchar(30),
+  contact_email varchar(254),
+  avatar_url text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint account_profiles_phone_unique unique (phone),
+  constraint account_profiles_contact_email_unique unique (contact_email)
+);
+
+create index if not exists idx_account_profiles_account_id on naherb.account_profiles(account_id);
+create index if not exists idx_account_profiles_phone on naherb.account_profiles(phone);
+
+drop trigger if exists trg_account_profiles_updated_at on naherb.account_profiles;
+create trigger trg_account_profiles_updated_at
+before update on naherb.account_profiles
+for each row execute function naherb.set_updated_at();
+
+-- Vietnam administrative address model after two-level local government:
+-- Province/City -> Ward/Commune/Special zone. No district field.
+create table if not exists naherb.account_addresses (
+  id uuid primary key default gen_random_uuid(),
+  account_id uuid not null references naherb.accounts(id) on delete cascade,
   receiver_name varchar(255) not null,
   receiver_phone varchar(30) not null,
-  province varchar(255),
-  district varchar(255),
-  ward varchar(255),
+  receiver_email varchar(254),
+  province_code varchar(30),
+  province_name varchar(255) not null,
+  ward_code varchar(30),
+  ward_name varchar(255) not null,
   address_line text not null,
   is_default boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
-drop trigger if exists trg_customer_addresses_updated_at on naherb.customer_addresses;
-create trigger trg_customer_addresses_updated_at
-before update on naherb.customer_addresses
+create index if not exists idx_account_addresses_account_id on naherb.account_addresses(account_id);
+
+drop trigger if exists trg_account_addresses_updated_at on naherb.account_addresses;
+create trigger trg_account_addresses_updated_at
+before update on naherb.account_addresses
 for each row execute function naherb.set_updated_at();
 
 -- =============================================================
@@ -337,6 +349,7 @@ create table if not exists naherb.blog_post_products (
 
 create table if not exists naherb.leads (
   id uuid primary key default gen_random_uuid(),
+  account_id uuid references naherb.accounts(id) on delete set null,
   full_name varchar(255) not null,
   phone varchar(30) not null,
   email varchar(255),
@@ -353,6 +366,8 @@ create table if not exists naherb.leads (
   constraint leads_quantity_chk check (quantity is null or quantity > 0)
 );
 
+create index if not exists idx_leads_account_id on naherb.leads(account_id);
+
 drop trigger if exists trg_leads_updated_at on naherb.leads;
 create trigger trg_leads_updated_at
 before update on naherb.leads
@@ -364,10 +379,12 @@ for each row execute function naherb.set_updated_at();
 
 create table if not exists naherb.carts (
   id uuid primary key default gen_random_uuid(),
-  customer_id uuid not null unique references naherb.customers(id) on delete cascade,
+  account_id uuid not null unique references naherb.accounts(id) on delete cascade,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+create index if not exists idx_carts_account_id on naherb.carts(account_id);
 
 drop trigger if exists trg_carts_updated_at on naherb.carts;
 create trigger trg_carts_updated_at
@@ -399,7 +416,7 @@ for each row execute function naherb.set_updated_at();
 create table if not exists naherb.orders (
   id uuid primary key default gen_random_uuid(),
   order_code varchar(50) not null unique,
-  customer_id uuid not null references naherb.customers(id) on delete restrict,
+  account_id uuid not null references naherb.accounts(id) on delete restrict,
   status naherb.order_status not null default 'PENDING',
   payment_method naherb.payment_method not null,
   payment_status naherb.payment_status not null default 'UNPAID',
@@ -409,7 +426,12 @@ create table if not exists naherb.orders (
   total_amount numeric(12,2) not null,
   receiver_name varchar(255) not null,
   receiver_phone varchar(30) not null,
-  shipping_address text not null,
+  receiver_email varchar(254),
+  shipping_province_code varchar(30),
+  shipping_province_name varchar(255) not null,
+  shipping_ward_code varchar(30),
+  shipping_ward_name varchar(255) not null,
+  shipping_address_line text not null,
   customer_note text,
   admin_note text,
   cancelled_reason text,
@@ -418,7 +440,7 @@ create table if not exists naherb.orders (
   constraint orders_amount_chk check (subtotal_amount >= 0 and shipping_fee >= 0 and discount_amount >= 0 and total_amount >= 0)
 );
 
-create index if not exists idx_orders_customer_id on naherb.orders(customer_id);
+create index if not exists idx_orders_account_id on naherb.orders(account_id);
 create index if not exists idx_orders_status_payment on naherb.orders(status, payment_status);
 create index if not exists idx_orders_created_at on naherb.orders(created_at desc);
 
@@ -460,7 +482,7 @@ create table if not exists naherb.payments (
   transfer_content varchar(255),
   qr_media_id uuid references naherb.media_assets(id) on delete set null,
   customer_transfer_note text,
-  verified_by_admin_id uuid references naherb.admin_users(id) on delete set null,
+  verified_by_account_id uuid references naherb.accounts(id) on delete set null,
   verified_at timestamptz,
   rejected_reason text,
   created_at timestamptz not null default now(),
@@ -469,6 +491,7 @@ create table if not exists naherb.payments (
 );
 
 create index if not exists idx_payments_status on naherb.payments(status);
+create index if not exists idx_payments_verified_by_account_id on naherb.payments(verified_by_account_id);
 
 drop trigger if exists trg_payments_updated_at on naherb.payments;
 create trigger trg_payments_updated_at
@@ -495,7 +518,7 @@ create table if not exists naherb.chatbot_configs (
 create table if not exists naherb.chatbot_conversations (
   id uuid primary key default gen_random_uuid(),
   session_id varchar(255) not null,
-  customer_id uuid references naherb.customers(id) on delete set null,
+  account_id uuid references naherb.accounts(id) on delete set null,
   customer_name varchar(255),
   customer_phone varchar(30),
   source_page text,
@@ -508,6 +531,7 @@ create table if not exists naherb.chatbot_conversations (
 );
 
 create index if not exists idx_chatbot_conversations_session on naherb.chatbot_conversations(session_id);
+create index if not exists idx_chatbot_conversations_account_id on naherb.chatbot_conversations(account_id);
 create index if not exists idx_chatbot_conversations_created on naherb.chatbot_conversations(created_at desc);
 
 drop trigger if exists trg_chatbot_conversations_updated_at on naherb.chatbot_conversations;
