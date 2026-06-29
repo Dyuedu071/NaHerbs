@@ -3,70 +3,70 @@
 This checklist is generated from `docs/openapi.yml`.
 
 ## Health
-- [ ] `GET` /health - Health check
+- [ ] `GET` /health - Health check (@TuanAnh)
 ## SEO
-- [ ] `GET` /site-settings/public - Get public site settings
-- [ ] `GET` /seo/sitemap-data - Data for Next.js sitemap.ts
+- [ ] `GET` /site-settings/public - Get public site settings (@Duy)
+- [ ] `GET` /seo/sitemap-data - Data for Next.js sitemap.ts (@Duy)
 ## Public Products
-- [ ] `GET` /product-categories - List published product categories
-- [ ] `GET` /products - List published products
-- [ ] `GET` /products/{slug} - Get product detail by slug
+- [ ] `GET` /product-categories - List published product categories (@Chien)
+- [ ] `GET` /products - List published products (@Chien)
+- [ ] `GET` /products/{slug} - Get product detail by slug (@Chien)
 ## Public Blog
-- [ ] `GET` /blog-posts - List published blog posts
-- [ ] `GET` /blog-posts/{slug} - Get blog post detail
+- [ ] `GET` /blog-posts - List published blog posts (@Duy)
+- [ ] `GET` /blog-posts/{slug} - Get blog post detail (@Duy)
 ## Customer Auth
 - [x] `POST` /auth/register - Register customer account and initialize profile
 - [x] `POST` /auth/login - Login customer
 ## Customer Profile
 - [x] `GET` /auth/me - Get current account and profile
-- [ ] `GET` /account/profile - Get current account profile
-- [ ] `PUT` /account/profile - Update current account profile
+- [ ] `GET` /account/profile - Get current account profile (@TuanAnh)
+- [ ] `PUT` /account/profile - Update current account profile (@TuanAnh)
 ## Cart
-- [ ] `GET` /cart - Get current customer's cart
-- [ ] `DELETE` /cart - Clear cart
-- [ ] `POST` /cart/items - Add item to cart
-- [ ] `PATCH` /cart/items/{itemId} - Update cart item quantity
-- [ ] `DELETE` /cart/items/{itemId} - Remove cart item
+- [ ] `GET` /cart - Get current customer's cart (@Hoang)
+- [ ] `DELETE` /cart - Clear cart (@Hoang)
+- [ ] `POST` /cart/items - Add item to cart (@Hoang)
+- [ ] `PATCH` /cart/items/{itemId} - Update cart item quantity (@Hoang)
+- [ ] `DELETE` /cart/items/{itemId} - Remove cart item (@Hoang)
 ## Checkout
-- [ ] `POST` /checkout - Create order from cart
+- [ ] `POST` /checkout - Create order from cart (@Hoang)
 ## Customer Orders
-- [ ] `GET` /orders/my - List current customer's orders
-- [ ] `GET` /orders/my/{orderId} - Get current customer's order detail
+- [ ] `GET` /orders/my - List current customer's orders (@Hoang)
+- [ ] `GET` /orders/my/{orderId} - Get current customer's order detail (@Hoang)
 ## Chatbot
-- [ ] `GET` /chatbot/config/public - Get public chatbot config
-- [ ] `POST` /chatbot/conversations - Create chatbot conversation
-- [ ] `POST` /chatbot/messages - Send chatbot message
+- [ ] `GET` /chatbot/config/public - Get public chatbot config (@TuanAnh)
+- [ ] `POST` /chatbot/conversations - Create chatbot conversation (@TuanAnh)
+- [ ] `POST` /chatbot/messages - Send chatbot message (@TuanAnh)
 ## Admin Auth
 - [x] `POST` /admin/auth/login - Login admin
 ## Admin Products
-- [ ] `GET` /admin/products - List products for admin
-- [ ] `POST` /admin/products - Create product
-- [ ] `PUT` /admin/products/{productId} - Update product
-- [ ] `DELETE` /admin/products/{productId} - Archive product
-- [ ] `POST` /admin/products/{productId}/versions - Create product version
-- [ ] `POST` /admin/products/{productId}/skus - Create product SKU
-- [ ] `PUT` /admin/product-skus/{skuId} - Update SKU
-- [ ] `PATCH` /admin/product-skus/{skuId}/stock - Update SKU stock
+- [ ] `GET` /admin/products - List products for admin (@Chien)
+- [ ] `POST` /admin/products - Create product (@Chien)
+- [ ] `PUT` /admin/products/{productId} - Update product (@Chien)
+- [ ] `DELETE` /admin/products/{productId} - Archive product (@Chien)
+- [ ] `POST` /admin/products/{productId}/versions - Create product version (@Chien)
+- [ ] `POST` /admin/products/{productId}/skus - Create product SKU (@Chien)
+- [ ] `PUT` /admin/product-skus/{skuId} - Update SKU (@Chien)
+- [ ] `PATCH` /admin/product-skus/{skuId}/stock - Update SKU stock (@Chien)
 ## Admin Orders
-- [ ] `GET` /admin/orders - List orders for admin
-- [ ] `GET` /admin/orders/{orderId} - Admin get order detail
-- [ ] `PATCH` /admin/orders/{orderId}/status - Update order status
-- [ ] `PATCH` /admin/orders/{orderId}/payment-status - Manually update payment status, used for QR confirmation
+- [ ] `GET` /admin/orders - List orders for admin (@Hoang)
+- [ ] `GET` /admin/orders/{orderId} - Admin get order detail (@Hoang)
+- [ ] `PATCH` /admin/orders/{orderId}/status - Update order status (@Hoang)
+- [ ] `PATCH` /admin/orders/{orderId}/payment-status - Manually update payment status, used for QR confirmation (@Hoang)
 ## Admin Blog
-- [ ] `GET` /admin/blog-posts - List blog posts admin
-- [ ] `POST` /admin/blog-posts - Create blog post
+- [ ] `GET` /admin/blog-posts - List blog posts admin (@Duy)
+- [ ] `POST` /admin/blog-posts - Create blog post (@Duy)
 ## Admin Chatbot
-- [ ] `GET` /admin/chatbot/config - Get chatbot config
-- [ ] `PUT` /admin/chatbot/config - Update chatbot config
+- [ ] `GET` /admin/chatbot/config - Get chatbot config (@TuanAnh)
+- [ ] `PUT` /admin/chatbot/config - Update chatbot config (@TuanAnh)
 ## Admin Settings
-- [ ] `GET` /admin/site-settings - Get site settings
-- [ ] `PUT` /admin/site-settings - Update site settings
+- [ ] `GET` /admin/site-settings - Get site settings (@Duy)
+- [ ] `PUT` /admin/site-settings - Update site settings (@Duy)
 ## Customer Addresses
-- [ ] `GET` /account/addresses - List current account shipping addresses
-- [ ] `POST` /account/addresses - Create shipping address for current account
-- [ ] `PUT` /account/addresses/{addressId} - Update shipping address
-- [ ] `DELETE` /account/addresses/{addressId} - Delete shipping address
-- [ ] `PATCH` /account/addresses/{addressId}/default - Set address as default
+- [ ] `GET` /account/addresses - List current account shipping addresses (@TuanAnh)
+- [ ] `POST` /account/addresses - Create shipping address for current account (@TuanAnh)
+- [ ] `PUT` /account/addresses/{addressId} - Update shipping address (@TuanAnh)
+- [ ] `DELETE` /account/addresses/{addressId} - Delete shipping address (@TuanAnh)
+- [ ] `PATCH` /account/addresses/{addressId}/default - Set address as default (@TuanAnh)
 ## auth
 - [x] `POST` /auth/google - Login or Register with Google
 - [x] `POST` /auth/register-otp - Send OTP for registration
