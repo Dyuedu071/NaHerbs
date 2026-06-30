@@ -3,7 +3,7 @@
 This checklist is generated from `docs/openapi.yml`.
 
 ## Health
-- [ ] `GET` /health - Health check (@TuanAnh)
+- [x] `GET` /health - Health check (@TuanAnh)
 ## SEO
 - [ ] `GET` /site-settings/public - Get public site settings (@Duy)
 - [ ] `GET` /seo/sitemap-data - Data for Next.js sitemap.ts (@Duy)
@@ -19,8 +19,8 @@ This checklist is generated from `docs/openapi.yml`.
 - [x] `POST` /auth/login - Login customer
 ## Customer Profile
 - [x] `GET` /auth/me - Get current account and profile
-- [ ] `GET` /account/profile - Get current account profile (@TuanAnh)
-- [ ] `PUT` /account/profile - Update current account profile (@TuanAnh)
+- [x] `GET` /account/profile - Get current account profile (@TuanAnh)
+- [x] `PUT` /account/profile - Update current account profile (@TuanAnh)
 ## Cart
 - [ ] `GET` /cart - Get current customer's cart (@Hoang)
 - [ ] `DELETE` /cart - Clear cart (@Hoang)
@@ -33,9 +33,9 @@ This checklist is generated from `docs/openapi.yml`.
 - [ ] `GET` /orders/my - List current customer's orders (@Hoang)
 - [ ] `GET` /orders/my/{orderId} - Get current customer's order detail (@Hoang)
 ## Chatbot
-- [ ] `GET` /chatbot/config/public - Get public chatbot config (@TuanAnh)
-- [ ] `POST` /chatbot/conversations - Create chatbot conversation (@TuanAnh)
-- [ ] `POST` /chatbot/messages - Send chatbot message (@TuanAnh)
+- [x] `GET` /chatbot/config/public - Get public chatbot config (@TuanAnh)
+- [x] `POST` /chatbot/conversations - Create chatbot conversation (@TuanAnh)
+- [x] `POST` /chatbot/messages - Send chatbot message (@TuanAnh)
 ## Admin Auth
 - [x] `POST` /admin/auth/login - Login admin
 ## Admin Products
@@ -56,17 +56,17 @@ This checklist is generated from `docs/openapi.yml`.
 - [ ] `GET` /admin/blog-posts - List blog posts admin (@Duy)
 - [ ] `POST` /admin/blog-posts - Create blog post (@Duy)
 ## Admin Chatbot
-- [ ] `GET` /admin/chatbot/config - Get chatbot config (@TuanAnh)
-- [ ] `PUT` /admin/chatbot/config - Update chatbot config (@TuanAnh)
+- [x] `GET` /admin/chatbot/config - Get chatbot config (@TuanAnh)
+- [x] `PUT` /admin/chatbot/config - Update chatbot config (@TuanAnh)
 ## Admin Settings
 - [ ] `GET` /admin/site-settings - Get site settings (@Duy)
 - [ ] `PUT` /admin/site-settings - Update site settings (@Duy)
 ## Customer Addresses
-- [ ] `GET` /account/addresses - List current account shipping addresses (@TuanAnh)
-- [ ] `POST` /account/addresses - Create shipping address for current account (@TuanAnh)
-- [ ] `PUT` /account/addresses/{addressId} - Update shipping address (@TuanAnh)
-- [ ] `DELETE` /account/addresses/{addressId} - Delete shipping address (@TuanAnh)
-- [ ] `PATCH` /account/addresses/{addressId}/default - Set address as default (@TuanAnh)
+- [x] `GET` /account/addresses - List current account shipping addresses (@TuanAnh)
+- [x] `POST` /account/addresses - Create shipping address for current account (@TuanAnh)
+- [x] `PUT` /account/addresses/{addressId} - Update shipping address (@TuanAnh)
+- [x] `DELETE` /account/addresses/{addressId} - Delete shipping address (@TuanAnh)
+- [x] `PATCH` /account/addresses/{addressId}/default - Set address as default (@TuanAnh)
 ## auth
 - [x] `POST` /auth/google - Login or Register with Google
 - [x] `POST` /auth/register-otp - Send OTP for registration

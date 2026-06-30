@@ -41,6 +41,30 @@ public class AccountAddress extends BaseEntity {
     @Column(name = "address_line", nullable = false, columnDefinition = "TEXT")
     private String addressLine;
 
+    @Column(columnDefinition = "TEXT")
+    private String note;
+
     @Column(name = "is_default", nullable = false)
     private boolean isDefault = false;
+
+    public AccountAddress(
+            Account account,
+            String receiverName,
+            String receiverPhone,
+            String receiverEmail,
+            String provinceName,
+            String wardName,
+            String addressLine,
+            String note,
+            boolean isDefault) {
+        this.account = account;
+        this.receiverName = receiverName;
+        this.receiverPhone = receiverPhone;
+        this.receiverEmail = receiverEmail;
+        this.provinceName = provinceName;
+        this.wardName = wardName;
+        this.addressLine = addressLine;
+        this.note = note;
+        this.isDefault = isDefault;
+    }
 }

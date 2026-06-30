@@ -901,6 +901,68 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/Ok'
+  /admin/chatbot/knowledge:
+    get:
+      tags:
+      - Admin Chatbot
+      summary: List chatbot knowledge markdown files
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+    post:
+      tags:
+      - Admin Chatbot
+      summary: Upload chatbot knowledge markdown file
+      parameters:
+      - name: replace
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          $ref: '#/components/responses/Ok'
+    delete:
+      tags:
+      - Admin Chatbot
+      summary: Delete chatbot knowledge file by source path
+      parameters:
+      - name: sourcePath
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+  /admin/chatbot/knowledge/{documentId}:
+    delete:
+      tags:
+      - Admin Chatbot
+      summary: Delete chatbot knowledge document by id
+      parameters:
+      - name: documentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
   /admin/site-settings:
     get:
       tags:
@@ -952,6 +1014,35 @@ paths:
       responses:
         '200':
           description: Updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/AccountProfile'
+  /account/profile/avatar:
+    post:
+      tags:
+      - Customer Profile
+      summary: Upload profile avatar image
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Avatar uploaded
           content:
             application/json:
               schema:
@@ -2002,6 +2093,59 @@ components:
           items:
             type: string
         fallbackMessage:
+          type: string
+    KnowledgeDocumentSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+        fileName:
+          type: string
+        sourcePath:
+          type: string
+        title:
+          type: string
+        sourceType:
+          type: string
+          enum:
+          - SEED
+          - UPLOAD
+          - BLOG
+          - PRODUCT
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - PUBLISHED
+          - ARCHIVED
+        chunkCount:
+          type: integer
+          format: int64
+        embeddedChunkCount:
+          type: integer
+          format: int64
+        indexedAt:
+          type: string
+          format: date-time
+          nullable: true
+        fileSizeBytes:
+          type: integer
+          format: int64
+          nullable: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+    KnowledgeUploadResult:
+      type: object
+      properties:
+        document:
+          $ref: '#/components/schemas/KnowledgeDocumentSummary'
+        ingestStarted:
+          type: boolean
+        message:
           type: string
     UpdateSiteSettingsRequest:
       type: object
