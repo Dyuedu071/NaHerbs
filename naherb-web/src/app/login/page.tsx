@@ -16,8 +16,13 @@ export default function Login() {
 
   const { mutate: loginMutate, isPending } = usePostAuthLogin({
     mutation: {
-      onSuccess: () => {
-        router.push('/');
+      onSuccess: (data: any) => {
+        const userRole = data?.role || data?.account?.role || data?.data?.user?.account?.role;
+        if (userRole === 'ADMIN') {
+          router.push('/admin/dashboard');
+        } else {
+          router.push('/');
+        }
       },
       onError: (err: unknown) => {
         console.error(err);
@@ -31,8 +36,13 @@ export default function Login() {
   // Mutation for Google Login
   const { mutate: googleLoginMutate, isPending: isGooglePending } = usePostAuthGoogle({
     mutation: {
-      onSuccess: () => {
-        router.push('/');
+      onSuccess: (data: any) => {
+        const userRole = data?.role || data?.account?.role || data?.data?.user?.account?.role;
+        if (userRole === 'ADMIN') {
+          router.push('/admin/dashboard');
+        } else {
+          router.push('/');
+        }
       },
       onError: (err: unknown) => {
         console.error(err);

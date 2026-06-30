@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NaHerbs - Cẩm nang Sức khỏe</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Merriweather:wght@400;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "success-bg": "#E7F0E4",
+                        "surface": "#fff9ed",
+                        "secondary-fixed": "#c7eccf",
+                        "tertiary-fixed": "#ffdbcb",
+                        "tertiary": "#7e3d18",
+                        "on-surface": "#1d1c14",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#c7eccf",
+                        "primary-fixed": "#c8ecc8",
+                        "on-tertiary-fixed": "#341100",
+                        "text-muted": "#6F6A61",
+                        "inverse-primary": "#acd0ad",
+                        "herbal-beige": "#E8D8BD",
+                        "earth-brown": "#8A6A4F",
+                        "on-secondary-fixed-variant": "#2e4d39",
+                        "on-primary-container": "#ccf0cc",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#9c542d",
+                        "outline": "#737971",
+                        "on-error": "#ffffff",
+                        "error-text": "#B94A3A",
+                        "surface-container": "#f3ede1",
+                        "primary": "#37563b",
+                        "outline-variant": "#c2c8bf",
+                        "on-surface-variant": "#424841",
+                        "surface-container-high": "#ede8dc",
+                        "on-secondary-fixed": "#012110",
+                        "primary-fixed-dim": "#acd0ad",
+                        "on-primary-fixed": "#03210b",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#733510",
+                        "inverse-on-surface": "#f6f0e4",
+                        "surface-dim": "#dfd9ce",
+                        "error-bg": "#FBEAE5",
+                        "primary-container": "#4f6f52",
+                        "surface-tint": "#466649",
+                        "inverse-surface": "#333028",
+                        "background": "#fff9ed",
+                        "soft-sage": "#A8BFA3",
+                        "surface-container-low": "#f9f3e7",
+                        "tertiary-fixed-dim": "#ffb692",
+                        "on-secondary-container": "#4b6c55",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e8e2d6",
+                        "text-main": "#2B2B2B",
+                        "secondary": "#45664f",
+                        "secondary-fixed-dim": "#abcfb4",
+                        "surface-container-highest": "#e8e2d6",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fff9ed",
+                        "on-tertiary-container": "#ffe1d3",
+                        "on-primary-fixed-variant": "#2f4e33",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1d1c14",
+                        "border-warm": "#DDD0BC",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "2xl": "1.5rem" // 24px requirement
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "xs": "8px",
+                        "sm": "16px",
+                        "lg": "48px",
+                        "md": "24px",
+                        "container-max": "1240px",
+                        "xl": "80px",
+                        "gutter": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Merriweather", "serif"],
+                        "display-lg-mobile": ["Merriweather", "serif"],
+                        "headline-lg-mobile": ["Merriweather", "serif"],
+                        "label-md": ["Inter", "sans-serif"],
+                        "display-lg": ["Merriweather", "serif"],
+                        "body-md": ["Inter", "sans-serif"],
+                        "caption": ["Inter", "sans-serif"],
+                        "price-display": ["Inter", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "headline-md": ["Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["40px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-md": ["15px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-lg": ["56px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "price-display": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.35", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.text-main');
+        }
+
+        .shadow-level-1 {
+            box-shadow: 0 4px 14px 0 rgba(55, 86, 59, 0.05);
+            /* Tinted with primary */
+        }
+
+        .shadow-level-2 {
+            box-shadow: 0 8px 24px 0 rgba(55, 86, 59, 0.08);
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen flex flex-col font-body-md text-body-md text-on-surface">
+    <!-- TopNavBar -->
+    <header
+        class="fixed top-0 w-full z-50 bg-surface/88 backdrop-blur-md shadow-sm dark:shadow-none dark:bg-on-surface/88 transition-all duration-300">
+        <div class="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
+            <!-- Brand -->
+            <a class="font-display-lg text-display-lg text-primary dark:text-primary-fixed-dim tracking-tight"
+                href="#">NaHerbs</a>
+            <!-- Navigation Links (Desktop) -->
+            <nav class="hidden md:flex gap-gutter items-center">
+                <a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:scale-105 transition-transform duration-200"
+                    href="#">Home</a>
+                <a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:scale-105 transition-transform duration-200"
+                    href="#">Products</a>
+                <!-- Active State -->
+                <a class="font-label-md text-label-md text-primary dark:text-primary-fixed-dim font-bold relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-soft-sage after:rounded-full hover:scale-105 transition-transform duration-200"
+                    href="#">Blog</a>
+                <a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:scale-105 transition-transform duration-200"
+                    href="#">About</a>
+                <a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim hover:scale-105 transition-transform duration-200"
+                    href="#">Contact</a>
+            </nav>
+            <!-- Actions -->
+            <div class="flex items-center gap-md">
+                <a class="hidden md:inline-flex items-center justify-center h-12 px-8 rounded-full bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container hover:shadow-level-2 hover:-translate-y-[2px] transition-all duration-200"
+                    href="#">
+                    Tư vấn ngay
+                </a>
+                <button aria-label="shopping_cart"
+                    class="w-12 h-12 flex items-center justify-center rounded-full text-primary hover:bg-surface-variant transition-colors">
+                    <span class="material-symbols-outlined">shopping_cart</span>
+                </button>
+                <button aria-label="account_circle"
+                    class="w-12 h-12 flex items-center justify-center rounded-full text-primary hover:bg-surface-variant transition-colors">
+                    <span class="material-symbols-outlined">account_circle</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="flex-grow pt-20"> <!-- Offset for fixed header -->
+        <!-- Hero Section -->
+        <section class="w-full bg-surface py-xl px-gutter">
+            <div class="max-w-container-max mx-auto text-center">
+                <h1 class="font-display-lg text-display-lg text-primary mb-md">Cẩm nang Sức khỏe NaHerbs</h1>
+                <p class="font-body-lg text-body-lg text-text-muted max-w-2xl mx-auto">
+                    Khám phá những bí quyết chăm sóc sức khỏe tự nhiên, từ các bài thuốc dân gian đến mẹo vặt hàng ngày
+                    với thảo dược thiên nhiên, giúp bạn duy trì một lối sống cân bằng và an lành.
+                </p>
+            </div>
+        </section>
+        <!-- Featured Article & Search/Filter Section -->
+        <section class="max-w-container-max mx-auto px-gutter pb-xl">
+            <!-- Search & Filters -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-md mb-xl">
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-xs">
+                    <button
+                        class="px-6 py-3 rounded-full font-label-md text-label-md bg-primary text-on-primary transition-all duration-200 shadow-level-1">Tất
+                        cả</button>
+                    <button
+                        class="px-6 py-3 rounded-full font-label-md text-label-md bg-surface border border-border-warm text-secondary hover:border-primary hover:text-primary transition-all duration-200 shadow-level-1">Sức
+                        khỏe</button>
+                    <button
+                        class="px-6 py-3 rounded-full font-label-md text-label-md bg-surface border border-border-warm text-secondary hover:border-primary hover:text-primary transition-all duration-200 shadow-level-1">Mẹo
+                        thảo dược</button>
+                    <button
+                        class="px-6 py-3 rounded-full font-label-md text-label-md bg-surface border border-border-warm text-secondary hover:border-primary hover:text-primary transition-all duration-200 shadow-level-1">Chăm
+                        sóc tại nhà</button>
+                </div>
+                <!-- Search -->
+                <div class="relative w-full md:w-80 group">
+                    <input
+                        class="w-full h-12 pl-12 pr-4 rounded-full bg-surface border border-border-warm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all duration-200 font-body-md text-body-md placeholder-text-muted shadow-level-1 group-hover:shadow-level-2"
+                        placeholder="Tìm kiếm bài viết..." type="text" />
+                    <span
+                        class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-primary transition-colors">search</span>
+                </div>
+            </div>
+            <!-- Featured Article Bento/Glassmorphism style -->
+            <div class="relative rounded-2xl overflow-hidden shadow-level-2 group cursor-pointer h-[500px] mb-xl">
+                <!-- Image -->
+                <div class="absolute inset-0 bg-cover bg-center w-full h-full transition-transform duration-700 group-hover:scale-105"
+                    data-alt="A serene, high-quality photograph of fresh herbal ingredients like mint, chamomile, and ginger arranged neatly on a rustic wooden table, bathed in soft, natural morning light, conveying a sense of organic wellness and modern natural health aesthetics."
+                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKxQEnWFCUbEvDghL5pCA9LdYNK29ahy831jKqQ-QWXeHrw1QV2_uWriBTiI4KYgoClZKdrDbbSmLRInnWJ07NHHtPmNfs9ldnYoDWpQzyIRuLPQHad3P0qVcQ7rPj7Z2NzJAGuT-Iw2zARUQ3K-6pCjAau4vGfIpZVFV5uMmGx0Iq9c4D0LbNIRDp8kU1BVVP8JY1VOG2qFsK5ZiZkZl3gXN1_oWDyoeD8Y7Hq8P2BSszu4n6F53ycJfmQpNblMk1VsdJ-Mx2GTQ')">
+                </div>
+                <!-- Glass Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-on-surface/30 to-transparent">
+                </div>
+                <!-- Content -->
+                <div class="absolute bottom-0 left-0 p-lg w-full md:w-2/3">
+                    <span
+                        class="inline-block px-4 py-1.5 bg-success-bg/90 backdrop-blur-sm text-primary rounded-full font-label-md text-label-md mb-md">Bài
+                        viết nổi bật</span>
+                    <h2
+                        class="font-headline-lg text-headline-lg text-on-primary mb-md group-hover:text-secondary-fixed transition-colors">
+                        7 Loại Thảo Dược Giúp Cải Thiện Giấc Ngủ Tự Nhiên</h2>
+                    <p class="font-body-md text-body-md text-on-primary/90 mb-md line-clamp-2">Giấc ngủ ngon là nền tảng
+                        của một sức khỏe tốt. Khám phá cách sử dụng hoa cúc, tâm sen, và các loại thảo dược khác để thư
+                        giãn hệ thần kinh, mang lại giấc ngủ sâu và trọn vẹn hơn mỗi đêm.</p>
+                    <button
+                        class="inline-flex items-center gap-xs font-label-md text-label-md text-on-primary hover:text-secondary-fixed transition-colors">
+                        Xem thêm <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Blog Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+                <!-- Card 1 -->
+                <article
+                    class="bg-surface rounded-2xl overflow-hidden shadow-level-1 border border-herbal-beige hover:shadow-level-2 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+                    <div class="relative w-full pt-[56.25%] overflow-hidden">
+                        <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            data-alt="A macro shot of a warm cup of herbal tea emitting soft steam, placed next to a fresh aloe vera leaf on a clean marble surface. The lighting is bright and airy, reflecting a modern, minimalist organic skincare routine."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC50KLWUXzNFDb9gJRoAMMuaB-uMM1GXAYuINlPLwU_hSiSD205DmAfjdwMHwnb2bx0C2C_IXdCQmYelRb3JwPjvgdA_mziLk_nvay1yV8zb7UBSPZ_BwVUT9dZrBYeSuq9ahQ36S2CbhKJ7VGl4z0mKf47EiFyuw-zEGmjjiaPzePmAkxYR6UklNdLBBsdvvfcdK3qP4Xdn7zbuSjhBdTnPffSYYg_ru-PwZW37A_c5V6RHF2mzxvBhLirDXOwWUO1YdCEqH41qcg" />
+                        <div
+                            class="absolute top-4 left-4 px-3 py-1 bg-surface/90 backdrop-blur-sm rounded-full font-caption text-caption text-primary">
+                            Sức khỏe</div>
+                    </div>
+                    <div class="p-md flex flex-col flex-grow">
+                        <time class="font-caption text-caption text-text-muted mb-xs block">24 Tháng 10, 2024</time>
+                        <h3
+                            class="font-headline-md text-headline-md text-primary mb-sm line-clamp-2 group-hover:text-earth-brown transition-colors">
+                            Công Dụng Bất Ngờ Của Nha Đam Trong Việc Phục Hồi Dạ Dày</h3>
+                        <p class="font-body-md text-body-md text-text-muted line-clamp-3 mb-md flex-grow">Không chỉ làm
+                            đẹp da, nha đam còn chứa nhiều enzyme giúp hỗ trợ tiêu hóa, làm dịu niêm mạc dạ dày và giảm
+                            thiểu triệu chứng trào ngược axit hiệu quả.</p>
+                        <a class="inline-flex items-center gap-xs font-label-md text-label-md text-earth-brown hover:text-primary transition-colors mt-auto"
+                            href="#">
+                            Đọc tiếp <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
+                        </a>
+                    </div>
+                </article>
+                <!-- Card 2 -->
+                <article
+                    class="bg-surface rounded-2xl overflow-hidden shadow-level-1 border border-herbal-beige hover:shadow-level-2 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+                    <div class="relative w-full pt-[56.25%] overflow-hidden">
+                        <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            data-alt="A beautifully styled kitchen counter showing a mortar and pestle grinding fresh turmeric and black pepper. Warm, golden sunlight highlights the vibrant orange of the turmeric, emphasizing natural healing and traditional remedies in a modern setting."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAi7FUNx9v5JkXavr2yIRJtG4ZRRj6RZmunAr7FJPvqf7vDm8V4CtRKnFZ7EokMzxjjkO0xRVM1vfADtROQ0den2OBvTBYsU_-Y49hUJlFW7LSjxccUX9NDZrXub9KBrL5s7aBLWGI0_cYriFzXP0Bas6t43XVIZUv0XwAAhNQSjJ3LRf5wGq2eklO8Mplg2eW2II3N4C5YnO23eH9DI8FlBgvHZZmMrFxsl-sZznGCYSSb8NUd04ZZz91jpzhlXHZKKjhfrdSeXvM" />
+                        <div
+                            class="absolute top-4 left-4 px-3 py-1 bg-surface/90 backdrop-blur-sm rounded-full font-caption text-caption text-primary">
+                            Mẹo thảo dược</div>
+                    </div>
+                    <div class="p-md flex flex-col flex-grow">
+                        <time class="font-caption text-caption text-text-muted mb-xs block">20 Tháng 10, 2024</time>
+                        <h3
+                            class="font-headline-md text-headline-md text-primary mb-sm line-clamp-2 group-hover:text-earth-brown transition-colors">
+                            Cách Tối Ưu Hóa Khả Năng Hấp Thụ Nghệ (Curcumin)</h3>
+                        <p class="font-body-md text-body-md text-text-muted line-clamp-3 mb-md flex-grow">Nghệ là một
+                            chất chống viêm tuyệt vời, nhưng cơ thể rất khó hấp thụ. Hãy tìm hiểu lý do tại sao bạn luôn
+                            nên kết hợp nghệ với hạt tiêu đen và một chút chất béo lành mạnh.</p>
+                        <a class="inline-flex items-center gap-xs font-label-md text-label-md text-earth-brown hover:text-primary transition-colors mt-auto"
+                            href="#">
+                            Đọc tiếp <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
+                        </a>
+                    </div>
+                </article>
+                <!-- Card 3 -->
+                <article
+                    class="bg-surface rounded-2xl overflow-hidden shadow-level-1 border border-herbal-beige hover:shadow-level-2 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+                    <div class="relative w-full pt-[56.25%] overflow-hidden">
+                        <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            data-alt="A person's hands gently massaging a soothing botanical balm onto their neck, with out-of-focus eucalyptus branches in the background. Soft, diffused lighting creates a calm, spa-like atmosphere consistent with a premium wellness brand."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC45qYqKpI4JFo1cag_Cpxv44_J-hFTlbQ3LkTGIsF7kR-nud_Q3SjcTaZmslJ5lO9PXJHWCv1NTKp8B_CHF4PjKMDG6Z_oZaq3C6LJGgpP31dyYTJY3DohfXuMNejQe0WaL7kSoFlDS6Ieo9SR7QgHid44l8guUO-svE691-YoTbvCB7zOq-O9mCvLjdntt0KO7rR1J9Ht_RhkL79-4gtmR2vgAXoCaUltyjVHqHbLKOp0VijywfNl9VQgRzqgW81Rne8-pisnT08" />
+                        <div
+                            class="absolute top-4 left-4 px-3 py-1 bg-surface/90 backdrop-blur-sm rounded-full font-caption text-caption text-primary">
+                            Chăm sóc tại nhà</div>
+                    </div>
+                    <div class="p-md flex flex-col flex-grow">
+                        <time class="font-caption text-caption text-text-muted mb-xs block">15 Tháng 10, 2024</time>
+                        <h3
+                            class="font-headline-md text-headline-md text-primary mb-sm line-clamp-2 group-hover:text-earth-brown transition-colors">
+                            Massage Tinh Dầu Bạch Đàn Giảm Đau Cổ Vai Gáy</h3>
+                        <p class="font-body-md text-body-md text-text-muted line-clamp-3 mb-md flex-grow">Hướng dẫn chi
+                            tiết cách tự xoa bóp tại nhà với tinh dầu bạch đàn và dầu nền để làm giãn cơ, giảm căng
+                            thẳng sau một ngày dài làm việc trước máy tính.</p>
+                        <a class="inline-flex items-center gap-xs font-label-md text-label-md text-earth-brown hover:text-primary transition-colors mt-auto"
+                            href="#">
+                            Đọc tiếp <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
+                        </a>
+                    </div>
+                </article>
+                <!-- Card 4 -->
+                <article
+                    class="bg-surface rounded-2xl overflow-hidden shadow-level-1 border border-herbal-beige hover:shadow-level-2 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+                    <div class="relative w-full pt-[56.25%] overflow-hidden">
+                        <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            data-alt="A flat lay composition of various dried herbs, star anise, and cinnamon sticks neatly organized in small white ceramic bowls on a light beige textured background. The aesthetic is clean, modern, and earthy, emphasizing botanical ingredients."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHLoCLuaqIXRJ4BognbH4rMefogERzVvSBWR4dHrGS0XWrrM0RnAvbsVYxLm4woR6FTm_WjDT9n__GV5fZAgFVrm74psthK2DG96mZzCRDsS9ab66jkrBar0QfBdRN4z0iEyGhsReA2wEgAMvvDQp6oMsdtbmMzs8BKNsIYYZVZWlUF3Ynh2Y2YVHLTIrYNrOP5kwH5t63XgaTthOoVAJNwZFejPBCi_l24dWUARr_hgPiYi7_g4GDCaxtlW9qbAB0RjFZV8Z4QHc" />
+                        <div
+                            class="absolute top-4 left-4 px-3 py-1 bg-surface/90 backdrop-blur-sm rounded-full font-caption text-caption text-primary">
+                            Sức khỏe</div>
+                    </div>
+                    <div class="p-md flex flex-col flex-grow">
+                        <time class="font-caption text-caption text-text-muted mb-xs block">10 Tháng 10, 2024</time>
+                        <h3
+                            class="font-headline-md text-headline-md text-primary mb-sm line-clamp-2 group-hover:text-earth-brown transition-colors">
+                            Gia Vị Mùa Đông: Tăng Cường Miễn Dịch Tự Nhiên</h3>
+                        <p class="font-body-md text-body-md text-text-muted line-clamp-3 mb-md flex-grow">Bổ sung quế,
+                            hồi và gừng vào thực đơn hàng ngày không chỉ làm tăng hương vị món ăn mà còn là tấm khiên
+                            vững chắc bảo vệ hệ miễn dịch trong những ngày chuyển mùa.</p>
+                        <a class="inline-flex items-center gap-xs font-label-md text-label-md text-earth-brown hover:text-primary transition-colors mt-auto"
+                            href="#">
+                            Đọc tiếp <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
+                        </a>
+                    </div>
+                </article>
+                <!-- Card 5 -->
+                <article
+                    class="bg-surface rounded-2xl overflow-hidden shadow-level-1 border border-herbal-beige hover:shadow-level-2 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+                    <div class="relative w-full pt-[56.25%] overflow-hidden">
+                        <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            data-alt="A close up of a steaming bowl of herbal soup with floating goji berries, dates, and thinly sliced ginger. The setting is cozy, with a warm cream ceramic bowl sitting on a simple wooden trivet, illuminated by soft natural light."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWRSCpRKRUQoWOBEwTH7fusjoI8OSzMRnQpqG6Lje_oYOAEhVzVp8bo60tctUR13vCCPxke7GwhDp2Ra-JBfFBB8HCI_IZhM5Ow7eop9aO1LNX7Dx7pWj3ub6hiwF4uYLo_NliW2wLHolYlXYJyXy4ednl076m1hBNCUtKl6YC9QI2LrKHlwrIU-AejI-Xk1FRLJJUftc6pctrmlNWCPifcXCBgAbPxhIcLevqPnu1zsqA1kZK9nnk9yVEijn53SWyIrbk8aiHQrg" />
+                        <div
+                            class="absolute top-4 left-4 px-3 py-1 bg-surface/90 backdrop-blur-sm rounded-full font-caption text-caption text-primary">
+                            Chăm sóc tại nhà</div>
+                    </div>
+                    <div class="p-md flex flex-col flex-grow">
+                        <time class="font-caption text-caption text-text-muted mb-xs block">05 Tháng 10, 2024</time>
+                        <h3
+                            class="font-headline-md text-headline-md text-primary mb-sm line-clamp-2 group-hover:text-earth-brown transition-colors">
+                            Công Thức Canh Thảo Dược Bồi Bổ Cơ Thể Suy Nhược</h3>
+                        <p class="font-body-md text-body-md text-text-muted line-clamp-3 mb-md flex-grow">Bài thuốc ẩm
+                            thực kết hợp kỷ tử, táo đỏ và đẳng sâm giúp phục hồi năng lượng nhanh chóng cho người vừa ốm
+                            dậy hoặc thường xuyên làm việc quá sức.</p>
+                        <a class="inline-flex items-center gap-xs font-label-md text-label-md text-earth-brown hover:text-primary transition-colors mt-auto"
+                            href="#">
+                            Đọc tiếp <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
+                        </a>
+                    </div>
+                </article>
+                <!-- Card 6 -->
+                <article
+                    class="bg-surface rounded-2xl overflow-hidden shadow-level-1 border border-herbal-beige hover:shadow-level-2 hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+                    <div class="relative w-full pt-[56.25%] overflow-hidden">
+                        <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            data-alt="A modern, minimalistic bathroom setting showing a clear glass bottle of herbal hair wash liquid, infused with real lemongrass and pomelo peel. The background features soft warm cream tiles and a small potted green plant, projecting clean, natural living."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTaeEx2GrMQRu3M9I-CSnh3p_xbLkoghHvJrlm2xzC4KI9HHA8nlS-ImNq7RwL-8iVG1g9sp8M0cxsrRw5kIvNO8nkNd2iV8_G5Gs9h1_TxwvLdos0ZLxt9i4Ytb4FouD_gTyH8SNm5NtN3HvzUHJqzwLOEfDgL-_sT8dTjCbZDrlxRdZ_vNVu2RTGD637FlSMoxUzCxmHQleukRqO-MGyhjQpHD-dXfRlgt5_s9XP4gAS84pOQF_eSoTG5rJE2pfAvZjf4ofsfBI" />
+                        <div
+                            class="absolute top-4 left-4 px-3 py-1 bg-surface/90 backdrop-blur-sm rounded-full font-caption text-caption text-primary">
+                            Mẹo thảo dược</div>
+                    </div>
+                    <div class="p-md flex flex-col flex-grow">
+                        <time class="font-caption text-caption text-text-muted mb-xs block">01 Tháng 10, 2024</time>
+                        <h3
+                            class="font-headline-md text-headline-md text-primary mb-sm line-clamp-2 group-hover:text-earth-brown transition-colors">
+                            Gội Đầu Bằng Vỏ Bưởi Và Sả: Bí Quyết Tóc Dày Mượt</h3>
+                        <p class="font-body-md text-body-md text-text-muted line-clamp-3 mb-md flex-grow">Trở về với
+                            phương pháp chăm sóc tóc truyền thống. Nước gội thảo mộc không hóa chất giúp làm sạch da
+                            đầu, kích thích mọc tóc và mang lại hương thơm thư giãn.</p>
+                        <a class="inline-flex items-center gap-xs font-label-md text-label-md text-earth-brown hover:text-primary transition-colors mt-auto"
+                            href="#">
+                            Đọc tiếp <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
+                        </a>
+                    </div>
+                </article>
+            </div>
+            <!-- Pagination -->
+            <div class="flex justify-center items-center gap-xs mt-xl">
+                <button
+                    class="w-10 h-10 flex items-center justify-center rounded-full text-text-muted hover:bg-surface-variant transition-colors disabled:opacity-50"
+                    disabled="">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button
+                    class="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-level-1">1</button>
+                <button
+                    class="w-10 h-10 flex items-center justify-center rounded-full text-secondary hover:bg-surface-variant transition-colors font-label-md text-label-md">2</button>
+                <button
+                    class="w-10 h-10 flex items-center justify-center rounded-full text-secondary hover:bg-surface-variant transition-colors font-label-md text-label-md">3</button>
+                <span class="text-text-muted">...</span>
+                <button
+                    class="w-10 h-10 flex items-center justify-center rounded-full text-secondary hover:bg-surface-variant transition-colors font-label-md text-label-md">8</button>
+                <button
+                    class="w-10 h-10 flex items-center justify-center rounded-full text-text-muted hover:bg-surface-variant transition-colors">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="w-full pt-xl pb-md bg-primary dark:bg-on-primary-fixed-variant">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto mb-lg">
+            <!-- Brand Column -->
+            <div class="col-span-1 md:col-span-1">
+                <div class="font-display-lg text-display-lg text-on-primary mb-md">NaHerbs</div>
+                <p class="font-body-md text-body-md text-on-primary/80 dark:text-primary-fixed/80">Mang tinh túy từ
+                    thiên nhiên vào cuộc sống hiện đại của bạn.</p>
+            </div>
+            <!-- Link Columns -->
+            <div class="flex flex-col gap-sm">
+                <h4 class="font-headline-md text-headline-md text-on-primary mb-xs">Product Categories</h4>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed rounded"
+                    href="#">Trà Thảo Dược</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed rounded"
+                    href="#">Tinh Dầu</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed rounded"
+                    href="#">Chăm Sóc Da</a>
+            </div>
+            <div class="flex flex-col gap-sm">
+                <h4 class="font-headline-md text-headline-md text-on-primary mb-xs">Support Links</h4>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed rounded"
+                    href="#">Chính sách vận chuyển</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed rounded"
+                    href="#">Đổi trả &amp; Hoàn tiền</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed rounded"
+                    href="#">Câu hỏi thường gặp</a>
+            </div>
+            <div class="flex flex-col gap-sm">
+                <h4 class="font-headline-md text-headline-md text-on-primary mb-xs">Liên hệ</h4>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed rounded flex items-center gap-xs"
+                    href="#"><span class="material-symbols-outlined text-[18px]">phone</span> Hotline: 1900 1234</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed rounded flex items-center gap-xs"
+                    href="#"><span class="material-symbols-outlined text-[18px]">chat</span> Zalo: 090 123 4567</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed rounded flex items-center gap-xs"
+                    href="#"><span class="material-symbols-outlined text-[18px]">mail</span> Email:
+                    hello@naherbs.com</a>
+            </div>
+        </div>
+        <div class="px-gutter max-w-container-max mx-auto border-t border-on-primary/20 pt-md">
+            <p class="font-caption text-caption text-on-primary/80 text-center">© 2024 NaHerbs. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

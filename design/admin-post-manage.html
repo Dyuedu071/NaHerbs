@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NaHerbs - Quản lý bài viết</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Merriweather:wght@400;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "success-bg": "#E7F0E4",
+                        "surface-variant": "#e8e2d6",
+                        "surface": "#fff9ed",
+                        "primary-fixed-dim": "#acd0ad",
+                        "on-tertiary-container": "#ffe1d3",
+                        "on-secondary-fixed-variant": "#2e4d39",
+                        "secondary-container": "#c7eccf",
+                        "on-secondary-fixed": "#012110",
+                        "on-primary-container": "#ccf0cc",
+                        "secondary": "#45664f",
+                        "tertiary-fixed-dim": "#ffb692",
+                        "surface-container-low": "#f9f3e7",
+                        "outline": "#737971",
+                        "secondary-fixed": "#c7eccf",
+                        "on-secondary-container": "#4b6c55",
+                        "surface-container": "#f3ede1",
+                        "surface-container-high": "#ede8dc",
+                        "tertiary": "#7e3d18",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#03210b",
+                        "background": "#fff9ed",
+                        "primary": "#37563b",
+                        "inverse-primary": "#acd0ad",
+                        "surface-container-highest": "#e8e2d6",
+                        "on-surface-variant": "#424841",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-background": "#1d1c14",
+                        "on-tertiary-fixed-variant": "#733510",
+                        "text-main": "#2B2B2B",
+                        "surface-bright": "#fff9ed",
+                        "inverse-on-surface": "#f6f0e4",
+                        "on-primary-fixed-variant": "#2f4e33",
+                        "primary-container": "#4f6f52",
+                        "error": "#ba1a1a",
+                        "border-warm": "#DDD0BC",
+                        "inverse-surface": "#333028",
+                        "tertiary-container": "#9c542d",
+                        "text-muted": "#6F6A61",
+                        "herbal-beige": "#E8D8BD",
+                        "on-surface": "#1d1c14",
+                        "on-tertiary-fixed": "#341100",
+                        "surface-container-lowest": "#ffffff",
+                        "error-text": "#B94A3A",
+                        "primary-fixed": "#c8ecc8",
+                        "surface-tint": "#466649",
+                        "on-primary": "#ffffff",
+                        "earth-brown": "#8A6A4F",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "error-bg": "#FBEAE5",
+                        "soft-sage": "#A8BFA3",
+                        "secondary-fixed-dim": "#abcfb4",
+                        "surface-dim": "#dfd9ce",
+                        "outline-variant": "#c2c8bf"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "80px",
+                        "gutter": "32px",
+                        "sm": "16px",
+                        "base": "4px",
+                        "lg": "48px",
+                        "container-max": "1240px",
+                        "xs": "8px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Merriweather"],
+                        "price-display": ["Inter"],
+                        "headline-lg": ["Merriweather"],
+                        "display-lg-mobile": ["Merriweather"],
+                        "headline-lg-mobile": ["Merriweather"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "caption": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["32px", { "lineHeight": "1.35", "fontWeight": "600" }],
+                        "display-lg": ["56px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "price-display": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["40px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-md": ["15px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F7F1E5;
+        }
+
+        .shadow-ambient-sm {
+            box-shadow: 0 4px 12px -2px rgba(55, 86, 59, 0.08);
+        }
+
+        .shadow-ambient-md {
+            box-shadow: 0 8px 24px -4px rgba(55, 86, 59, 0.12);
+        }
+    </style>
+</head>
+
+<body class="font-body-md text-body-md text-text-main flex min-h-screen">
+    <!-- SideNavBar -->
+    <aside
+        class="flex flex-col h-screen fixed left-0 top-0 bg-surface-container-low border-r border-border-warm shadow-sm docked left-0 h-full w-64 z-50">
+        <div class="p-md border-b border-border-warm flex flex-col items-center">
+            <div class="w-16 h-16 rounded-full bg-herbal-beige mb-xs flex items-center justify-center overflow-hidden">
+                <img class="w-full h-full object-cover"
+                    data-alt="A portrait of a professional wellness clinic administrator, a middle-aged woman with a warm smile, wearing a subtle earth-toned blouse. The background is a softly blurred modern office setting with natural light and hints of indoor plants. Warm, organic light-mode aesthetic."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUvIyn86HxX7B0C0hVLnUsLEPOBquhHiSErWc-J6O5bD3OJSheJ7AaozIJ0We28BV5wfaQCHy_ATPN2Xtih-pvQeAgJD06H2J1--FOZGbcS4MCeUNl-ECk-TQdVWAhp5LEdNrWKPRLmaKulgaTzVbmWo2Y1A974UYpSVWPP4heGHFQ4dxQyUdX_KvApSziEfTuj4VRII48zkA-iblORSPlODOCMaPlQGVWr1sYAhCvEszhvf2uqxYuiIwqjzn08hM-llNEU7lPNbo" />
+            </div>
+            <h2 class="text-headline-md font-headline-md font-bold text-primary">Wellness Admin</h2>
+            <p class="text-caption font-caption text-text-muted">Management Portal</p>
+        </div>
+        <nav class="flex-1 py-md flex flex-col gap-base">
+            <a class="flex items-center gap-sm px-md py-sm mx-sm rounded-lg text-text-muted hover:text-primary hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="text-label-md font-label-md">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-sm px-md py-sm mx-sm rounded-lg text-text-muted hover:text-primary hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                <span class="text-label-md font-label-md">Products</span>
+            </a>
+            <a class="flex items-center gap-sm px-md py-sm mx-sm rounded-lg text-text-muted hover:text-primary hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+                <span class="text-label-md font-label-md">Orders</span>
+            </a>
+            <a class="flex items-center gap-sm px-md py-sm mx-sm rounded-lg text-text-muted hover:text-primary hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="qr_code_2">qr_code_2</span>
+                <span class="text-label-md font-label-md">QR Payments</span>
+            </a>
+            <a class="flex items-center gap-sm px-md py-sm mx-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-secondary-container/20 scale-[0.98] transition-transform"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+                <span class="text-label-md font-label-md">Blog</span>
+            </a>
+        </nav>
+        <div class="p-md border-t border-border-warm flex flex-col gap-base">
+            <a class="flex items-center gap-sm px-sm py-sm rounded-lg text-text-muted hover:text-primary hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                <span class="text-label-md font-label-md">Settings</span>
+            </a>
+            <a class="flex items-center gap-sm px-sm py-sm rounded-lg text-text-muted hover:text-primary hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+                <span class="text-label-md font-label-md">Support</span>
+            </a>
+            <button
+                class="mt-sm w-full py-sm bg-primary text-on-primary rounded-full text-label-md font-label-md hover:bg-secondary transition-colors">
+                View Store
+            </button>
+        </div>
+    </aside>
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 ml-64 flex flex-col min-h-screen">
+        <!-- TopNavBar -->
+        <header
+            class="flex justify-between items-center w-full px-md h-16 sticky top-0 z-40 bg-surface/88 backdrop-blur-md shadow-sm">
+            <div class="flex items-center gap-md">
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+                        data-icon="search">search</span>
+                    <input
+                        class="pl-10 pr-4 py-2 bg-surface-container rounded-full border-none focus:ring-2 focus:ring-primary text-body-md font-body-md w-64"
+                        placeholder="Search..." type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-lg">
+                <span class="text-label-md font-label-md font-semibold text-primary">Organic Wellness Core</span>
+                <div class="flex items-center gap-sm">
+                    <button
+                        class="w-10 h-10 rounded-full flex items-center justify-center text-text-muted hover:text-primary hover:bg-surface-container transition-all">
+                        <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+                    </button>
+                    <button
+                        class="w-10 h-10 rounded-full flex items-center justify-center text-text-muted hover:text-primary hover:bg-surface-container transition-all">
+                        <span class="material-symbols-outlined" data-icon="apps">apps</span>
+                    </button>
+                    <div class="w-8 h-8 rounded-full overflow-hidden ml-sm border border-border-warm">
+                        <img class="w-full h-full object-cover"
+                            data-alt="A small circular avatar placeholder showing a detailed, stylized minimalist leaf motif in deep green against a warm cream background, embodying a modern organic wellness brand identity."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-evsc8zgEtLnYVJ3_1r2ubC3F1RYQkMgOO6zoM_gL7oo0ds_FIjp_ulem8jucVnyU8AnVmUrrppSmxZ0dOkVJFK88By3IT7OKXeqfoO5VrSvHCmszOJzPEsLaOssABaVPSNJk57cj0rfjN6RdKvN8h-8qLwH1eCZTEKM7QX3fXACyDvzP1XpsYTaXPm07z9ai9ExFRuzT2k8UbwC83po4wEz1Erx7LBcsiIc9ixrDjhgHFRYzrCS8QDsuVOblf-P-0sY3CvxCYTE" />
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Main Canvas -->
+        <main class="flex-1 p-gutter max-w-container-max mx-auto w-full flex flex-col gap-md">
+            <!-- Page Header -->
+            <div class="flex justify-between items-end mb-sm">
+                <div>
+                    <h1 class="text-headline-md font-headline-md text-primary mb-xs">Quản lý bài viết</h1>
+                    <p class="text-body-md font-body-md text-text-muted">Manage your herbal wellness content, SEO
+                        status, and publication schedule.</p>
+                </div>
+                <button
+                    class="px-md py-sm bg-primary text-on-primary rounded-full text-label-md font-label-md hover:bg-secondary transition-all shadow-ambient-md flex items-center gap-xs hover:-translate-y-0.5">
+                    <span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                    Viết bài mới
+                </button>
+            </div>
+            <!-- Filter & Search Bar -->
+            <div
+                class="bg-surface-container-lowest p-sm rounded-xl shadow-ambient-sm border border-border-warm flex gap-sm items-center">
+                <div class="relative flex-1 max-w-md">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+                        data-icon="search">search</span>
+                    <input
+                        class="w-full pl-10 pr-4 py-2.5 bg-surface rounded-lg border border-border-warm focus:ring-1 focus:ring-primary focus:border-primary text-body-md font-body-md outline-none transition-colors"
+                        placeholder="Tìm kiếm bài viết..." type="text" />
+                </div>
+                <div class="relative w-64">
+                    <select
+                        class="w-full pl-4 pr-10 py-2.5 bg-surface rounded-lg border border-border-warm focus:ring-1 focus:ring-primary focus:border-primary text-body-md font-body-md appearance-none outline-none transition-colors">
+                        <option value="">Tất cả danh mục</option>
+                        <option value="health">Sức khỏe</option>
+                        <option value="herbal">Mẹo thảo dược</option>
+                        <option value="homecare">Chăm sóc tại nhà</option>
+                    </select>
+                    <span
+                        class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
+                        data-icon="expand_more">expand_more</span>
+                </div>
+                <button
+                    class="px-4 py-2.5 bg-surface-container text-text-main rounded-lg text-label-md font-label-md hover:bg-surface-variant transition-colors border border-border-warm flex items-center gap-xs">
+                    <span class="material-symbols-outlined text-[18px]" data-icon="filter_list">filter_list</span>
+                    Lọc
+                </button>
+            </div>
+            <!-- Blog Table Card -->
+            <div
+                class="bg-surface-container-lowest rounded-[24px] shadow-ambient-sm border border-herbal-beige overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-surface-container-low border-b border-border-warm">
+                                <th class="p-sm text-label-md font-label-md text-text-muted font-semibold w-16">Hình ảnh
+                                </th>
+                                <th class="p-sm text-label-md font-label-md text-text-muted font-semibold">Tiêu đề bài
+                                    viết</th>
+                                <th class="p-sm text-label-md font-label-md text-text-muted font-semibold">Danh mục</th>
+                                <th class="p-sm text-label-md font-label-md text-text-muted font-semibold">Trạng thái
+                                </th>
+                                <th class="p-sm text-label-md font-label-md text-text-muted font-semibold">Ngày đăng
+                                </th>
+                                <th class="p-sm text-label-md font-label-md text-text-muted font-semibold">SEO</th>
+                                <th class="p-sm text-label-md font-label-md text-text-muted font-semibold text-center">
+                                    Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border-warm">
+                            <!-- Row 1 -->
+                            <tr class="hover:bg-surface/50 transition-colors group">
+                                <td class="p-sm">
+                                    <div class="w-12 h-12 rounded-lg overflow-hidden border border-border-warm">
+                                        <img class="w-full h-full object-cover"
+                                            data-alt="A serene close-up photograph of a cup of chamomile tea steaming gently on a rustic wooden table, surrounded by dried lavender and herbs. The scene is illuminated by soft, natural morning light, creating a calm, healing organic wellness aesthetic."
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAC-ZG8hEyTB7uKtPWv0J7blsUwNTbQEcV2BexL9MBWnbXdDTqw_dG6BO9A3GKw6HixzKCJP1WLcCDwEEuqEU6U3EbeVdx1apQWOL3GfT4DOgFPIB3m6Qt4YtRDLv4VmqKWWNarxKwW5PhvrpDNqECzAYy6lo6Oy060pRnGPNkXDqP8Oejr-LFKV3jLXNYT_EAckprKa4SMUlq4LJPrMSw5BoTqutarL_7YBhFcLfs1BFaw7p8BTi2Ka-djmxj4-V8n20TR0w6hyY" />
+                                    </div>
+                                </td>
+                                <td class="p-sm">
+                                    <p class="text-body-md font-body-md font-semibold text-text-main">7 Loại Thảo Dược
+                                        Giúp Cải Thiện Giấc Ngủ</p>
+                                    <p class="text-caption font-caption text-text-muted truncate w-64">Khám phá sức mạnh
+                                        của thiên nhiên mang lại giấc ngủ sâu...</p>
+                                </td>
+                                <td class="p-sm text-body-md font-body-md">Sức khỏe</td>
+                                <td class="p-sm">
+                                    <span
+                                        class="inline-flex items-center px-2 py-1 rounded-full bg-success-bg text-primary text-caption font-label-md font-semibold">
+                                        Published
+                                    </span>
+                                </td>
+                                <td class="p-sm text-body-md font-body-md text-text-muted">12/10/2023</td>
+                                <td class="p-sm">
+                                    <span
+                                        class="inline-flex items-center px-2 py-1 rounded-full bg-success-bg text-primary text-caption font-label-md font-semibold gap-1">
+                                        <span class="material-symbols-outlined text-[14px]"
+                                            data-icon="check_circle">check_circle</span> Good
+                                    </span>
+                                </td>
+                                <td class="p-sm">
+                                    <div
+                                        class="flex justify-center gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            class="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-primary hover:bg-secondary-container/30 transition-colors"
+                                            title="Edit">
+                                            <span class="material-symbols-outlined text-[18px]"
+                                                data-icon="edit">edit</span>
+                                        </button>
+                                        <button
+                                            class="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-primary hover:bg-secondary-container/30 transition-colors"
+                                            title="View">
+                                            <span class="material-symbols-outlined text-[18px]"
+                                                data-icon="visibility">visibility</span>
+                                        </button>
+                                        <button
+                                            class="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-error hover:bg-error-container/30 transition-colors"
+                                            title="Delete">
+                                            <span class="material-symbols-outlined text-[18px]"
+                                                data-icon="delete">delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr class="hover:bg-surface/50 transition-colors group">
+                                <td class="p-sm">
+                                    <div
+                                        class="w-12 h-12 rounded-lg overflow-hidden border border-border-warm bg-herbal-beige flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-outline"
+                                            data-icon="image">image</span>
+                                    </div>
+                                </td>
+                                <td class="p-sm">
+                                    <p class="text-body-md font-body-md font-semibold text-text-main">Công Dụng Bất Ngờ
+                                        Của Nha Đam</p>
+                                    <p class="text-caption font-caption text-text-muted truncate w-64">Nha đam không chỉ
+                                        dùng để làm đẹp mà còn...</p>
+                                </td>
+                                <td class="p-sm text-body-md font-body-md">Mẹo thảo dược</td>
+                                <td class="p-sm">
+                                    <span
+                                        class="inline-flex items-center px-2 py-1 rounded-full bg-surface-container-high text-text-muted text-caption font-label-md font-semibold">
+                                        Draft
+                                    </span>
+                                </td>
+                                <td class="p-sm text-body-md font-body-md text-text-muted">-</td>
+                                <td class="p-sm">
+                                    <span
+                                        class="inline-flex items-center px-2 py-1 rounded-full bg-surface-container-high text-text-muted text-caption font-label-md font-semibold gap-1">
+                                        <span class="material-symbols-outlined text-[14px]"
+                                            data-icon="pending">pending</span> N/A
+                                    </span>
+                                </td>
+                                <td class="p-sm">
+                                    <div
+                                        class="flex justify-center gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            class="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-primary hover:bg-secondary-container/30 transition-colors"
+                                            title="Edit">
+                                            <span class="material-symbols-outlined text-[18px]"
+                                                data-icon="edit">edit</span>
+                                        </button>
+                                        <button
+                                            class="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-error hover:bg-error-container/30 transition-colors"
+                                            title="Delete">
+                                            <span class="material-symbols-outlined text-[18px]"
+                                                data-icon="delete">delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <div
+                    class="p-sm border-t border-border-warm flex justify-between items-center bg-surface-container-lowest">
+                    <p class="text-caption font-caption text-text-muted">Showing 1 to 2 of 24 entries</p>
+                    <div class="flex gap-1">
+                        <button
+                            class="w-8 h-8 rounded-lg flex items-center justify-center border border-border-warm text-text-muted hover:border-primary hover:text-primary transition-colors disabled:opacity-50"
+                            disabled="">
+                            <span class="material-symbols-outlined text-[18px]"
+                                data-icon="chevron_left">chevron_left</span>
+                        </button>
+                        <button
+                            class="w-8 h-8 rounded-lg flex items-center justify-center border border-primary bg-primary text-on-primary font-label-md text-label-md">1</button>
+                        <button
+                            class="w-8 h-8 rounded-lg flex items-center justify-center border border-border-warm text-text-main hover:border-primary hover:text-primary transition-colors font-label-md text-label-md">2</button>
+                        <button
+                            class="w-8 h-8 rounded-lg flex items-center justify-center border border-border-warm text-text-main hover:border-primary hover:text-primary transition-colors font-label-md text-label-md">3</button>
+                        <button
+                            class="w-8 h-8 rounded-lg flex items-center justify-center border border-border-warm text-text-muted hover:border-primary hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-[18px]"
+                                data-icon="chevron_right">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

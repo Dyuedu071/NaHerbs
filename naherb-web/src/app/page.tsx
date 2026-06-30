@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
+import { AXIOS_INSTANCE } from '@/services/api-client';
 
 export default function Home() {
   const { data } = useGetAuthMe({
@@ -12,6 +13,16 @@ export default function Home() {
   });
 
   const user = data as unknown as { id: string; email: string; name: string; role: string; avatarUrl?: string } | undefined;
+
+  const handleLogout = async () => {
+    try {
+      await AXIOS_INSTANCE.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      window.location.href = '/login';
+    }
+  };
 
   return (
     <>
@@ -56,6 +67,9 @@ export default function Home() {
                         <span className="font-label-md text-label-md text-primary font-semibold max-w-[120px] truncate">
                             {user.name}
                         </span>
+                        <button onClick={handleLogout} className="ml-2 text-label-md text-error hover:underline flex items-center" title="Đăng xuất">
+                            <span className="material-symbols-outlined text-[20px]">logout</span>
+                        </button>
                     </div>
                 ) : (
                     <>

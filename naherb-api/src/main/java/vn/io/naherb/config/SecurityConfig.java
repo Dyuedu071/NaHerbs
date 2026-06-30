@@ -90,7 +90,8 @@ public class SecurityConfig {
                                 "/api/auth/register",
                                 "/api/auth/register-otp",
                                 "/api/auth/google",
-                                "/api/auth/refresh"))
+                                "/api/auth/refresh",
+                                "/api/auth/logout"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(cache -> cache.disable())
                 .formLogin(form -> form.disable())
