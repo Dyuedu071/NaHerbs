@@ -31,7 +31,8 @@ public class AuthController {
     public Map<String, String> csrf(CsrfToken csrfToken) {
         return Map.of(
                 "headerName", csrfToken.getHeaderName(),
-                "parameterName", csrfToken.getParameterName());
+                "parameterName", csrfToken.getParameterName(),
+                "token", csrfToken.getToken());
     }
 
     @PostMapping("/register")

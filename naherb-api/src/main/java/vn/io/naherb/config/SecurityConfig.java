@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -53,7 +54,23 @@ public class SecurityConfig {
 
     private final SecurityProperties properties;
 
+    /**
+     * Public chatbot APIs — no JWT filter, guests can chat without login.
+     * Must be {@link Order}(1) so it takes precedence over the main chain.
+     */
     @Bean
+    @Order(1)
+    SecurityFilterChain chatbotSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/api/chatbot/**")
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
         CookieCsrfTokenRepository csrfRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrfRepository.setCookiePath("/");
@@ -76,11 +93,12 @@ public class SecurityConfig {
                         "/api/auth/register",
                         "/api/auth/register-otp",
                         "/api/auth/google",
-                        "/api/auth/refresh")));
+                        "/api/auth/refresh"),
+                Set.of()));
         jwtFilter.setAuthenticationEntryPoint((request, response, exception) ->
                 writeError(response, 401, "Bạn chưa đăng nhập hoặc phiên đã hết hạn"));
 
-        http
+        http.securityMatcher("/**")
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfRepository)
@@ -91,7 +109,8 @@ public class SecurityConfig {
                                 "/api/auth/register-otp",
                                 "/api/auth/google",
                                 "/api/auth/refresh",
-                                "/api/auth/logout"))
+                                "/api/admin/**",
+                                "/api/account/**"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(cache -> cache.disable())
                 .formLogin(form -> form.disable())
@@ -111,10 +130,17 @@ public class SecurityConfig {
                                 "/api/auth/register-otp",
                                 "/api/auth/google",
                                 "/api/auth/refresh",
+                                "/api/health",
+                                "/api/v1/health",
+                                "/api/media/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html")
                         .permitAll()
+                        .requestMatchers("/api/admin/auth/**")
+                        .permitAll()
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

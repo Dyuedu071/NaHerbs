@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 };
 
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import ChatbotShell from "@/components/chatbot/ChatbotShell";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 export default function RootLayout({
@@ -39,7 +40,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col">
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "dummy-google-client-id.apps.googleusercontent.com"}>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <ChatbotShell>{children}</ChatbotShell>
+          </QueryProvider>
         </GoogleOAuthProvider>
       </body>
     </html>

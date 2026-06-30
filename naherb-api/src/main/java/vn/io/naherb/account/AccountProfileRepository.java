@@ -8,4 +8,6 @@ public interface AccountProfileRepository extends JpaRepository<AccountProfile, 
     Optional<AccountProfile> findByAccountId(UUID accountId);
 
     boolean existsByPhone(String phone);
+
+    boolean existsByPhoneAndAccount_IdNot(String phone, UUID accountId);
 }
