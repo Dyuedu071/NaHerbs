@@ -5,6 +5,24 @@ export const AXIOS_INSTANCE = axios.create({
   withCredentials: true,
 });
 
+// Request Interceptor: Thủ công nhúng X-XSRF-TOKEN vào header (cần cho Cross-Origin)
+AXIOS_INSTANCE.interceptors.request.use((config) => {
+  if (typeof document !== 'undefined') {
+    const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
+    console.log("XSRF-TOKEN cookie match:", match);
+    if (match && config.headers) {
+      const token = decodeURIComponent(match[2]);
+      console.log("Setting X-XSRF-TOKEN header:", token);
+      if (typeof config.headers.set === 'function') {
+        config.headers.set('X-XSRF-TOKEN', token);
+      } else {
+        config.headers['X-XSRF-TOKEN'] = token;
+      }
+    }
+  }
+  return config;
+});
+
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (value: unknown) => void;
