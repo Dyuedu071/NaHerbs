@@ -23,6 +23,7 @@ replay_pid*
 
 # Logs
 logs/
+uploads/
 *.log
 *.log.*
 npm-debug.log*

@@ -25,7 +25,10 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  DeleteAdminChatbotKnowledgeParams,
   OkResponse,
+  PostAdminChatbotKnowledgeBody,
+  PostAdminChatbotKnowledgeParams,
   UpdateChatbotConfigRequest
 } from '.././model';
 
@@ -187,6 +190,288 @@ export const usePutAdminChatbotConfig = <TError = unknown,
       > => {
 
       const mutationOptions = getPutAdminChatbotConfigMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary List chatbot knowledge markdown files
+ */
+export const getAdminChatbotKnowledge = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<OkResponse>(
+      {url: `/admin/chatbot/knowledge`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getGetAdminChatbotKnowledgeQueryKey = () => {
+    return [
+    `/admin/chatbot/knowledge`
+    ] as const;
+    }
+
+    
+export const getGetAdminChatbotKnowledgeQueryOptions = <TData = Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminChatbotKnowledgeQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminChatbotKnowledge>>> = ({ signal }) => getAdminChatbotKnowledge(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdminChatbotKnowledgeQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminChatbotKnowledge>>>
+export type GetAdminChatbotKnowledgeQueryError = unknown
+
+
+export function useGetAdminChatbotKnowledge<TData = Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminChatbotKnowledge>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminChatbotKnowledge>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminChatbotKnowledge<TData = Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminChatbotKnowledge>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminChatbotKnowledge>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminChatbotKnowledge<TData = Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List chatbot knowledge markdown files
+ */
+
+export function useGetAdminChatbotKnowledge<TData = Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminChatbotKnowledge>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdminChatbotKnowledgeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
+ * @summary Upload chatbot knowledge markdown file
+ */
+export const postAdminChatbotKnowledge = (
+    postAdminChatbotKnowledgeBody: PostAdminChatbotKnowledgeBody,
+    params?: PostAdminChatbotKnowledgeParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      const formData = new FormData();
+formData.append(`file`, postAdminChatbotKnowledgeBody.file)
+
+      return customInstance<OkResponse>(
+      {url: `/admin/chatbot/knowledge`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData,
+        params, signal
+    },
+      options);
+    }
+  
+
+
+export const getPostAdminChatbotKnowledgeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminChatbotKnowledge>>, TError,{data: PostAdminChatbotKnowledgeBody;params?: PostAdminChatbotKnowledgeParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAdminChatbotKnowledge>>, TError,{data: PostAdminChatbotKnowledgeBody;params?: PostAdminChatbotKnowledgeParams}, TContext> => {
+
+const mutationKey = ['postAdminChatbotKnowledge'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAdminChatbotKnowledge>>, {data: PostAdminChatbotKnowledgeBody;params?: PostAdminChatbotKnowledgeParams}> = (props) => {
+          const {data,params} = props ?? {};
+
+          return  postAdminChatbotKnowledge(data,params,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAdminChatbotKnowledgeMutationResult = NonNullable<Awaited<ReturnType<typeof postAdminChatbotKnowledge>>>
+    export type PostAdminChatbotKnowledgeMutationBody = PostAdminChatbotKnowledgeBody
+    export type PostAdminChatbotKnowledgeMutationError = unknown
+
+    /**
+ * @summary Upload chatbot knowledge markdown file
+ */
+export const usePostAdminChatbotKnowledge = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminChatbotKnowledge>>, TError,{data: PostAdminChatbotKnowledgeBody;params?: PostAdminChatbotKnowledgeParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAdminChatbotKnowledge>>,
+        TError,
+        {data: PostAdminChatbotKnowledgeBody;params?: PostAdminChatbotKnowledgeParams},
+        TContext
+      > => {
+
+      const mutationOptions = getPostAdminChatbotKnowledgeMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Delete chatbot knowledge file by source path
+ */
+export const deleteAdminChatbotKnowledge = (
+    params: DeleteAdminChatbotKnowledgeParams,
+ options?: SecondParameter<typeof customInstance>,) => {
+      
+      
+      return customInstance<OkResponse>(
+      {url: `/admin/chatbot/knowledge`, method: 'DELETE',
+        params
+    },
+      options);
+    }
+  
+
+
+export const getDeleteAdminChatbotKnowledgeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminChatbotKnowledge>>, TError,{params: DeleteAdminChatbotKnowledgeParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdminChatbotKnowledge>>, TError,{params: DeleteAdminChatbotKnowledgeParams}, TContext> => {
+
+const mutationKey = ['deleteAdminChatbotKnowledge'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdminChatbotKnowledge>>, {params: DeleteAdminChatbotKnowledgeParams}> = (props) => {
+          const {params} = props ?? {};
+
+          return  deleteAdminChatbotKnowledge(params,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdminChatbotKnowledgeMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdminChatbotKnowledge>>>
+    
+    export type DeleteAdminChatbotKnowledgeMutationError = unknown
+
+    /**
+ * @summary Delete chatbot knowledge file by source path
+ */
+export const useDeleteAdminChatbotKnowledge = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminChatbotKnowledge>>, TError,{params: DeleteAdminChatbotKnowledgeParams}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdminChatbotKnowledge>>,
+        TError,
+        {params: DeleteAdminChatbotKnowledgeParams},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteAdminChatbotKnowledgeMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Delete chatbot knowledge document by id
+ */
+export const deleteAdminChatbotKnowledgeDocumentId = (
+    documentId: string,
+ options?: SecondParameter<typeof customInstance>,) => {
+      
+      
+      return customInstance<OkResponse>(
+      {url: `/admin/chatbot/knowledge/${documentId}`, method: 'DELETE'
+    },
+      options);
+    }
+  
+
+
+export const getDeleteAdminChatbotKnowledgeDocumentIdMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminChatbotKnowledgeDocumentId>>, TError,{documentId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAdminChatbotKnowledgeDocumentId>>, TError,{documentId: string}, TContext> => {
+
+const mutationKey = ['deleteAdminChatbotKnowledgeDocumentId'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAdminChatbotKnowledgeDocumentId>>, {documentId: string}> = (props) => {
+          const {documentId} = props ?? {};
+
+          return  deleteAdminChatbotKnowledgeDocumentId(documentId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAdminChatbotKnowledgeDocumentIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAdminChatbotKnowledgeDocumentId>>>
+    
+    export type DeleteAdminChatbotKnowledgeDocumentIdMutationError = unknown
+
+    /**
+ * @summary Delete chatbot knowledge document by id
+ */
+export const useDeleteAdminChatbotKnowledgeDocumentId = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAdminChatbotKnowledgeDocumentId>>, TError,{documentId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAdminChatbotKnowledgeDocumentId>>,
+        TError,
+        {documentId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDeleteAdminChatbotKnowledgeDocumentIdMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

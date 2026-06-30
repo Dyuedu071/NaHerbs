@@ -20,6 +20,7 @@ export default function AdminSidebar() {
     { name: "Orders", href: "/admin/orders", icon: "shopping_cart" },
     { name: "QR Payments", href: "/admin/qr-payments", icon: "qr_code_2" },
     { name: "Blog", href: "/admin/posts", icon: "edit_note" },
+    { name: "Chatbot AI", href: "/admin/chatbot", icon: "psychiatry" },
   ];
 
   return (

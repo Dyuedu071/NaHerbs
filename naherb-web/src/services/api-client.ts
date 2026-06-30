@@ -1,23 +1,18 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { clearCsrfToken, getCsrfToken } from './csrf';
 
 export const AXIOS_INSTANCE = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api',
   withCredentials: true,
 });
 
-// Request Interceptor: Thủ công nhúng X-XSRF-TOKEN vào header (cần cho Cross-Origin)
-AXIOS_INSTANCE.interceptors.request.use((config) => {
-  if (typeof document !== 'undefined') {
-    const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
-    console.log("XSRF-TOKEN cookie match:", match);
-    if (match && config.headers) {
-      const token = decodeURIComponent(match[2]);
-      console.log("Setting X-XSRF-TOKEN header:", token);
-      if (typeof config.headers.set === 'function') {
-        config.headers.set('X-XSRF-TOKEN', token);
-      } else {
-        config.headers['X-XSRF-TOKEN'] = token;
-      }
+AXIOS_INSTANCE.interceptors.request.use(async (config) => {
+  const method = config.method?.toLowerCase();
+  if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
+    const csrfToken = await getCsrfToken();
+    if (csrfToken) {
+      config.headers = config.headers ?? {};
+      config.headers["X-XSRF-TOKEN"] = csrfToken;
     }
   }
   return config;
@@ -42,7 +37,13 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 // Response Interceptor tự động Refresh Token khi gặp lỗi 401 (Access Token hết hạn)
 AXIOS_INSTANCE.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const method = response.config.method?.toLowerCase();
+    if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
+      clearCsrfToken();
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -74,7 +75,7 @@ AXIOS_INSTANCE.interceptors.response.use(
         await AXIOS_INSTANCE.post('/auth/refresh');
         isRefreshing = false;
         processQueue(null);
-        
+
         // Thực hiện lại request gốc ban đầu với Cookie mới
         return AXIOS_INSTANCE(originalRequest);
       } catch (refreshError) {

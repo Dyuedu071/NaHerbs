@@ -20,7 +20,7 @@ public class ChatbotMessage extends BaseEntity {
     @Column(name = "sender_type", nullable = false)
     private ChatSenderType senderType;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(name = "message_text", nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Column(columnDefinition = "TEXT")

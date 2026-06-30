@@ -27,4 +27,8 @@ public class ChatbotConversation extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChatConversationStatus status = ChatConversationStatus.OPEN;
+
+    public ChatbotConversation(String sessionId) {
+        this.sessionId = sessionId;
+    }
 }

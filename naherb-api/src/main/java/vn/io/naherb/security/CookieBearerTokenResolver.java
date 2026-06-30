@@ -9,16 +9,19 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenResolv
 public class CookieBearerTokenResolver implements BearerTokenResolver {
 
     private final String cookieName;
-    private final Set<String> ignoredPaths;
+    private final Set<String> ignoredExactPaths;
+    private final Set<String> ignoredPathPrefixes;
 
-    public CookieBearerTokenResolver(String cookieName, Set<String> ignoredPaths) {
+    public CookieBearerTokenResolver(
+            String cookieName, Set<String> ignoredExactPaths, Set<String> ignoredPathPrefixes) {
         this.cookieName = cookieName;
-        this.ignoredPaths = Set.copyOf(ignoredPaths);
+        this.ignoredExactPaths = Set.copyOf(ignoredExactPaths);
+        this.ignoredPathPrefixes = Set.copyOf(ignoredPathPrefixes);
     }
 
     @Override
     public String resolve(HttpServletRequest request) {
-        if (ignoredPaths.contains(request.getRequestURI()) || request.getCookies() == null) {
+        if (isIgnored(request.getRequestURI()) || request.getCookies() == null) {
             return null;
         }
 
@@ -27,5 +30,17 @@ public class CookieBearerTokenResolver implements BearerTokenResolver {
                 .map(Cookie::getValue)
                 .findFirst()
                 .orElse(null);
+    }
+
+    private boolean isIgnored(String requestUri) {
+        if (ignoredExactPaths.contains(requestUri)) {
+            return true;
+        }
+        for (String prefix : ignoredPathPrefixes) {
+            if (requestUri.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

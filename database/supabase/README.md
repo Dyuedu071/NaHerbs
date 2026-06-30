@@ -6,6 +6,7 @@ Bộ file này đã được chỉnh theo yêu cầu: **dùng UUID cho tất c�
 
 - `001_init_schema.sql`: schema Supabase PostgreSQL dùng `uuid primary key default gen_random_uuid()` cho `accounts` và các bảng nghiệp vụ.
 - `002_seed_minimal.sql`: seed tối thiểu, tương thích UUID.
+- `knowledge_rag.sql`: bảng `knowledge_documents` / `knowledge_chunks` cho chatbot RAG (Phase 4).
 - `openapi.yml` / `openapi.yaml`: API contract đã đổi các `accountId`, `addressId`, `shippingAddressId` sang `string` `format: uuid`.
 
 ## Lưu ý bắt buộc cho Spring Boot
@@ -40,5 +41,8 @@ drop schema if exists naherb cascade;
 
 2. Chạy `001_init_schema.sql`.
 3. Chạy `002_seed_minimal.sql`.
+4. (Phase 4 chatbot) Chạy `003_chatbot_configs_keyvalue.sql` nếu bảng `chatbot_configs` còn cột `welcome_message`.
+5. (Phase 4 RAG) Chạy `knowledge_rag.sql` nếu chưa có bảng knowledge.
+6. (Phase 4 chatbot) Chạy `004_chatbot_messages_message_text.sql` nếu insert message lỗi `message_text` null.
 
 Dự án này vẫn giữ nguyên quy ước: **không dùng Flyway auto migration**, schema được chạy thủ công bằng Supabase SQL Editor hoặc Supabase CLI.

@@ -1,10 +1,13 @@
 "use client";
 
 import Link from 'next/link';
+import { useChatbot } from '@/components/chatbot/ChatbotContext';
 import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
 import { AXIOS_INSTANCE } from '@/services/api-client';
+import { useState } from 'react';
 
 export default function Home() {
+  const { open: openChatbot } = useChatbot();
   const { data } = useGetAuthMe({
     query: {
       retry: false,
@@ -13,6 +16,7 @@ export default function Home() {
   });
 
   const user = data as unknown as { id: string; email: string; name: string; role: string; avatarUrl?: string } | undefined;
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -56,20 +60,52 @@ export default function Home() {
                         style={{ fontVariationSettings: "'FILL' 0" }}>shopping_cart</span>
                 </button>
                 {user ? (
-                    <div className="flex items-center gap-xs hidden md:flex">
-                        <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 hover:scale-105 transition-transform duration-200 shadow-sm cursor-pointer">
-                            <img
-                                src={user.avatarUrl || '/images/avatars/default-avatar.jpg'}
-                                alt="User Avatar"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                        <span className="font-label-md text-label-md text-primary font-semibold max-w-[120px] truncate">
-                            {user.name}
-                        </span>
-                        <button onClick={handleLogout} className="ml-2 text-label-md text-error hover:underline flex items-center" title="Đăng xuất">
-                            <span className="material-symbols-outlined text-[20px]">logout</span>
+                    <div className="relative hidden md:flex items-center gap-xs">
+                        <button
+                            type="button"
+                            onClick={() => setAccountMenuOpen((open) => !open)}
+                            className="flex items-center gap-xs rounded-full py-1 pl-1 pr-2 hover:bg-success-bg transition-colors"
+                        >
+                            <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 shadow-sm">
+                                <img
+                                    src={user.avatarUrl || '/images/avatars/default-avatar.jpg'}
+                                    alt="User Avatar"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <span className="font-label-md text-label-md text-primary font-semibold max-w-[120px] truncate">
+                                {user.name}
+                            </span>
+                            <span className="material-symbols-outlined text-primary text-[18px]">
+                                expand_more
+                            </span>
                         </button>
+                        {accountMenuOpen && (
+                            <div className="absolute right-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-herbal-beige bg-surface py-2 shadow-ambient-2">
+                                <Link
+                                    href="/account/profile"
+                                    onClick={() => setAccountMenuOpen(false)}
+                                    className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
+                                >
+                                    Hồ sơ cá nhân
+                                </Link>
+                                <Link
+                                    href="/account/addresses"
+                                    onClick={() => setAccountMenuOpen(false)}
+                                    className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
+                                >
+                                    Địa chỉ giao hàng
+                                </Link>
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                    className="flex w-full items-center gap-xs px-md py-2 font-label-md text-label-md text-error hover:bg-error-container"
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">logout</span>
+                                    Đăng xuất
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <>
@@ -85,6 +121,8 @@ export default function Home() {
                     </>
                 )}
                 <button
+                    type="button"
+                    onClick={openChatbot}
                     className="bg-primary text-on-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
                     Tư vấn ngay
                 </button>
@@ -348,6 +386,8 @@ export default function Home() {
                         nhân hóa 24/7.
                     </p>
                     <button
+                        type="button"
+                        onClick={openChatbot}
                         className="bg-primary text-on-primary rounded-full px-lg py-3 font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors shadow-ambient-2 w-fit flex items-center gap-sm mt-sm">
                         <span className="material-symbols-outlined"
                             style={{ fontVariationSettings: "'FILL' 1" }}>chat_bubble</span>
@@ -418,13 +458,6 @@ export default function Home() {
             </p>
         </div>
     </footer>
-    {/* Fixed AI Chat Trigger */}
-    <button
-        className="fixed bottom-lg right-lg w-14 h-14 bg-primary text-on-primary rounded-full shadow-ambient-3 flex items-center justify-center hover:scale-110 transition-transform duration-300 z-50">
-        <span className="material-symbols-outlined"
-            style={{ fontVariationSettings: "'FILL' 1", fontSize: "28px" }}>psychiatry</span>
-    </button>
-
     </>
   );
 }

@@ -19,7 +19,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import vn.io.naherb.auth.service.OtpService;
+import vn.io.naherb.account.AccountAddressRepository;
+import vn.io.naherb.account.AccountProfileRepository;
 import vn.io.naherb.account.AccountRepository;
+import vn.io.naherb.cart.CartRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -35,8 +39,23 @@ class AuthFlowIntegrationTests {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private AccountProfileRepository accountProfileRepository;
+
+    @Autowired
+    private AccountAddressRepository accountAddressRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private OtpService otpService;
+
     @BeforeEach
     void cleanDatabase() {
+        cartRepository.deleteAll();
+        accountAddressRepository.deleteAll();
+        accountProfileRepository.deleteAll();
         accountRepository.deleteAll();
     }
 
@@ -110,17 +129,21 @@ class AuthFlowIntegrationTests {
     }
 
     private void register(Cookie csrfCookie) throws Exception {
+        String email = "user@naherb.vn";
+        String otp = otpService.generateAndStoreOtp(email, "{}");
+
         mockMvc.perform(post("/api/auth/register")
                         .cookie(csrfCookie)
                         .header("X-XSRF-TOKEN", csrfCookie.getValue())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "email": "user@naherb.vn",
+                                  "email": "%s",
                                   "password": "password123",
-                                  "name": "NaHerb User"
+                                  "name": "NaHerb User",
+                                  "otp": "%s"
                                 }
-                                """))
+                                """.formatted(email, otp)))
                 .andExpect(status().isCreated());
     }
 
