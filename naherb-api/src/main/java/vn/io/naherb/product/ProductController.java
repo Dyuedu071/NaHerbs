@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import vn.io.naherb.product.dto.ProductSummaryDto;
+
 @RestController
 @RequestMapping("/api/v1/admin/products")
 public class ProductController {
@@ -18,7 +20,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getProducts() {
+    public ResponseEntity<List<ProductSummaryDto>> getProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 }

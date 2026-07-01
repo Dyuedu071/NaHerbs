@@ -30,15 +30,18 @@ public class BlogService {
     private final BlogCategoryRepository categoryRepository;
     private final BlogPostProductRepository postProductRepository;
     private final ProductRepository productRepository; // needed to resolve products
+    private final vn.io.naherb.media.MediaAssetRepository mediaAssetRepository;
 
     public BlogService(BlogPostRepository blogPostRepository, 
                        BlogCategoryRepository categoryRepository,
                        BlogPostProductRepository postProductRepository,
-                       ProductRepository productRepository) {
+                       ProductRepository productRepository,
+                       vn.io.naherb.media.MediaAssetRepository mediaAssetRepository) {
         this.blogPostRepository = blogPostRepository;
         this.categoryRepository = categoryRepository;
         this.postProductRepository = postProductRepository;
         this.productRepository = productRepository;
+        this.mediaAssetRepository = mediaAssetRepository;
     }
 
     @CacheEvict(value = {RedisCacheConfig.CACHE_BLOGS_LIST, RedisCacheConfig.CACHE_BLOG_DETAIL}, allEntries = true)
@@ -86,6 +89,12 @@ public class BlogService {
             post.setCategory(category);
         }
 
+        if (request.getThumbnailMediaId() != null) {
+            vn.io.naherb.media.MediaAsset thumbnail = mediaAssetRepository.findById(request.getThumbnailMediaId())
+                .orElseThrow(() -> new IllegalArgumentException("Ảnh đại diện không tồn tại hoặc đã bị xóa. Vui lòng chọn lại ảnh khác."));
+            post.setThumbnailMedia(thumbnail);
+        }
+
         BlogPost savedPost = blogPostRepository.save(post);
 
         // Associate products
@@ -127,8 +136,14 @@ public class BlogService {
         return posts.map(this::mapToResponse);
     }
 
-    public List<BlogCategory> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<vn.io.naherb.blog.dto.BlogCategoryDto> getAllCategories() {
+        return categoryRepository.findAll().stream().map(category -> {
+            vn.io.naherb.blog.dto.BlogCategoryDto dto = new vn.io.naherb.blog.dto.BlogCategoryDto();
+            dto.setId(category.getId());
+            dto.setName(category.getName());
+            dto.setSlug(category.getSlug());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     private BlogPostResponse mapToResponse(BlogPost post) {

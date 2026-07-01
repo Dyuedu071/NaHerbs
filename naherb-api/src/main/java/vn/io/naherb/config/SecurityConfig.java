@@ -112,7 +112,7 @@ public class SecurityConfig {
                                                                 "/api/auth/refresh",
                                                                 "/api/admin/**",
                                                                 "/api/account/**",
-                                                                "/api/v1/admin/media/upload"))
+                                                                "/api/v1/admin/media/**"))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .requestCache(cache -> cache.disable())

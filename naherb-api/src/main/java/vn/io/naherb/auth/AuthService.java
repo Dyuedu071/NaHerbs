@@ -104,12 +104,19 @@ public class AuthService {
     
     @Transactional
     public SessionResult loginWithGoogle(String idTokenString) {
+        if (googleClientId == null || googleClientId.isBlank()) {
+            throw new BadRequestException("Google Client ID chưa được cấu hình trên Server (app.security.google.client-id)");
+        }
+        String cleanToken = idTokenString != null ? idTokenString.trim() : "";
+        if (cleanToken.isEmpty()) {
+            throw new BadRequestException("Token Google ID không được để trống");
+        }
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
                 
-            GoogleIdToken idToken = verifier.verify(idTokenString);
+            GoogleIdToken idToken = verifier.verify(cleanToken);
             if (idToken == null) {
                 throw new BadRequestException("Invalid Google ID Token");
             }
@@ -138,6 +145,8 @@ public class AuthService {
             });
             
             return createSession(account, refreshTokenService.issue(account.getEmail()));
+        } catch (BadRequestException bre) {
+            throw bre;
         } catch (Exception e) {
             throw new BadRequestException("Failed to verify Google ID Token: " + e.getMessage());
         }

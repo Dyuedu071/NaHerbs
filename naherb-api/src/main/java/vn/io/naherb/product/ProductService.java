@@ -4,6 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+import vn.io.naherb.product.dto.ProductSummaryDto;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class ProductService {
@@ -14,7 +17,13 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductSummaryDto> getAllProducts() {
+        return productRepository.findAll().stream().map(product -> {
+            ProductSummaryDto dto = new ProductSummaryDto();
+            dto.setId(product.getId());
+            dto.setName(product.getName());
+            dto.setSlug(product.getSlug());
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

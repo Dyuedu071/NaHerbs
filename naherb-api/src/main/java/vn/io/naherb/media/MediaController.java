@@ -34,4 +34,18 @@ public class MediaController {
             return ResponseEntity.internalServerError().body(Map.of("error", "Unexpected error: " + e.getMessage()));
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteImage(@PathVariable java.util.UUID id) {
+        try {
+            mediaService.deleteImage(id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", "Failed to delete image: " + e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", "Unexpected error: " + e.getMessage()));
+        }
+    }
 }

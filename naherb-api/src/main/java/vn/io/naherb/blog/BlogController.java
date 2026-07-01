@@ -8,6 +8,8 @@ import vn.io.naherb.blog.dto.BlogPostRequest;
 
 import java.util.List;
 
+import vn.io.naherb.blog.dto.BlogCategoryDto;
+
 @RestController
 @RequestMapping("/api/v1/admin/blog")
 public class BlogController {
@@ -25,7 +27,7 @@ public class BlogController {
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<List<BlogCategory>> getCategories() {
+    public ResponseEntity<List<BlogCategoryDto>> getCategories() {
         return ResponseEntity.ok(blogService.getAllCategories());
     }
 }

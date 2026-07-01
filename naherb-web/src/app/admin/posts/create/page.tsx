@@ -37,15 +37,61 @@ export default function CreatePost() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Custom Notifications & Modals
+  const [toast, setToast] = useState<{message: string, type: 'success'|'error'} | null>(null);
+  const showToast = (message: string, type: 'success' | 'error' = 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const [showDraftModal, setShowDraftModal] = useState(false);
+  const [draftData, setDraftData] = useState<any>(null);
+
+  const restoreDraft = () => {
+    const draft = draftData;
+    if (draft) {
+      if (draft.title) setTitle(draft.title);
+      if (draft.slug) setSlug(draft.slug);
+      if (draft.content) setContent(draft.content);
+      if (draft.seoTitle) setSeoTitle(draft.seoTitle);
+      if (draft.seoDescription) setSeoDescription(draft.seoDescription);
+      if (draft.categoryId) setCategoryId(draft.categoryId);
+      if (draft.productIds) setProductIds(draft.productIds);
+      if (draft.thumbnailMediaId) setThumbnailMediaId(draft.thumbnailMediaId);
+      if (draft.thumbnailUrl) setThumbnailUrl(draft.thumbnailUrl);
+    }
+    setShowDraftModal(false);
+  };
+
+  const discardDraft = () => {
+    if (draftData?.thumbnailMediaId) {
+      AXIOS_INSTANCE.delete('/v1/admin/media/' + draftData.thumbnailMediaId).catch(console.error);
+    }
+    localStorage.removeItem('naherb_draft_post');
+    setShowDraftModal(false);
+  };
+
   useEffect(() => {
+    // Check for draft
+    const savedDraft = localStorage.getItem('naherb_draft_post');
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        setDraftData(parsed);
+        setShowDraftModal(true);
+      } catch (e) {
+        localStorage.removeItem('naherb_draft_post');
+      }
+    }
+
     // Đảm bảo trình duyệt có XSRF-TOKEN cookie trước khi submit form hoặc upload ảnh
     AXIOS_INSTANCE.get('/auth/csrf').catch(console.error);
 
     const fetchData = async () => {
       try {
         const [catRes, prodRes] = await Promise.all([
-          AXIOS_INSTANCE.get('/admin/blog/categories'),
-          AXIOS_INSTANCE.get('/admin/products')
+          AXIOS_INSTANCE.get('/v1/admin/blog/categories'),
+          AXIOS_INSTANCE.get('/v1/admin/products')
         ]);
         setCategories(catRes.data);
         setProducts(prodRes.data);
@@ -55,6 +101,23 @@ export default function CreatePost() {
     };
     fetchData();
   }, []);
+
+  // Auto-save effect
+  useEffect(() => {
+    // Prevent saving empty draft immediately on mount if it's a new post
+    if (!title && !content && !categoryId && productIds.length === 0 && !thumbnailMediaId) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      const draft = {
+        title, slug, content, seoTitle, seoDescription, categoryId, productIds, thumbnailMediaId, thumbnailUrl
+      };
+      localStorage.setItem('naherb_draft_post', JSON.stringify(draft));
+    }, 1000); // 1-second debounce
+
+    return () => clearTimeout(timer);
+  }, [title, slug, content, seoTitle, seoDescription, categoryId, productIds, thumbnailMediaId, thumbnailUrl]);
 
   // Derived state for filtered lists
   const filteredCategories = categories.filter(c => c.name.toLowerCase().includes(categorySearch.toLowerCase()));
@@ -71,7 +134,7 @@ export default function CreatePost() {
 
   const handleSelectProduct = (id: string) => {
     if (productIds.length >= 6) {
-      alert("Chỉ được chọn tối đa 6 sản phẩm");
+      showToast("Chỉ được chọn tối đa 6 sản phẩm", "error");
       return;
     }
     setProductIds([...productIds, id]);
@@ -92,29 +155,62 @@ export default function CreatePost() {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await AXIOS_INSTANCE.post('/v1/admin/media/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await AXIOS_INSTANCE.post('/v1/admin/media/upload', formData);
       
+      if (thumbnailMediaId) {
+        try {
+          await AXIOS_INSTANCE.delete('/v1/admin/media/' + thumbnailMediaId);
+        } catch (delErr) {
+          console.error("Failed to delete old thumbnail:", delErr);
+        }
+      }
+
       setThumbnailUrl(response.data.location);
       setThumbnailMediaId(response.data.id);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Thumbnail upload failed:", error);
-      alert("Lỗi tải ảnh đại diện lên.");
+      if (error.response?.data?.error) {
+        showToast("Lỗi tải ảnh: " + error.response.data.error, "error");
+      } else {
+        showToast("Lỗi tải ảnh đại diện lên.", "error");
+      }
     } finally {
       setIsUploadingThumbnail(false);
     }
   };
 
+  const handleRemoveThumbnail = async () => {
+    if (thumbnailMediaId) {
+      try {
+        await AXIOS_INSTANCE.delete('/v1/admin/media/' + thumbnailMediaId);
+      } catch (error) {
+        console.error("Failed to delete thumbnail:", error);
+      }
+    }
+    setThumbnailUrl('');
+    setThumbnailMediaId(null);
+    
+    // Xóa ngay lập tức khỏi localStorage để tránh lỗi khôi phục nháp cũ
+    const savedDraft = localStorage.getItem('naherb_draft_post');
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft);
+        draft.thumbnailMediaId = null;
+        draft.thumbnailUrl = '';
+        localStorage.setItem('naherb_draft_post', JSON.stringify(draft));
+      } catch (e) {}
+    }
+  };
+
   const submitPost = async (status: 'DRAFT' | 'PUBLISHED') => {
     if (!title.trim()) {
-      alert("Vui lòng nhập tiêu đề bài viết");
+      showToast("Vui lòng nhập tiêu đề bài viết", "error");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await AXIOS_INSTANCE.post('/admin/blogs', {
+      await AXIOS_INSTANCE.post('/v1/admin/blog', {
         title,
         slug,
         content,
@@ -126,16 +222,17 @@ export default function CreatePost() {
         categoryId: categoryId ? categoryId : null,
         productIds
       });
-      alert(status === 'DRAFT' ? "Đã lưu nháp thành công!" : "Đã xuất bản bài viết!");
-      router.push('/admin/posts');
+      localStorage.removeItem('naherb_draft_post');
+      showToast(status === 'DRAFT' ? "Đã lưu nháp thành công!" : "Đã xuất bản bài viết!", "success");
+      setTimeout(() => router.push('/admin/posts'), 1000);
     } catch (error: any) {
       console.error("Error creating post:", error);
       if (error.response?.status === 409) {
-        alert("Lỗi: Đường dẫn tĩnh (Slug) đã tồn tại. Vui lòng đổi slug khác.");
+        showToast("Lỗi: Đường dẫn tĩnh (Slug) đã tồn tại. Vui lòng đổi slug khác.", "error");
       } else if (error.response?.data?.message) {
-        alert("Lỗi: " + error.response.data.message);
+        showToast("Lỗi: " + error.response.data.message, "error");
       } else {
-        alert("Đã có lỗi xảy ra. Vui lòng thử lại.");
+        showToast("Đã có lỗi xảy ra. Vui lòng thử lại.", "error");
       }
     } finally {
       setIsSubmitting(false);
@@ -146,7 +243,38 @@ export default function CreatePost() {
   const handlePublish = async () => submitPost('PUBLISHED');
 
   return (
-    <main className="flex-1 p-gutter max-w-container-max mx-auto w-full flex flex-col gap-md pb-xl">
+    <main className="flex-1 p-gutter max-w-container-max mx-auto w-full flex flex-col gap-md pb-xl relative">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-ambient-lg text-label-md font-label-md text-white transition-all transform duration-300 ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+          {toast.message}
+        </div>
+      )}
+
+      {/* Draft Restore Modal */}
+      {showDraftModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-surface p-xl rounded-2xl shadow-ambient-lg max-w-md w-full flex flex-col gap-md">
+            <h2 className="text-title-lg font-title-lg text-primary">Khôi phục bản nháp</h2>
+            <p className="text-body-md text-text-main">
+              Bạn có một bản nháp chưa lưu từ phiên làm việc trước. Bạn có muốn khôi phục không?
+            </p>
+            <div className="flex gap-sm justify-end mt-sm">
+              <button 
+                onClick={discardDraft}
+                className="px-md py-sm bg-surface-variant text-text-main rounded-full text-label-md font-label-md hover:bg-border-warm transition-colors">
+                Hủy bỏ
+              </button>
+              <button 
+                onClick={restoreDraft}
+                className="px-md py-sm bg-primary text-on-primary rounded-full text-label-md font-label-md hover:bg-secondary transition-colors">
+                Khôi phục
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-sm">
         <div className="flex items-center gap-sm">
           <Link href="/admin/posts" className="w-10 h-10 flex items-center justify-center rounded-full text-text-muted hover:bg-surface-variant transition-colors">
@@ -218,7 +346,7 @@ export default function CreatePost() {
                  {/* eslint-disable-next-line @next/next/no-img-element */}
                  <img src={thumbnailUrl} alt="Thumbnail preview" className="object-cover w-full h-full" />
                  <button 
-                   onClick={() => { setThumbnailUrl(''); setThumbnailMediaId(null); }}
+                   onClick={handleRemoveThumbnail}
                    className="absolute top-2 right-2 w-8 h-8 bg-surface/80 rounded-full flex items-center justify-center text-error hover:bg-error hover:text-white transition-colors"
                  >
                    <span className="material-symbols-outlined text-[18px]">close</span>
