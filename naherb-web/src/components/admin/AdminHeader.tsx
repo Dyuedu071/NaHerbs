@@ -1,8 +1,16 @@
 "use client";
 
 import { AXIOS_INSTANCE } from '@/services/api-client';
+import { useGetAuthMe } from "@/services/generated/customer-profile/customer-profile";
 
 export default function AdminHeader() {
+  const { data } = useGetAuthMe({
+    query: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    }
+  });
+  const user = data as unknown as { avatarUrl?: string } | undefined;
   const handleLogout = async () => {
     try {
       await AXIOS_INSTANCE.post('/auth/logout');
@@ -44,7 +52,7 @@ export default function AdminHeader() {
             <img
               className="w-full h-full object-cover"
               alt="Admin Avatar"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-evsc8zgEtLnYVJ3_1r2ubC3F1RYQkMgOO6zoM_gL7oo0ds_FIjp_ulem8jucVnyU8AnVmUrrppSmxZ0dOkVJFK88By3IT7OKXeqfoO5VrSvHCmszOJzPEsLaOssABaVPSNJk57cj0rfjN6RdKvN8h-8qLwH1eCZTEKM7QX3fXACyDvzP1XpsYTaXPm07z9ai9ExFRuzT2k8UbwC83po4wEz1Erx7LBcsiIc9ixrDjhgHFRYzrCS8QDsuVOblf-P-0sY3CvxCYTE"
+              src={user?.avatarUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuC-evsc8zgEtLnYVJ3_1r2ubC3F1RYQkMgOO6zoM_gL7oo0ds_FIjp_ulem8jucVnyU8AnVmUrrppSmxZ0dOkVJFK88By3IT7OKXeqfoO5VrSvHCmszOJzPEsLaOssABaVPSNJk57cj0rfjN6RdKvN8h-8qLwH1eCZTEKM7QX3fXACyDvzP1XpsYTaXPm07z9ai9ExFRuzT2k8UbwC83po4wEz1Erx7LBcsiIc9ixrDjhgHFRYzrCS8QDsuVOblf-P-0sY3CvxCYTE"}
             />
           </div>
           <button 

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function AdminPosts() {
   return (
     <main className="flex-1 p-gutter max-w-container-max mx-auto w-full flex flex-col gap-md">
@@ -11,10 +13,12 @@ export default function AdminPosts() {
             Manage your herbal wellness content, SEO status, and publication schedule.
           </p>
         </div>
-        <button className="px-md py-sm bg-primary text-on-primary rounded-full text-label-md font-label-md hover:bg-secondary transition-all shadow-ambient-md flex items-center gap-xs hover:-translate-y-0.5">
+        <Link 
+          href="/admin/posts/create"
+          className="px-md py-sm bg-primary text-on-primary rounded-full text-label-md font-label-md hover:bg-secondary transition-all shadow-ambient-md flex items-center gap-xs hover:-translate-y-0.5">
           <span className="material-symbols-outlined text-[18px]">add</span>
           Viết bài mới
-        </button>
+        </Link>
       </div>
       {/* Filter & Search Bar */}
       <div className="bg-surface-container-lowest p-sm rounded-xl shadow-ambient-sm border border-border-warm flex gap-sm items-center">

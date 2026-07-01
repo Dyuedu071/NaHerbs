@@ -2,9 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useGetAuthMe } from "@/services/generated/customer-profile/customer-profile";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const { data } = useGetAuthMe({
+    query: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    }
+  });
+  const user = data as unknown as { name: string; role: string; avatarUrl?: string } | undefined;
 
   const navItems = [
     { name: "Dashboard", href: "/admin/dashboard", icon: "dashboard" },
@@ -12,6 +20,7 @@ export default function AdminSidebar() {
     { name: "Orders", href: "/admin/orders", icon: "shopping_cart" },
     { name: "QR Payments", href: "/admin/qr-payments", icon: "qr_code_2" },
     { name: "Blog", href: "/admin/posts", icon: "edit_note" },
+    { name: "Chatbot AI", href: "/admin/chatbot", icon: "psychiatry" },
   ];
 
   return (
@@ -21,11 +30,11 @@ export default function AdminSidebar() {
           <img
             className="w-full h-full object-cover"
             alt="Wellness Clinic Administrator"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUvIyn86HxX7B0C0hVLnUsLEPOBquhHiSErWc-J6O5bD3OJSheJ7AaozIJ0We28BV5wfaQCHy_ATPN2Xtih-pvQeAgJD06H2J1--FOZGbcS4MCeUNl-ECk-TQdVWAhp5LEdNrWKPRLmaKulgaTzVbmWo2Y1A974UYpSVWPP4heGHFQ4dxQyUdX_KvApSziEfTuj4VRII48zkA-iblORSPlODOCMaPlQGVWr1sYAhCvEszhvf2uqxYuiIwqjzn08hM-llNEU7lPNbo"
+            src={user?.avatarUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuCUvIyn86HxX7B0C0hVLnUsLEPOBquhHiSErWc-J6O5bD3OJSheJ7AaozIJ0We28BV5wfaQCHy_ATPN2Xtih-pvQeAgJD06H2J1--FOZGbcS4MCeUNl-ECk-TQdVWAhp5LEdNrWKPRLmaKulgaTzVbmWo2Y1A974UYpSVWPP4heGHFQ4dxQyUdX_KvApSziEfTuj4VRII48zkA-iblORSPlODOCMaPlQGVWr1sYAhCvEszhvf2uqxYuiIwqjzn08hM-llNEU7lPNbo"}
           />
         </div>
-        <h2 className="text-headline-md font-headline-md font-bold text-primary">Wellness Admin</h2>
-        <p className="text-caption font-caption text-text-muted">Management Portal</p>
+        <h2 className="text-headline-md font-headline-md font-bold text-primary">{user?.name || "Wellness Admin"}</h2>
+        <p className="text-caption font-caption text-text-muted">{user?.role === "ADMIN" ? "Quản trị viên" : (user?.role || "Management Portal")}</p>
       </div>
 
       <nav className="flex-1 py-md flex flex-col gap-base">
