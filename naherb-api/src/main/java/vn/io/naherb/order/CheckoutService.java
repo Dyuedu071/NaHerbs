@@ -33,7 +33,7 @@ import vn.io.naherb.exception.NotFoundException;
 import vn.io.naherb.order.dto.CheckoutRequest;
 import vn.io.naherb.order.dto.CheckoutResponse;
 import vn.io.naherb.product.ProductSku;
-import vn.io.naherb.product.ProductSkuRepository;
+import vn.io.naherb.product.repository.ProductSkuRepository;
 import vn.io.naherb.security.CurrentAccountHelper;
 
 @Service
