@@ -22,16 +22,16 @@ This checklist is generated from `docs/openapi.yml`.
 - [x] `GET` /account/profile - Get current account profile (@TuanAnh)
 - [x] `PUT` /account/profile - Update current account profile (@TuanAnh)
 ## Cart
-- [ ] `GET` /cart - Get current customer's cart (@Hoang)
-- [ ] `DELETE` /cart - Clear cart (@Hoang)
-- [ ] `POST` /cart/items - Add item to cart (@Hoang)
-- [ ] `PATCH` /cart/items/{itemId} - Update cart item quantity (@Hoang)
-- [ ] `DELETE` /cart/items/{itemId} - Remove cart item (@Hoang)
+- [x] `GET` /cart - Get current customer's cart (@Hoang)
+- [x] `DELETE` /cart - Clear cart (@Hoang)
+- [x] `POST` /cart/items - Add item to cart (@Hoang)
+- [x] `PATCH` /cart/items/{itemId} - Update cart item quantity (@Hoang)
+- [x] `DELETE` /cart/items/{itemId} - Remove cart item (@Hoang)
 ## Checkout
-- [ ] `POST` /checkout - Create order from cart (@Hoang)
+- [x] `POST` /checkout - Create order from cart (@Hoang)
 ## Customer Orders
-- [ ] `GET` /orders/my - List current customer's orders (@Hoang)
-- [ ] `GET` /orders/my/{orderId} - Get current customer's order detail (@Hoang)
+- [x] `GET` /orders/my - List current customer's orders (@Hoang)
+- [x] `GET` /orders/my/{orderId} - Get current customer's order detail (@Hoang)
 ## Chatbot
 - [x] `GET` /chatbot/config/public - Get public chatbot config (@TuanAnh)
 - [x] `POST` /chatbot/conversations - Create chatbot conversation (@TuanAnh)
@@ -48,10 +48,10 @@ This checklist is generated from `docs/openapi.yml`.
 - [ ] `PUT` /admin/product-skus/{skuId} - Update SKU (@Chien)
 - [ ] `PATCH` /admin/product-skus/{skuId}/stock - Update SKU stock (@Chien)
 ## Admin Orders
-- [ ] `GET` /admin/orders - List orders for admin (@Hoang)
-- [ ] `GET` /admin/orders/{orderId} - Admin get order detail (@Hoang)
-- [ ] `PATCH` /admin/orders/{orderId}/status - Update order status (@Hoang)
-- [ ] `PATCH` /admin/orders/{orderId}/payment-status - Manually update payment status, used for QR confirmation (@Hoang)
+- [x] `GET` /admin/orders - List orders for admin (@Hoang)
+- [x] `GET` /admin/orders/{orderId} - Admin get order detail (@Hoang)
+- [x] `PATCH` /admin/orders/{orderId}/status - Update order status (@Hoang)
+- [x] `PATCH` /admin/orders/{orderId}/payment-status - Manually update payment status, used for QR confirmation (@Hoang)
 ## Admin Blog
 - [ ] `GET` /admin/blog-posts - List blog posts admin (@Duy)
 - [ ] `POST` /admin/blog-posts - Create blog post (@Duy)
