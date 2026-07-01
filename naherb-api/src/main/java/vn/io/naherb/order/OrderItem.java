@@ -21,7 +21,10 @@ public class OrderItem extends BaseEntity {
     @JoinColumn(name = "sku_id")
     private ProductSku sku;
 
-    @Column(name = "sku_name", nullable = false)
+    @Column(name = "product_name_snapshot", nullable = false)
+    private String productNameSnapshot;
+
+    @Column(name = "sku_name_snapshot", nullable = false)
     private String skuName;
 
     @Column(name = "unit_price", nullable = false)
@@ -30,6 +33,6 @@ public class OrderItem extends BaseEntity {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "total_price", nullable = false)
+    @Column(name = "line_total", nullable = false)
     private BigDecimal totalPrice;
 }

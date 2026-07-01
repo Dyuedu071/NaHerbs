@@ -11,5 +11,7 @@ public interface AccountAddressRepository extends JpaRepository<AccountAddress, 
 
     Optional<AccountAddress> findByIdAndAccount_Id(UUID id, UUID accountId);
 
+    Optional<AccountAddress> findFirstByAccount_IdAndIsDefaultTrue(UUID accountId);
+
     long countByAccount_Id(UUID accountId);
 }
