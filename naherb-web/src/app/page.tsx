@@ -42,8 +42,8 @@ export default function Home() {
                     href="#">Home</a>
                 <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
                     href="#">Products</a>
-                <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">Blog</a>
+                <Link className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
+                    href="/blog">Blog</Link>
                 <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
                     href="#">About</a>
                 <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"

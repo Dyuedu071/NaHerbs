@@ -49,8 +49,13 @@ AXIOS_INSTANCE.interceptors.response.use(
 
     // Chỉ thực hiện refresh khi trả về lỗi 401 và request chưa được thử lại lần nào (_retry)
     if (error.response?.status === 401 && !originalRequest._retry) {
-      // Tránh lặp vô hạn nếu API refresh hoặc login trả về 401
-      if (originalRequest.url?.includes('/auth/refresh') || originalRequest.url?.includes('/auth/login')) {
+      // Tránh lặp vô hạn nếu các API auth trả về 401
+      if (
+        originalRequest.url?.includes('/auth/refresh') ||
+        originalRequest.url?.includes('/auth/login') ||
+        originalRequest.url?.includes('/auth/google') ||
+        originalRequest.url?.includes('/auth/register')
+      ) {
         return Promise.reject(error);
       }
 
@@ -75,16 +80,19 @@ AXIOS_INSTANCE.interceptors.response.use(
         await AXIOS_INSTANCE.post('/auth/refresh');
         isRefreshing = false;
         processQueue(null);
-        
+
         // Thực hiện lại request gốc ban đầu với Cookie mới
         return AXIOS_INSTANCE(originalRequest);
       } catch (refreshError) {
         isRefreshing = false;
         processQueue(refreshError, null);
 
-        // Nếu refresh thất bại (Refresh Token hết hạn sau 7 ngày), chuyển hướng về trang đăng nhập
+        // Nếu refresh thất bại, chỉ chuyển hướng nếu không phải đang ở trang login/register
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          const currentPath = window.location.pathname;
+          if (currentPath !== '/login' && currentPath !== '/register') {
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(refreshError);
       }
