@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import vn.io.naherb.blog.dto.BlogPostRequest;
 import vn.io.naherb.common.enums.ContentStatus;
 import vn.io.naherb.product.Product;
-import vn.io.naherb.product.ProductRepository;
+import vn.io.naherb.product.repository.ProductRepository;
 
 import java.util.List;
 
@@ -19,6 +19,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
 import vn.io.naherb.auth.service.EmailService;
 
+import org.springframework.context.annotation.Import;
+import vn.io.naherb.InMemoryTokenStoreTestConfig;
 import org.springframework.test.context.TestPropertySource;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
+@Import(InMemoryTokenStoreTestConfig.class)
 @TestPropertySource(properties = {
     "app.security.google.client-id=test-client-id"
 })

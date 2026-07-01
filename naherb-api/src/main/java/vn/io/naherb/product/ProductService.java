@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import vn.io.naherb.product.dto.ProductSummaryDto;
+import vn.io.naherb.product.repository.ProductRepository;
 import java.util.stream.Collectors;
 
 @Service
