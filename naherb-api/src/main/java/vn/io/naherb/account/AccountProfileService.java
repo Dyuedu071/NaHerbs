@@ -59,7 +59,7 @@ public class AccountProfileService {
                 .findByAccountId(accountId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy hồ sơ"));
 
-        String avatarUrl = avatarStorageService.storeAvatar(accountId, file);
+        String avatarUrl = avatarStorageService.storeAvatar(accountId, file, profile.getAvatarUrl());
         profile.setAvatarUrl(avatarUrl);
         return AccountProfileMapper.toResponse(accountProfileRepository.save(profile));
     }

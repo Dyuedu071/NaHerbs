@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/account/profile", label: "Hồ sơ cá nhân", icon: "person" },
-  { href: "/account/addresses", label: "Địa chỉ giao hàng", icon: "location_on" },
+  { href: "/tai-khoan/ho-so", label: "Hồ sơ cá nhân", icon: "person" },
+  { href: "/tai-khoan/dia-chi", label: "Địa chỉ giao hàng", icon: "location_on" },
 ] as const;
 
 export default function AccountNav() {

@@ -36,6 +36,9 @@ class AccountProfileIntegrationTests {
     @Autowired
     private MockMvc mockMvc;
 
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private com.cloudinary.Cloudinary cloudinary;
+
     @Autowired
     private AccountRepository accountRepository;
 
@@ -143,6 +146,11 @@ class AccountProfileIntegrationTests {
         register(csrfCookie);
         SessionCookies session = login(csrfCookie);
 
+        com.cloudinary.Uploader uploader = org.mockito.Mockito.mock(com.cloudinary.Uploader.class);
+        org.mockito.Mockito.when(cloudinary.uploader()).thenReturn(uploader);
+        org.mockito.Mockito.when(uploader.upload(org.mockito.ArgumentMatchers.any(byte[].class), org.mockito.ArgumentMatchers.anyMap()))
+                .thenReturn(java.util.Map.of("secure_url", "https://res.cloudinary.com/test/image/upload/naherb/avatars/avatar_test.png"));
+
         byte[] pngBytes = java.util.Base64.getDecoder()
                 .decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==");
 
@@ -153,7 +161,7 @@ class AccountProfileIntegrationTests {
                         .header("X-XSRF-TOKEN", csrfCookie.getValue()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.data.avatarUrl", org.hamcrest.Matchers.containsString("/api/media/avatars/")));
+                .andExpect(jsonPath("$.data.avatarUrl", is("https://res.cloudinary.com/test/image/upload/naherb/avatars/avatar_test.png")));
     }
 
     @Test

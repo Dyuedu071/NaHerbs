@@ -16,7 +16,7 @@ import vn.io.naherb.product.dto.ProductListResponse;
 import vn.io.naherb.product.service.PublicProductService;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping({"/api", "/api/v1"})
 @RequiredArgsConstructor
 public class PublicProductController {
 

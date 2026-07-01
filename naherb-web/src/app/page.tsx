@@ -2,133 +2,16 @@
 
 import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
-import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
-import { AXIOS_INSTANCE } from '@/services/api-client';
-import { useState } from 'react';
+import PublicHeader from '@/components/common/PublicHeader';
 
 export default function Home() {
   const { open: openChatbot } = useChatbot();
-  const { data } = useGetAuthMe({
-    query: {
-      retry: false,
-      refetchOnWindowFocus: false,
-    }
-  });
-
-  const user = data as unknown as { id: string; email: string; name: string; role: string; avatarUrl?: string } | undefined;
-  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-
-  const handleLogout = async () => {
-    try {
-      await AXIOS_INSTANCE.post('/auth/logout');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      window.location.href = '/login';
-    }
-  };
 
   return (
     <>
 
     {/* TopNavBar */}
-    <header className="fixed top-0 w-full z-50 bg-surface/88 backdrop-blur-md shadow-sm">
-        <div className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
-            {/* Brand Logo */}
-            <Link className="font-display-lg text-display-lg text-primary tracking-tight" href="/">NaHerbs</Link>
-            {/* Navigation Links */}
-            <nav className="hidden md:flex gap-gutter items-center">
-                <a className="text-primary font-bold relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-soft-sage after:rounded-full font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">Home</a>
-                <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">Products</a>
-                <Link className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="/blog">Blog</Link>
-                <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">About</a>
-                <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">Contact</a>
-            </nav>
-            {/* Trailing Actions */}
-            <div className="flex items-center gap-md">
-                {/* Search Icon (Search bar on right implied) */}
-                <button className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>search</span>
-                </button>
-                <button className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 relative">
-                    <span className="material-symbols-outlined"
-                        style={{ fontVariationSettings: "'FILL' 0" }}>shopping_cart</span>
-                </button>
-                {user ? (
-                    <div className="relative hidden md:flex items-center gap-xs">
-                        <button
-                            type="button"
-                            onClick={() => setAccountMenuOpen((open) => !open)}
-                            className="flex items-center gap-xs rounded-full py-1 pl-1 pr-2 hover:bg-success-bg transition-colors"
-                        >
-                            <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 shadow-sm">
-                                <img
-                                    src={user.avatarUrl || '/images/avatars/default-avatar.jpg'}
-                                    alt="User Avatar"
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            <span className="font-label-md text-label-md text-primary font-semibold max-w-[120px] truncate">
-                                {user.name}
-                            </span>
-                            <span className="material-symbols-outlined text-primary text-[18px]">
-                                expand_more
-                            </span>
-                        </button>
-                        {accountMenuOpen && (
-                            <div className="absolute right-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-herbal-beige bg-surface py-2 shadow-ambient-2">
-                                <Link
-                                    href="/account/profile"
-                                    onClick={() => setAccountMenuOpen(false)}
-                                    className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
-                                >
-                                    Hồ sơ cá nhân
-                                </Link>
-                                <Link
-                                    href="/account/addresses"
-                                    onClick={() => setAccountMenuOpen(false)}
-                                    className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
-                                >
-                                    Địa chỉ giao hàng
-                                </Link>
-                                <button
-                                    type="button"
-                                    onClick={handleLogout}
-                                    className="flex w-full items-center gap-xs px-md py-2 font-label-md text-label-md text-error hover:bg-error-container"
-                                >
-                                    <span className="material-symbols-outlined text-[18px]">logout</span>
-                                    Đăng xuất
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <>
-                        <Link href="/login" className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 hidden md:block">
-                            <span className="material-symbols-outlined"
-                                style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
-                        </Link>
-                        <Link
-                            href="/login"
-                            className="border border-primary text-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-success-bg transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
-                            Đăng nhập
-                        </Link>
-                    </>
-                )}
-                <button
-                    type="button"
-                    onClick={openChatbot}
-                    className="bg-primary text-on-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
-                    Tư vấn ngay
-                </button>
-            </div>
-        </div>
-    </header>
+    <PublicHeader />
     <main className="flex-grow pt-24 pb-xl">
         {/* Hero Section */}
         <section className="px-gutter max-w-container-max mx-auto py-xl">
@@ -165,7 +48,7 @@ export default function Home() {
             </div>
         </section>
         {/* Benefit Strip */}
-        <section className="px-gutter max-w-container-max mx-auto pb-xl">
+        <section id="about" className="px-gutter max-w-container-max mx-auto pb-xl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
                 <div
                     className="bg-surface rounded-xl p-md flex items-center gap-sm border border-border-warm shadow-ambient-1">
@@ -350,14 +233,15 @@ export default function Home() {
                 </div>
             </div>
             <div className="flex justify-center mt-lg">
-                <button
+                <Link
+                    href="/san-pham"
                     className="bg-surface border-2 border-primary text-primary rounded-full px-lg py-sm font-label-md text-label-md hover:bg-primary-fixed hover:border-transparent transition-colors">
                     Xem Tất Cả Sản Phẩm
-                </button>
+                </Link>
             </div>
         </section>
         {/* AI Advisor Section */}
-        <section className="bg-surface-container my-xl">
+        <section id="contact" className="bg-surface-container my-xl">
             <div
                 className="px-gutter max-w-container-max mx-auto py-xl flex flex-col md:flex-row items-center gap-xl relative">
                 <div className="w-full md:w-1/2 relative">

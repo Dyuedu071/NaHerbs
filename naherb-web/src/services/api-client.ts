@@ -87,11 +87,12 @@ AXIOS_INSTANCE.interceptors.response.use(
         isRefreshing = false;
         processQueue(refreshError, null);
 
-        // Nếu refresh thất bại, chỉ chuyển hướng nếu không phải đang ở trang login/register
+        // Nếu refresh thất bại, chỉ tự động chuyển hướng nếu đang ở các trang bảo mật (như /tai-khoan hoặc /admin)
         if (typeof window !== 'undefined') {
           const currentPath = window.location.pathname;
-          if (currentPath !== '/login' && currentPath !== '/register') {
-            window.location.href = '/login';
+          const isProtectedRoute = currentPath.startsWith('/tai-khoan') || currentPath.startsWith('/admin');
+          if (isProtectedRoute) {
+            window.location.href = '/dang-nhap';
           }
         }
         return Promise.reject(refreshError);

@@ -17,7 +17,7 @@ export default function AdminHeader() {
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
-      window.location.href = '/login';
+      window.location.href = '/dang-nhap';
     }
   };
 
@@ -39,7 +39,7 @@ export default function AdminHeader() {
       </div>
       <div className="flex items-center gap-lg">
         <span className="text-label-md font-label-md font-semibold text-primary">
-          Organic Wellness Core
+          Hệ thống quản trị NaHerbs
         </span>
         <div className="flex items-center gap-sm">
           <button className="w-10 h-10 rounded-full flex items-center justify-center text-text-muted hover:text-primary hover:bg-surface-container transition-all">

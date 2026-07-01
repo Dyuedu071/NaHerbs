@@ -2,39 +2,29 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useGetAuthMe } from "@/services/generated/customer-profile/customer-profile";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const { data } = useGetAuthMe({
-    query: {
-      retry: false,
-      refetchOnWindowFocus: false,
-    }
-  });
-  const user = data as unknown as { name: string; role: string; avatarUrl?: string } | undefined;
 
   const navItems = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: "dashboard" },
-    { name: "Products", href: "/admin/products", icon: "inventory_2" },
-    { name: "Orders", href: "/admin/orders", icon: "shopping_cart" },
-    { name: "QR Payments", href: "/admin/qr-payments", icon: "qr_code_2" },
-    { name: "Blog", href: "/admin/posts", icon: "edit_note" },
+    { name: "Tổng quan", href: "/admin/dashboard", icon: "dashboard" },
+    { name: "Sản phẩm", href: "/admin/san-pham", icon: "inventory_2" },
+    { name: "Đơn hàng", href: "/admin/orders", icon: "shopping_cart" },
+    { name: "Thanh toán QR", href: "/admin/qr-payments", icon: "qr_code_2" },
+    { name: "Bài viết", href: "/admin/posts", icon: "edit_note" },
     { name: "Chatbot AI", href: "/admin/chatbot", icon: "psychiatry" },
   ];
 
   return (
     <aside className="flex flex-col h-screen overflow-y-auto fixed left-0 top-0 bg-surface-container-low border-r border-border-warm shadow-sm w-64 z-50 custom-scrollbar">
-      <div className="p-md border-b border-border-warm flex flex-col items-center">
-        <div className="w-16 h-16 rounded-full bg-herbal-beige mb-xs flex items-center justify-center overflow-hidden">
-          <img
-            className="w-full h-full object-cover"
-            alt="Wellness Clinic Administrator"
-            src={user?.avatarUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuCUvIyn86HxX7B0C0hVLnUsLEPOBquhHiSErWc-J6O5bD3OJSheJ7AaozIJ0We28BV5wfaQCHy_ATPN2Xtih-pvQeAgJD06H2J1--FOZGbcS4MCeUNl-ECk-TQdVWAhp5LEdNrWKPRLmaKulgaTzVbmWo2Y1A974UYpSVWPP4heGHFQ4dxQyUdX_KvApSziEfTuj4VRII48zkA-iblORSPlODOCMaPlQGVWr1sYAhCvEszhvf2uqxYuiIwqjzn08hM-llNEU7lPNbo"}
-          />
+      <div className="p-md border-b border-border-warm flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+          <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>spa</span>
         </div>
-        <h2 className="text-headline-md font-headline-md font-bold text-primary">{user?.name || "Wellness Admin"}</h2>
-        <p className="text-caption font-caption text-text-muted">{user?.role === "ADMIN" ? "Quản trị viên" : (user?.role || "Management Portal")}</p>
+        <div>
+          <h2 className="text-title-md font-bold text-primary">NaHerbs</h2>
+          <p className="text-caption text-text-muted">Quản trị viên</p>
+        </div>
       </div>
 
       <nav className="flex-1 py-md flex flex-col gap-base">
@@ -64,18 +54,21 @@ export default function AdminSidebar() {
           href="#"
         >
           <span className="material-symbols-outlined">settings</span>
-          <span className="text-label-md font-label-md">Settings</span>
+          <span className="text-label-md font-label-md">Cài đặt</span>
         </a>
         <a
           className="flex items-center gap-sm px-sm py-sm rounded-lg text-text-muted hover:text-primary hover:bg-surface-container-high transition-all duration-200"
           href="#"
         >
           <span className="material-symbols-outlined">help_outline</span>
-          <span className="text-label-md font-label-md">Support</span>
+          <span className="text-label-md font-label-md">Hỗ trợ</span>
         </a>
-        <button className="mt-sm w-full py-sm bg-primary text-on-primary rounded-full text-label-md font-label-md hover:bg-secondary transition-colors">
-          View Store
-        </button>
+        <Link
+          href="/"
+          className="mt-sm w-full py-sm bg-primary text-on-primary rounded-full text-label-md font-label-md hover:bg-secondary transition-colors text-center block shadow-level-1 hover:shadow-level-2"
+        >
+          Xem cửa hàng
+        </Link>
       </div>
     </aside>
   );

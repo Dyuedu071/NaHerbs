@@ -1349,6 +1349,21 @@ components:
           type: number
         stockStatus:
           $ref: '#/components/schemas/StockStatus'
+        skuCode:
+          type: string
+          nullable: true
+        categoryName:
+          type: string
+          nullable: true
+        categorySlug:
+          type: string
+          nullable: true
+        skuCount:
+          type: integer
+        totalStockQuantity:
+          type: integer
+        status:
+          $ref: '#/components/schemas/ProductStatus'
     ProductPage:
       type: object
       properties:
