@@ -10,8 +10,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import lombok.RequiredArgsConstructor;
+import vn.io.naherb.security.AuthCookieService;
+
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final AuthCookieService authCookieService;
 
     @ExceptionHandler(AuthenticationException.class)
     ResponseEntity<ApiError> handleAuthentication(AuthenticationException exception) {
@@ -20,7 +26,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidRefreshTokenException.class)
     ResponseEntity<ApiError> handleInvalidRefreshToken(InvalidRefreshTokenException exception) {
-        return response(HttpStatus.UNAUTHORIZED, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .header(org.springframework.http.HttpHeaders.SET_COOKIE, authCookieService.deleteAccess(), authCookieService.deleteRefresh())
+                .body(ApiError.of(HttpStatus.UNAUTHORIZED.value(), exception.getMessage()));
     }
 
     @ExceptionHandler(ConflictException.class)
