@@ -36,8 +36,8 @@ public class Order extends BaseEntity {
     private BigDecimal finalAmount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private OrderStatus status = OrderStatus.PENDING;
+    @Column(name = "order_status", nullable = false)
+    private OrderStatus status = OrderStatus.PENDING_CONFIRMATION;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false)
@@ -52,6 +52,21 @@ public class Order extends BaseEntity {
 
     @Column(name = "receiver_phone", nullable = false, length = 30)
     private String receiverPhone;
+
+    @Column(name = "receiver_email", length = 254)
+    private String receiverEmail;
+
+    @Column(name = "receiver_province_city")
+    private String receiverProvinceCity;
+
+    @Column(name = "receiver_ward_commune")
+    private String receiverWardCommune;
+
+    @Column(name = "receiver_address_detail", columnDefinition = "TEXT")
+    private String receiverAddressDetail;
+
+    @Column(name = "receiver_address_note", columnDefinition = "TEXT")
+    private String receiverAddressNote;
 
     @Column(name = "shipping_address", nullable = false, columnDefinition = "TEXT")
     private String shippingAddress;
