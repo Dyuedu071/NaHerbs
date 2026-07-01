@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NaHerbs Admin - Product Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Merriweather:wght@400;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e8e2d6",
+                        "text-main": "#2B2B2B",
+                        "secondary": "#45664f",
+                        "secondary-fixed-dim": "#abcfb4",
+                        "surface-container-highest": "#e8e2d6",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fff9ed",
+                        "on-tertiary-container": "#ffe1d3",
+                        "on-primary-fixed-variant": "#2f4e33",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1d1c14",
+                        "border-warm": "#DDD0BC",
+                        "on-error-container": "#93000a",
+                        "soft-sage": "#A8BFA3",
+                        "surface-container-low": "#f9f3e7",
+                        "tertiary-fixed-dim": "#ffb692",
+                        "on-secondary-container": "#4b6c55",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#dfd9ce",
+                        "error-bg": "#FBEAE5",
+                        "primary-container": "#4f6f52",
+                        "surface-tint": "#466649",
+                        "inverse-surface": "#333028",
+                        "background": "#fff9ed",
+                        "surface-container-high": "#ede8dc",
+                        "on-secondary-fixed": "#012110",
+                        "primary-fixed-dim": "#acd0ad",
+                        "on-primary-fixed": "#03210b",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#733510",
+                        "inverse-on-surface": "#f6f0e4",
+                        "on-error": "#ffffff",
+                        "error-text": "#B94A3A",
+                        "surface-container": "#f3ede1",
+                        "primary": "#37563b",
+                        "outline-variant": "#c2c8bf",
+                        "on-surface-variant": "#424841",
+                        "on-secondary-fixed-variant": "#2e4d39",
+                        "on-primary-container": "#ccf0cc",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#9c542d",
+                        "outline": "#737971",
+                        "text-muted": "#6F6A61",
+                        "inverse-primary": "#acd0ad",
+                        "herbal-beige": "#E8D8BD",
+                        "earth-brown": "#8A6A4F",
+                        "success-bg": "#E7F0E4",
+                        "surface": "#fff9ed",
+                        "secondary-fixed": "#c7eccf",
+                        "tertiary-fixed": "#ffdbcb",
+                        "tertiary": "#7e3d18",
+                        "on-surface": "#1d1c14",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#c7eccf",
+                        "primary-fixed": "#c8ecc8",
+                        "on-tertiary-fixed": "#341100"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "2xl": "1.5rem"
+                    },
+                    "spacing": {
+                        "xl": "80px",
+                        "md": "24px",
+                        "container-max": "1240px",
+                        "gutter": "32px",
+                        "xs": "8px",
+                        "sm": "16px",
+                        "lg": "48px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "caption": ["Inter"],
+                        "price-display": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Merriweather"],
+                        "headline-lg": ["Merriweather"],
+                        "headline-lg-mobile": ["Merriweather"],
+                        "display-lg": ["Merriweather"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "price-display": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.35", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg": ["40px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["56px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-md": ["15px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .shadow-ambient-low {
+            box-shadow: 0 4px 6px -1px rgba(69, 102, 79, 0.05), 0 2px 4px -1px rgba(69, 102, 79, 0.03);
+        }
+
+        .shadow-ambient-md {
+            box-shadow: 0 10px 15px -3px rgba(69, 102, 79, 0.08), 0 4px 6px -2px rgba(69, 102, 79, 0.04);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background font-body-md text-text-main flex h-screen overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+    <!-- SideNavBar -->
+    <aside
+        class="flex flex-col h-screen fixed left-0 top-0 bg-surface-container-low dark:bg-inverse-surface border-r border-border-warm dark:border-outline-variant shadow-sm w-64 z-50">
+        <div class="p-md flex items-center gap-xs">
+            <span class="material-symbols-outlined text-primary text-3xl">spa</span>
+            <div class="flex flex-col">
+                <span
+                    class="text-headline-md font-headline-md font-bold text-primary dark:text-inverse-primary text-[20px] leading-tight">Wellness
+                    Admin</span>
+                <span class="text-caption font-caption text-text-muted">Management Portal</span>
+            </div>
+        </div>
+        <nav class="flex-1 px-sm py-sm space-y-xs overflow-y-auto">
+            <a class="flex items-center gap-sm px-sm py-xs rounded-lg text-text-muted hover:text-primary transition-colors hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-label-md font-label-md">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-sm px-sm py-xs rounded-lg text-primary font-bold border-r-4 border-primary bg-secondary-container/20 scale-[0.98] transition-transform"
+                href="#">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+                <span class="text-label-md font-label-md">Products</span>
+            </a>
+            <a class="flex items-center gap-sm px-sm py-xs rounded-lg text-text-muted hover:text-primary transition-colors hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="text-label-md font-label-md">Orders</span>
+            </a>
+            <a class="flex items-center gap-sm px-sm py-xs rounded-lg text-text-muted hover:text-primary transition-colors hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined">qr_code_2</span>
+                <span class="text-label-md font-label-md">QR Payments</span>
+            </a>
+            <a class="flex items-center gap-sm px-sm py-xs rounded-lg text-text-muted hover:text-primary transition-colors hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined">edit_note</span>
+                <span class="text-label-md font-label-md">Blog</span>
+            </a>
+        </nav>
+        <div class="p-sm border-t border-border-warm space-y-xs">
+            <a class="flex items-center gap-sm px-sm py-xs rounded-lg text-text-muted hover:text-primary transition-colors hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="text-label-md font-label-md">Settings</span>
+            </a>
+            <a class="flex items-center gap-sm px-sm py-xs rounded-lg text-text-muted hover:text-primary transition-colors hover:bg-surface-container-high transition-all duration-200"
+                href="#">
+                <span class="material-symbols-outlined">help_outline</span>
+                <span class="text-label-md font-label-md">Support</span>
+            </a>
+            <div class="mt-md px-sm">
+                <button
+                    class="w-full py-xs px-sm border border-primary text-primary rounded-full hover:bg-primary hover:text-on-primary transition-colors text-label-md font-label-md">
+                    View Store
+                </button>
+            </div>
+            <div class="flex items-center gap-xs mt-md px-sm pb-sm">
+                <img alt="Admin User Profile" class="w-10 h-10 rounded-full object-cover border border-border-warm"
+                    data-alt="A close up professional headshot of an administrative user, light studio lighting, neutral background, modern organic minimal aesthetic."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIhyZjCKKMsuhAbJC_R6o_zUYYS5flx4N4YZ-__dYO0XTMct47Ba6nKfK4lwnRaoVLb70y5wiRuiIRM1yQTv_RcfAe7rMJnu6rn9-YKMR-elFL_yRyDXRC8ZJ6kpt8c1zOZwsOdMmnICHD0oXpUfqpqGXgDI5Oa-r6ekq4mfwqFrfZ-PqU8CkfFw9gpHhl5ZYfuQR8R6NofPgrtDBlUfyG3pCp1XfATOa4l-52bIdwcmpf6yZBbvrhwyWuTjD6uejOIFfFGvoSje4" />
+                <div class="flex flex-col">
+                    <span class="text-label-md font-label-md">Admin User</span>
+                    <span class="text-caption font-caption text-text-muted">admin@naherbs.vn</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 flex flex-col ml-64 bg-background">
+        <!-- TopNavBar -->
+        <header
+            class="flex justify-between items-center w-full px-md h-16 sticky top-0 z-40 bg-surface/88 backdrop-blur-md dark:bg-inverse-surface/88 border-b border-border-warm shadow-sm">
+            <div class="flex items-center gap-md">
+                <span class="text-label-md font-label-md font-semibold text-primary">Organic Wellness Core</span>
+                <div class="relative hidden sm:block">
+                    <span
+                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">search</span>
+                    <input
+                        class="pl-10 pr-4 py-2 bg-surface-container-low border border-border-warm rounded-full focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 text-body-md font-body-md w-64 transition-all"
+                        placeholder="Search across admin..." type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-sm">
+                <button
+                    class="p-xs text-text-muted hover:text-primary transition-colors hover:bg-surface-container-high rounded-full relative">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+                </button>
+                <button
+                    class="p-xs text-text-muted hover:text-primary transition-colors hover:bg-surface-container-high rounded-full">
+                    <span class="material-symbols-outlined">apps</span>
+                </button>
+                <div class="w-px h-6 bg-border-warm mx-xs"></div>
+                <img alt="Admin Avatar"
+                    class="w-8 h-8 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                    data-alt="A small circular avatar placeholder for admin profile, soft natural lighting, warm beige background."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBerFuQsGF-xdAjiEnBtQA0v0Qpg3mZGmceY__5odTnaitBus1ScYNDvb4kiZKpTCMXCVPQSJozwnVX6Y0gDo3pHzoVkQGafMqjg2fragTdTIa9TJEDfhurIfataLChDZ73Ru3Y8-9oHLUJNu9wJ8VyWZiOIZgiVBs1mxA3Ma41zVrszAdQt_LG3obJQ6_7sWv4bZ5mba9AQC-iTpV86ikMj0ByP9hbYn0wSb5qGlTB6vMwbONd1q3tTClckRqbOwcXNo4cRUF-6hs" />
+            </div>
+        </header>
+        <!-- Main Scrollable Canvas -->
+        <main class="flex-1 overflow-y-auto p-gutter">
+            <div class="max-w-container-max mx-auto space-y-md">
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-sm">
+                    <div>
+                        <h1 class="text-headline-md font-headline-md text-on-surface">Quản lý sản phẩm</h1>
+                        <p class="text-body-md font-body-md text-text-muted mt-1">Manage your herbal product catalog,
+                            inventory, and pricing.</p>
+                    </div>
+                    <button
+                        class="flex items-center gap-xs bg-primary text-on-primary px-sm py-2 rounded-full hover:bg-primary-container transition-all shadow-ambient-md hover:shadow-ambient-low hover:translate-y-px">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                        <span class="text-label-md font-label-md">Thêm sản phẩm mới</span>
+                    </button>
+                </div>
+                <!-- Filters & Controls Card -->
+                <div
+                    class="bg-surface-container-lowest rounded-2xl border border-border-warm p-sm shadow-ambient-low flex flex-col lg:flex-row gap-sm items-center justify-between">
+                    <div class="flex flex-1 w-full gap-sm">
+                        <div class="relative flex-1 max-w-md">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">search</span>
+                            <input
+                                class="w-full pl-10 pr-4 py-2 h-[42px] bg-background border border-border-warm rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 text-body-md"
+                                placeholder="Tìm kiếm tên sản phẩm, SKU..." type="text" />
+                        </div>
+                        <div class="relative">
+                            <select
+                                class="appearance-none h-[42px] pl-4 pr-10 py-2 bg-background border border-border-warm rounded-lg focus:outline-none focus:border-primary text-body-md text-text-main cursor-pointer">
+                                <option value="">Tất cả danh mục</option>
+                                <option value="tra">Trà thảo mộc</option>
+                                <option value="tinh-dau">Tinh dầu</option>
+                                <option value="goi">Gối chườm</option>
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 hide-scrollbar">
+                        <button
+                            class="px-4 py-1.5 rounded-full text-label-md font-label-md bg-secondary-container/30 text-primary border border-primary/20 whitespace-nowrap">Tất
+                            cả (124)</button>
+                        <button
+                            class="px-4 py-1.5 rounded-full text-label-md font-label-md bg-transparent text-text-muted border border-transparent hover:bg-surface-container whitespace-nowrap">Đang
+                            bán (98)</button>
+                        <button
+                            class="px-4 py-1.5 rounded-full text-label-md font-label-md bg-transparent text-text-muted border border-transparent hover:bg-surface-container whitespace-nowrap">Hết
+                            hàng (12)</button>
+                        <button
+                            class="px-4 py-1.5 rounded-full text-label-md font-label-md bg-transparent text-text-muted border border-transparent hover:bg-surface-container whitespace-nowrap">Nháp
+                            (14)</button>
+                    </div>
+                </div>
+                <!-- Product Table Card -->
+                <div
+                    class="bg-surface-container-lowest rounded-2xl border border-border-warm shadow-ambient-low overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr
+                                    class="bg-surface-container-low border-b border-border-warm text-label-md font-label-md text-text-muted">
+                                    <th class="py-3 px-4 font-semibold w-12"><input
+                                            class="rounded border-border-warm text-primary focus:ring-primary/20"
+                                            type="checkbox" /></th>
+                                    <th class="py-3 px-4 font-semibold">Sản phẩm</th>
+                                    <th class="py-3 px-4 font-semibold">Danh mục</th>
+                                    <th class="py-3 px-4 font-semibold">Phân loại</th>
+                                    <th class="py-3 px-4 font-semibold">Giá bán</th>
+                                    <th class="py-3 px-4 font-semibold">Tồn kho</th>
+                                    <th class="py-3 px-4 font-semibold">Trạng thái</th>
+                                    <th class="py-3 px-4 font-semibold text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border-warm text-body-md font-body-md">
+                                <!-- Row 1 -->
+                                <tr class="hover:bg-surface/50 transition-colors group">
+                                    <td class="py-3 px-4"><input
+                                            class="rounded border-border-warm text-primary focus:ring-primary/20"
+                                            type="checkbox" /></td>
+                                    <td class="py-3 px-4">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-12 h-12 rounded-lg border border-border-warm overflow-hidden bg-surface flex-shrink-0">
+                                                <img alt="Gối chườm" class="w-full h-full object-cover"
+                                                    data-alt="A product photo of an organic herbal neck heating pad, neutral linen texture, soft warm lighting, minimalist composition, shallow depth of field."
+                                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtmd_aliLTk7izPki6rP1m1jCNG4p9V1Q7pA7ftkfV1TFq-YfdnrQSZXN8-8i1Hp9u1Yb-gLe-umfmM2g-Fu9DpMhoO2ZjHFBA58GRC79IF6msrnoESq9udHIaweDP2a_5yB4bIH3OcZJIyXZw7kSgHhNrO9gmhloW2M9cTmGRbV6203Irf3cofjaVlBR5QVML1BKQ_aj8YSWTiSudWsI8ZCEU4qH40cqOMFIAclQIvSlL0Cy7WAt997fdVWIp7EoOS1sbySZvhwQ" />
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-on-surface line-clamp-1">Gối chườm thảo
+                                                    dược cổ vai gáy</div>
+                                                <div class="text-caption text-text-muted">SKU: GC-CVG-001</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-text-muted">Gối chườm</td>
+                                    <td class="py-3 px-4 text-text-muted">2 SKU</td>
+                                    <td class="py-3 px-4 font-semibold">650.000đ</td>
+                                    <td class="py-3 px-4">
+                                        <div class="flex flex-col">
+                                            <span>45</span>
+                                            <span class="text-caption text-primary flex items-center gap-1"><span
+                                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> Còn hàng</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-caption bg-success-bg text-primary border border-primary/10">Đang
+                                            bán</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right">
+                                        <div
+                                            class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                class="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"><span
+                                                    class="material-symbols-outlined text-[20px]">visibility</span></button>
+                                            <button
+                                                class="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"><span
+                                                    class="material-symbols-outlined text-[20px]">edit</span></button>
+                                            <button
+                                                class="p-1.5 text-text-muted hover:text-error rounded-lg hover:bg-error-bg transition-colors"><span
+                                                    class="material-symbols-outlined text-[20px]">delete</span></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Row 2 -->
+                                <tr class="hover:bg-surface/50 transition-colors group">
+                                    <td class="py-3 px-4"><input
+                                            class="rounded border-border-warm text-primary focus:ring-primary/20"
+                                            type="checkbox" /></td>
+                                    <td class="py-3 px-4">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-12 h-12 rounded-lg border border-border-warm overflow-hidden bg-surface flex-shrink-0">
+                                                <img alt="Tinh dầu" class="w-full h-full object-cover"
+                                                    data-alt="A small amber glass bottle of lavender essential oil with a dropper, soft natural window light casting gentle shadows, warm cream background, modern organic feel."
+                                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfe09C8B9CpSakamp7Y2LZazUKiBmIqn-iaenatVx4kMU25sUpwX7nnDi6cj8aCtirwZ_EUMkhWpjpe25q3HHR-2mvOj-XPRjHELiuPXIdmH3hVH6nWEcU85PKkg0yx1d4s12qlV9CBeu5W9On6D3BcBJtz8NEuxiT58wXD8t9SaG7MUIZRx7XaDXEL2I5MYux8QnGqww8OKPdQUyqXXD6lCsLK4yCmiOKNCPSOgJbh8sb9K6c4V79W_i32e-FVcBLnpC_st-eGmw" />
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-on-surface line-clamp-1">Tinh dầu oải
+                                                    hương nguyên chất</div>
+                                                <div class="text-caption text-text-muted">SKU: EO-LAV-10ML</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-text-muted">Tinh dầu</td>
+                                    <td class="py-3 px-4 text-text-muted">1 SKU</td>
+                                    <td class="py-3 px-4 font-semibold">520.000đ</td>
+                                    <td class="py-3 px-4">
+                                        <div class="flex flex-col">
+                                            <span class="text-tertiary-container font-semibold">5</span>
+                                            <span
+                                                class="text-caption text-tertiary-container flex items-center gap-1"><span
+                                                    class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span> Sắp
+                                                hết</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-caption bg-success-bg text-primary border border-primary/10">Đang
+                                            bán</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right">
+                                        <div
+                                            class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                class="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"><span
+                                                    class="material-symbols-outlined text-[20px]">visibility</span></button>
+                                            <button
+                                                class="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"><span
+                                                    class="material-symbols-outlined text-[20px]">edit</span></button>
+                                            <button
+                                                class="p-1.5 text-text-muted hover:text-error rounded-lg hover:bg-error-bg transition-colors"><span
+                                                    class="material-symbols-outlined text-[20px]">delete</span></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Row 3 -->
+                                <tr class="hover:bg-surface/50 transition-colors group">
+                                    <td class="py-3 px-4"><input
+                                            class="rounded border-border-warm text-primary focus:ring-primary/20"
+                                            type="checkbox" /></td>
+                                    <td class="py-3 px-4">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-12 h-12 rounded-lg border border-border-warm overflow-hidden bg-surface flex-shrink-0">
+                                                <img alt="Trà" class="w-full h-full object-cover"
+                                                    data-alt="A minimalist pouch of dried chamomile loose leaf tea, aesthetic packaging, earthy tones, soft diffuse lighting, organic lifestyle photography."
+                                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtCjOua8ALMM-OEwqSR8-ktM55NyO2hRGWG5kpHtrmCTClrmC5QS3eo_EZk9lMG7TNZ4j_bZx2iM8_qq0Nwgb0eVLG0uxMwJt4K9yz2IyzUEzqeeGHLGp-dZsOxn_yHrfPqnopIHWRuejlPfL50gjGRz3nGoa5I62pus21ZgSlyazf2Wf-MO1lb65EXm8DxpbCh_szWVYzgrT-mwWjRRS3peT2DgDfpfyfe4NeN31WLyizbfd6dx7BpPC6tomYKJv44KqWQ_RV_Uc" />
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-on-surface line-clamp-1">Trà An Thần
+                                                    Chamomile</div>
+                                                <div class="text-caption text-text-muted">SKU: TEA-CHAM-01</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-text-muted">Trà thảo mộc</td>
+                                    <td class="py-3 px-4 text-text-muted">1 SKU</td>
+                                    <td class="py-3 px-4 font-semibold text-text-muted line-through">350.000đ</td>
+                                    <td class="py-3 px-4">
+                                        <div class="flex flex-col">
+                                            <span class="text-error-text font-semibold">0</span>
+                                            <span class="text-caption text-error-text flex items-center gap-1"><span
+                                                    class="w-1.5 h-1.5 rounded-full bg-error-text"></span> Hết
+                                                hàng</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-caption bg-surface-variant text-text-muted border border-border-warm">Đã
+                                            ẩn</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right">
+                                        <div
+                                            class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                class="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"><span
+                                                    class="material-symbols-outlined text-[20px]">visibility</span></button>
+                                            <button
+                                                class="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"><span
+                                                    class="material-symbols-outlined text-[20px]">edit</span></button>
+                                            <button
+                                                class="p-1.5 text-text-muted hover:text-error rounded-lg hover:bg-error-bg transition-colors"><span
+                                                    class="material-symbols-outlined text-[20px]">delete</span></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination -->
+                    <div
+                        class="p-4 border-t border-border-warm flex items-center justify-between text-caption text-text-muted">
+                        <div>Hiển thị 1-3 trong số 124 sản phẩm</div>
+                        <div class="flex items-center gap-2">
+                            <button class="p-1 rounded hover:bg-surface-container transition-colors disabled:opacity-50"
+                                disabled=""><span
+                                    class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+                            <button
+                                class="w-6 h-6 rounded flex items-center justify-center bg-primary text-on-primary font-semibold">1</button>
+                            <button
+                                class="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container transition-colors">2</button>
+                            <button
+                                class="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container transition-colors">3</button>
+                            <span>...</span>
+                            <button class="p-1 rounded hover:bg-surface-container transition-colors"><span
+                                    class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body>
+
+</html>

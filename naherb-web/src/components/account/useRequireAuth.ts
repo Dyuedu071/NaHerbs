@@ -15,7 +15,7 @@ export function useRequireAuth() {
 
   useEffect(() => {
     if (!isLoading && (isError || !data)) {
-      router.replace("/login");
+      router.replace("/dang-nhap");
     }
   }, [data, isError, isLoading, router]);
 

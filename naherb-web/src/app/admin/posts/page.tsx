@@ -81,12 +81,8 @@ export default function AdminPosts() {
               {/* Row 1 */}
               <tr className="hover:bg-surface/50 transition-colors group">
                 <td className="p-sm">
-                  <div className="w-12 h-12 rounded-lg overflow-hidden border border-border-warm">
-                    <img
-                      className="w-full h-full object-cover"
-                      alt="Blog Cover"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAC-ZG8hEyTB7uKtPWv0J7blsUwNTbQEcV2BexL9MBWnbXdDTqw_dG6BO9A3GKw6HixzKCJP1WLcCDwEEuqEU6U3EbeVdx1apQWOL3GfT4DOgFPIB3m6Qt4YtRDLv4VmqKWWNarxKwW5PhvrpDNqECzAYy6lo6Oy060pRnGPNkXDqP8Oejr-LFKV3jLXNYT_EAckprKa4SMUlq4LJPrMSw5BoTqutarL_7YBhFcLfs1BFaw7p8BTi2Ka-djmxj4-V8n20TR0w6hyY"
-                    />
+                  <div className="w-12 h-12 rounded-lg overflow-hidden border border-border-warm bg-herbal-beige flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined">article</span>
                   </div>
                 </td>
                 <td className="p-sm">

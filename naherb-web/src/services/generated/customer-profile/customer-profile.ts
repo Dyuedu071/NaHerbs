@@ -27,6 +27,8 @@ import type {
 import type {
   GetAccountProfile200,
   GetAuthMe200,
+  PostAccountProfileAvatar200,
+  PostAccountProfileAvatarBody,
   PutAccountProfile200,
   UpdateProfileRequest
 } from '.././model';
@@ -280,6 +282,72 @@ export const usePutAccountProfile = <TError = unknown,
       > => {
 
       const mutationOptions = getPutAccountProfileMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Upload profile avatar image
+ */
+export const postAccountProfileAvatar = (
+    postAccountProfileAvatarBody: PostAccountProfileAvatarBody,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      const formData = new FormData();
+formData.append(`file`, postAccountProfileAvatarBody.file)
+
+      return customInstance<PostAccountProfileAvatar200>(
+      {url: `/account/profile/avatar`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
+    },
+      options);
+    }
+  
+
+
+export const getPostAccountProfileAvatarMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAccountProfileAvatar>>, TError,{data: PostAccountProfileAvatarBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAccountProfileAvatar>>, TError,{data: PostAccountProfileAvatarBody}, TContext> => {
+
+const mutationKey = ['postAccountProfileAvatar'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAccountProfileAvatar>>, {data: PostAccountProfileAvatarBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postAccountProfileAvatar(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAccountProfileAvatarMutationResult = NonNullable<Awaited<ReturnType<typeof postAccountProfileAvatar>>>
+    export type PostAccountProfileAvatarMutationBody = PostAccountProfileAvatarBody
+    export type PostAccountProfileAvatarMutationError = unknown
+
+    /**
+ * @summary Upload profile avatar image
+ */
+export const usePostAccountProfileAvatar = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAccountProfileAvatar>>, TError,{data: PostAccountProfileAvatarBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAccountProfileAvatar>>,
+        TError,
+        {data: PostAccountProfileAvatarBody},
+        TContext
+      > => {
+
+      const mutationOptions = getPostAccountProfileAvatarMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

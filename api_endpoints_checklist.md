@@ -8,12 +8,12 @@ This checklist is generated from `docs/openapi.yml`.
 - [ ] `GET` /site-settings/public - Get public site settings (@Duy)
 - [ ] `GET` /seo/sitemap-data - Data for Next.js sitemap.ts (@Duy)
 ## Public Products
-- [ ] `GET` /product-categories - List published product categories (@Chien)
-- [ ] `GET` /products - List published products (@Chien)
-- [ ] `GET` /products/{slug} - Get product detail by slug (@Chien)
+- [x] `GET` /product-categories - List published product categories (@Chien)
+- [x] `GET` /products - List published products (@Chien)
+- [x] `GET` /products/{slug} - Get product detail by slug (@Chien)
 ## Public Blog
-- [ ] `GET` /blog-posts - List published blog posts (@Duy)
-- [ ] `GET` /blog-posts/{slug} - Get blog post detail (@Duy)
+- [x] `GET` /blog-posts - List published blog posts (@Duy)
+- [x] `GET` /blog-posts/{slug} - Get blog post detail (@Duy)
 ## Customer Auth
 - [x] `POST` /auth/register - Register customer account and initialize profile
 - [x] `POST` /auth/login - Login customer
@@ -39,7 +39,7 @@ This checklist is generated from `docs/openapi.yml`.
 ## Admin Auth
 - [x] `POST` /admin/auth/login - Login admin
 ## Admin Products
-- [ ] `GET` /admin/products - List products for admin (@Chien)
+- [x] `GET` /admin/products - List products for admin (@Chien)
 - [ ] `POST` /admin/products - Create product (@Chien)
 - [ ] `PUT` /admin/products/{productId} - Update product (@Chien)
 - [ ] `DELETE` /admin/products/{productId} - Archive product (@Chien)
@@ -54,7 +54,7 @@ This checklist is generated from `docs/openapi.yml`.
 - [x] `PATCH` /admin/orders/{orderId}/payment-status - Manually update payment status, used for QR confirmation (@Hoang)
 ## Admin Blog
 - [ ] `GET` /admin/blog-posts - List blog posts admin (@Duy)
-- [ ] `POST` /admin/blog-posts - Create blog post (@Duy)
+- [x] `POST` /admin/blog-posts - Create blog post (@Duy)
 ## Admin Chatbot
 - [x] `GET` /admin/chatbot/config - Get chatbot config (@TuanAnh)
 - [x] `PUT` /admin/chatbot/config - Update chatbot config (@TuanAnh)

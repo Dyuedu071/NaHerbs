@@ -11,12 +11,15 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
 @EnableCaching
+@ConditionalOnBean(RedisConnectionFactory.class)
 public class RedisCacheConfig {
 
     public static final String CACHE_BLOGS_LIST = "blogsList";

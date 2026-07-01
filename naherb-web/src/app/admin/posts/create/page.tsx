@@ -93,8 +93,10 @@ export default function CreatePost() {
           AXIOS_INSTANCE.get('/v1/admin/blog/categories'),
           AXIOS_INSTANCE.get('/v1/admin/products')
         ]);
-        setCategories(catRes.data);
-        setProducts(prodRes.data);
+        const catsData = catRes.data?.data?.items || catRes.data?.data || catRes.data;
+        setCategories(Array.isArray(catsData) ? catsData : []);
+        const prodsData = prodRes.data?.data?.items || prodRes.data?.data || prodRes.data;
+        setProducts(Array.isArray(prodsData) ? prodsData : []);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

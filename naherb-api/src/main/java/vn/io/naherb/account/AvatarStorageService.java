@@ -1,10 +1,10 @@
 package vn.io.naherb.account;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,13 @@ public class AvatarStorageService {
             Set.of("image/jpeg", "image/png", "image/webp", "image/jpg");
 
     private final UploadProperties uploadProperties;
+    private final Cloudinary cloudinary;
 
     public String storeAvatar(UUID accountId, MultipartFile file) {
+        return storeAvatar(accountId, file, null);
+    }
+
+    public String storeAvatar(UUID accountId, MultipartFile file, String oldAvatarUrl) {
         if (file == null || file.isEmpty()) {
             throw new BadRequestException("Vui lòng chọn ảnh đại diện");
         }
@@ -36,49 +41,40 @@ public class AvatarStorageService {
             throw new BadRequestException("Chỉ chấp nhận ảnh JPG, PNG hoặc WebP");
         }
 
+        deleteOldAvatarFromCloudinary(oldAvatarUrl);
+
         try {
-            Path accountDir = resolveBasePath()
-                    .resolve("avatars")
-                    .resolve(accountId.toString());
-            Files.createDirectories(accountDir);
-            deleteExistingAvatars(accountDir);
-
-            String extension = extensionFor(contentType);
-            String filename = UUID.randomUUID() + extension;
-            Path target = accountDir.resolve(filename);
-            file.transferTo(target.toFile());
-
-            String publicBase = uploadProperties.getPublicBaseUrl().replaceAll("/$", "");
-            return publicBase + "/media/avatars/" + accountId + "/" + filename;
+            String publicId = "avatar_" + accountId.toString() + "_" + UUID.randomUUID().toString().substring(0, 8);
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                    "public_id", publicId,
+                    "folder", "naherb/avatars",
+                    "resource_type", "image"
+            ));
+            return uploadResult.get("secure_url").toString();
         } catch (IOException exception) {
             throw new BadRequestException("Không thể lưu ảnh đại diện: " + exception.getMessage());
         }
     }
 
-    private Path resolveBasePath() {
-        return Paths.get(uploadProperties.getBasePath()).toAbsolutePath().normalize();
-    }
-
-    private static void deleteExistingAvatars(Path accountDir) throws IOException {
-        if (!Files.isDirectory(accountDir)) {
+    private void deleteOldAvatarFromCloudinary(String oldAvatarUrl) {
+        if (!StringUtils.hasText(oldAvatarUrl) || !oldAvatarUrl.contains("cloudinary.com")) {
             return;
         }
-        try (var files = Files.list(accountDir)) {
-            files.forEach(path -> {
-                try {
-                    Files.deleteIfExists(path);
-                } catch (IOException ignored) {
-                    // best effort cleanup
+        try {
+            int uploadIdx = oldAvatarUrl.indexOf("/upload/");
+            if (uploadIdx != -1) {
+                String path = oldAvatarUrl.substring(uploadIdx + 8);
+                if (path.matches("^v\\d+/.*")) {
+                    path = path.replaceFirst("^v\\d+/", "");
                 }
-            });
+                int dotIdx = path.lastIndexOf('.');
+                if (dotIdx != -1) {
+                    String publicId = path.substring(0, dotIdx);
+                    cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("invalidate", true));
+                }
+            }
+        } catch (Exception ignored) {
+            // Best effort cleanup
         }
-    }
-
-    private static String extensionFor(String contentType) {
-        return switch (contentType.toLowerCase(Locale.ROOT)) {
-            case "image/png" -> ".png";
-            case "image/webp" -> ".webp";
-            default -> ".jpg";
-        };
     }
 }

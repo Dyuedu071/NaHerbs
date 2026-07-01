@@ -272,12 +272,8 @@ export default function AdminDashboard() {
             </div>
             <div className="p-sm space-y-sm">
               <div className="flex items-center gap-sm">
-                <div className="w-12 h-12 rounded-lg bg-surface-container overflow-hidden shrink-0">
-                  <img
-                    alt="Product Image"
-                    className="w-full h-full object-cover"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEVZIRt4wiKFgZDe_4LMAonaGjhJQ_FkGH500-OvO-9aeEazl8OL4QSX6IapXnRQIwn-2nf-Hr9LqOdpdEGC-nxXLtsjY77a0LdAIide4FgxV0hU4G3vImPmxOqudze3KEERL3dkcVAKq19OWB7IgrBeZqcOb018TyZQSoXBwdBF4fbmZc1Cs4-rMhLJBxO1F_eLxidZRRe8clUxIIeJe0zB4izN14JuY94NS0iz6dX7iQFBZt2MOBPdyZ6aU1_ZkGD3QsfzCgoM8"
-                  />
+                <div className="w-12 h-12 rounded-lg bg-herbal-beige border border-border-warm overflow-hidden shrink-0 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined">emoji_food_beverage</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-body-md font-medium text-text-main truncate">
@@ -287,12 +283,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-sm">
-                <div className="w-12 h-12 rounded-lg bg-surface-container overflow-hidden shrink-0">
-                  <img
-                    alt="Product Image"
-                    className="w-full h-full object-cover"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuD40rUHlBu6aIjAj1Lb9yRkrK5hGIqajbBnlVymQ8RjnB_uRplb-mFZghUYkzeMX11NLEOffnQXFP8K_io4TE54JFRb6U3xETYA_lKZUSTQeCwtsxMuxBEkJ4FW_QJG-w9QMwHPd-17jCA44FU31vcpAA_y0QhvGjq1vbHH3UlF2AiNorxGSZzlrXuG22upa5PlP-DGcJBi8vXfeMny1JMckKEouIK0X6n5XgBDpNBx0KOLwYSz_V5Gn3wEAcSX17AYVeQ7-T7PY6w"
-                  />
+                <div className="w-12 h-12 rounded-lg bg-herbal-beige border border-border-warm overflow-hidden shrink-0 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined">water_drop</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-body-md font-medium text-text-main truncate">
@@ -302,12 +294,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-sm">
-                <div className="w-12 h-12 rounded-lg bg-surface-container overflow-hidden shrink-0">
-                  <img
-                    alt="Product Image"
-                    className="w-full h-full object-cover"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAezX57Zb9DOhrAM15IdPmx4ckMsJVAmOOr3ykIXwgxtdM0un045e1dn69y2XLZiATa-GTZ-ZEua9UQVRLKLOrGuUYpfJNK7IUF2J7K_yvwhPoq2jtgW126GUXnCvBe_JmLkm1HjCw-tGLAOFHefmRIuIhVYR1kBUlHyt8Gy61htjiNy2YTODCElDSyHlGLWSNZsnkr9T5eeONlEL0Z6By03VISpwKhTPz03zMpgJBph1KKMgbikEOXnEayrLY72v8hAf4gFVHiD4"
-                  />
+                <div className="w-12 h-12 rounded-lg bg-herbal-beige border border-border-warm overflow-hidden shrink-0 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined">spa</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-body-md font-medium text-text-main truncate">

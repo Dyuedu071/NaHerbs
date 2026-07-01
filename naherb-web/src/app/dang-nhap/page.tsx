@@ -130,7 +130,7 @@ export default function Login() {
                   <div className="flex justify-between items-center mb-xs">
                       <label className="block font-label-md text-label-md text-on-surface-variant" htmlFor="password">Mật khẩu</label>
                       <Link className="font-caption text-caption text-primary hover:text-primary-container transition-colors"
-                          href="/register">Quên mật khẩu?</Link>
+                          href="/dang-ky">Quên mật khẩu?</Link>
                   </div>
                   <div className="relative">
                       <span
@@ -191,7 +191,7 @@ export default function Login() {
           <div className="mt-lg text-center border-t border-border-warm pt-md">
               <p className="font-body-md text-body-md text-text-muted">
                   Chưa có tài khoản?{' '}
-                  <Link className="text-primary font-semibold hover:text-primary-container transition-colors" href="/register">Đăng ký ngay</Link>
+                  <Link className="text-primary font-semibold hover:text-primary-container transition-colors" href="/dang-ky">Đăng ký ngay</Link>
               </p>
           </div>
       </div>

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.io.naherb.blog.dto.BlogPostResponse;
 
 @RestController
-@RequestMapping("/api/v1/blogs")
+@RequestMapping({"/api/blogs", "/api/blog-posts", "/api/v1/blogs", "/api/v1/blog-posts"})
 public class PublicBlogController {
 
     private final BlogService blogService;

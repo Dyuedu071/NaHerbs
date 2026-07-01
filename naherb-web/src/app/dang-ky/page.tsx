@@ -47,7 +47,7 @@ export default function Register() {
         setSuccessMessage('');
         setStep(3);
         setTimeout(() => {
-          router.push('/login');
+          router.push('/dang-nhap');
         }, 3000);
       },
       onError: (err: unknown) => {
@@ -381,7 +381,7 @@ export default function Register() {
                       <p className="font-body-md text-body-md text-text-muted mb-lg max-w-[320px]">
                           Chào mừng bạn đến với NaHerbs. Hệ thống sẽ tự động chuyển hướng bạn đến trang đăng nhập trong giây lát...
                       </p>
-                      <Link href="/login" className="w-full h-[48px] bg-primary text-on-primary font-label-md text-label-md rounded-full flex items-center justify-center hover:bg-surface-tint hover:-translate-y-[2px] transition-all duration-300 shadow-sm">
+                      <Link href="/dang-nhap" className="w-full h-[48px] bg-primary text-on-primary font-label-md text-label-md rounded-full flex items-center justify-center hover:bg-surface-tint hover:-translate-y-[2px] transition-all duration-300 shadow-sm">
                           Đăng nhập ngay
                       </Link>
                   </div>
@@ -393,7 +393,7 @@ export default function Register() {
                       <p className="font-body-md text-body-md text-text-muted">
                           Đã có tài khoản?{' '}
                           <Link className="font-label-md text-label-md text-primary hover:text-surface-tint transition-colors ml-1"
-                              href="/login">Đăng nhập</Link>
+                              href="/dang-nhap">Đăng nhập</Link>
                       </p>
                   </div>
               )}

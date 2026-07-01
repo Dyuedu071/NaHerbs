@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { ChatbotProvider } from "./ChatbotContext";
 import ChatbotWidget from "./ChatbotWidget";
 
-const HIDDEN_PREFIXES = ["/admin", "/login"];
+const HIDDEN_PREFIXES = ["/admin", "/dang-nhap", "/dang-ky"];
 
 function shouldShowChatbot(pathname: string): boolean {
   return !HIDDEN_PREFIXES.some(

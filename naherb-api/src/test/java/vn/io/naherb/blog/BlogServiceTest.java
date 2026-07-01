@@ -8,11 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import vn.io.naherb.blog.dto.BlogPostRequest;
 import vn.io.naherb.common.enums.ContentStatus;
-import vn.io.naherb.product.ProductRepository;
-import vn.io.naherb.product.Product;
+import vn.io.naherb.product.repository.ProductRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -18,7 +18,7 @@ import vn.io.naherb.common.enums.StockStatus;
 import vn.io.naherb.exception.ConflictException;
 import vn.io.naherb.exception.NotFoundException;
 import vn.io.naherb.product.ProductSku;
-import vn.io.naherb.product.ProductSkuRepository;
+import vn.io.naherb.product.repository.ProductSkuRepository;
 import vn.io.naherb.security.CurrentAccountHelper;
 
 @Service

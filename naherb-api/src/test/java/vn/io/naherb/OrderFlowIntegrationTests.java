@@ -41,12 +41,12 @@ import vn.io.naherb.order.OrderRepository;
 import vn.io.naherb.order.PaymentRepository;
 import vn.io.naherb.product.Product;
 import vn.io.naherb.product.ProductSku;
-import vn.io.naherb.product.ProductSkuRepository;
+import vn.io.naherb.product.repository.ProductSkuRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(InMemoryTokenStoreTestConfig.class)
-class HoangOrderFlowIntegrationTests {
+class OrderFlowIntegrationTests {
 
     private static final String ACCESS_COOKIE = "NAHERB_ACCESS_TOKEN";
     private static final String REFRESH_COOKIE = "NAHERB_REFRESH_TOKEN";

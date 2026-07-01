@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(BlogController.class)
 @AutoConfigureMockMvc(addFilters = false) // Disable security filters for unit test
 @Import(GlobalExceptionHandler.class)
+@org.springframework.boot.context.properties.EnableConfigurationProperties(vn.io.naherb.config.UploadProperties.class)
 public class BlogControllerTest {
 
     @Autowired
@@ -30,6 +31,9 @@ public class BlogControllerTest {
 
     @MockBean
     private BlogService blogService;
+
+    @MockBean
+    private vn.io.naherb.security.AuthCookieService authCookieService;
 
     @Autowired
     private ObjectMapper objectMapper;

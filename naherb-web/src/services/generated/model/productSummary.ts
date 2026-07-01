@@ -6,6 +6,7 @@
  * OpenAPI spec version: 2.2.0
  */
 import type { StockStatus } from './stockStatus';
+import type { ProductStatus } from './productStatus';
 
 export interface ProductSummary {
   id?: string;
@@ -18,4 +19,13 @@ export interface ProductSummary {
   minSalePrice?: number;
   maxSalePrice?: number;
   stockStatus?: StockStatus;
+  /** @nullable */
+  skuCode?: string | null;
+  /** @nullable */
+  categoryName?: string | null;
+  /** @nullable */
+  categorySlug?: string | null;
+  skuCount?: number;
+  totalStockQuantity?: number;
+  status?: ProductStatus;
 }
