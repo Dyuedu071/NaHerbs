@@ -3,6 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import PublicHeader from '@/components/common/PublicHeader';
+import PublicFooter from '@/components/common/PublicFooter';
 import { AXIOS_INSTANCE } from '@/services/api-client';
 
 interface BlogDetailProps {
@@ -417,62 +418,7 @@ export default function BlogDetail({ params }: BlogDetailProps) {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="w-full pt-xl pb-md bg-primary text-on-primary">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto mb-lg">
-          <div className="col-span-1">
-            <div className="font-display-lg text-display-lg text-on-primary mb-sm">NaHerbs</div>
-            <p className="font-body-md text-body-md text-on-primary/80 mb-sm">Giải pháp chăm sóc sức khỏe toàn diện từ thảo dược tự nhiên.</p>
-          </div>
-          <div>
-            <h4 className="font-headline-md text-headline-md mb-md">Product Categories</h4>
-            <ul className="space-y-sm">
-              <li><Link href="#" className="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors">Trà Thảo Mộc</Link></li>
-              <li><Link href="#" className="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors">Tinh Chất Thảo Dược</Link></li>
-              <li><Link href="#" className="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors">Bộ Quà Tặng</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-headline-md text-headline-md mb-md">Support Links</h4>
-            <ul className="space-y-sm">
-              <li><Link href="#" className="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors">Về Chúng Tôi</Link></li>
-              <li><Link href="#" className="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors">Chính Sách Mua Hàng</Link></li>
-              <li><Link href="#" className="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors">Câu Hỏi Thường Gặp</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-headline-md text-headline-md mb-md">Liên Hệ</h4>
-            <ul className="space-y-sm">
-              <li>
-                <Link href="#" className="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors flex items-center gap-xs">
-                  <span className="material-symbols-outlined">call</span> Hotline
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors flex items-center gap-xs">
-                  <span className="material-symbols-outlined">forum</span> Zalo
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors flex items-center gap-xs">
-                  <span className="material-symbols-outlined">mail</span> Email
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="px-gutter max-w-container-max mx-auto border-t border-on-primary/20 pt-md text-center font-caption text-caption text-on-primary/60">
-          © 2024 NaHerbs. All rights reserved.
-        </div>
-      </footer>
-
-      {/* AI Advisor FAB */}
-      <button className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-[0_4px_12px_-2px_rgba(55,86,59,0.12),0_8px_24px_-4px_rgba(55,86,59,0.08)] flex items-center justify-center hover:scale-110 transition-transform duration-300 z-50 group">
-        <span className="material-symbols-outlined">psychiatry</span>
-        <span className="absolute right-full mr-4 bg-surface text-on-surface px-3 py-1 rounded-md font-caption text-caption shadow-[0_2px_8px_-2px_rgba(55,86,59,0.08)] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-          Hỏi AI Tư Vấn
-        </span>
-      </button>
+      <PublicFooter />
     </>
   );
 }

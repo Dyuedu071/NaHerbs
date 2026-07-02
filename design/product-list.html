@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Sản phẩm NaHerbs - Organic Wellness</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Merriweather:wght@400;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols Outlined -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Theme Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#c7eccf",
+                        "herbal-beige": "#E8D8BD",
+                        "tertiary-fixed-dim": "#ffb692",
+                        "surface-variant": "#e8e2d6",
+                        "on-surface": "#1d1c14",
+                        "soft-sage": "#A8BFA3",
+                        "on-error-container": "#93000a",
+                        "text-main": "#2B2B2B",
+                        "primary-fixed-dim": "#acd0ad",
+                        "secondary-fixed-dim": "#abcfb4",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#2e4d39",
+                        "on-secondary-container": "#4b6c55",
+                        "surface-container-high": "#ede8dc",
+                        "inverse-surface": "#333028",
+                        "error-text": "#B94A3A",
+                        "surface-container-low": "#f9f3e7",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#2f4e33",
+                        "primary-fixed": "#c8ecc8",
+                        "surface-dim": "#dfd9ce",
+                        "on-primary-fixed": "#03210b",
+                        "on-tertiary-fixed": "#341100",
+                        "surface-bright": "#fff9ed",
+                        "on-tertiary-fixed-variant": "#733510",
+                        "surface-container": "#f3ede1",
+                        "on-primary-container": "#ccf0cc",
+                        "tertiary": "#7e3d18",
+                        "tertiary-fixed": "#ffdbcb",
+                        "secondary": "#45664f",
+                        "on-background": "#1d1c14",
+                        "on-tertiary-container": "#ffe1d3",
+                        "border-warm": "#DDD0BC",
+                        "on-secondary": "#ffffff",
+                        "text-muted": "#6F6A61",
+                        "outline": "#737971",
+                        "on-secondary-fixed": "#012110",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fff9ed",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#424841",
+                        "success-bg": "#E7F0E4",
+                        "surface": "#fff9ed",
+                        "surface-tint": "#466649",
+                        "tertiary-container": "#9c542d",
+                        "surface-container-highest": "#e8e2d6",
+                        "primary": "#37563b",
+                        "earth-brown": "#8A6A4F",
+                        "outline-variant": "#c2c8bf",
+                        "error-bg": "#FBEAE5",
+                        "primary-container": "#4f6f52",
+                        "secondary-container": "#c7eccf",
+                        "inverse-on-surface": "#f6f0e4",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#acd0ad"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "md": "24px",
+                        "lg": "48px",
+                        "gutter": "32px",
+                        "container-max": "1240px",
+                        "xl": "80px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Merriweather"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Merriweather"],
+                        "price-display": ["Inter"],
+                        "display-lg": ["Merriweather"],
+                        "caption": ["Inter"],
+                        "headline-lg-mobile": ["Merriweather"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-md": ["15px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.35", "fontWeight": "600" }],
+                        "headline-lg": ["40px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "price-display": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["56px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Ambient Tonal Shadows */
+        .shadow-ambient-sm {
+            box-shadow: 0 2px 8px -2px rgba(70, 102, 73, 0.08), 0 4px 16px -4px rgba(70, 102, 73, 0.04);
+        }
+
+        .shadow-ambient-md {
+            box-shadow: 0 4px 12px -2px rgba(70, 102, 73, 0.12), 0 8px 24px -4px rgba(70, 102, 73, 0.08);
+        }
+
+        /* Custom Checkbox styles */
+        .form-checkbox {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 0.25rem;
+            border: 1px solid #DDD0BC;
+            /* border-warm */
+            background-color: transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .form-checkbox:checked {
+            background-color: #37563b;
+            /* primary */
+            border-color: #37563b;
+        }
+
+        .form-checkbox:checked::after {
+            content: '\2713';
+            /* Checkmark */
+            color: white;
+            font-size: 0.875rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-text-main font-body-md antialiased min-h-screen flex flex-col">
+    <!-- TopNavBar (Shared Component) -->
+    <!-- Active State Logic: 'Products' is the closest match for a Product Listing Page -->
+    <header
+        class="fixed top-0 w-full z-50 bg-surface/88 backdrop-blur-md dark:bg-on-surface/88 shadow-sm dark:shadow-none transition-all duration-300">
+        <div class="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
+            <!-- Brand Logo -->
+            <a class="font-display-lg text-display-lg text-primary dark:text-primary-fixed-dim shrink-0 text-3xl md:text-display-lg"
+                href="#">NaHerbs</a>
+            <!-- Navigation Links (Desktop) -->
+            <nav class="hidden md:flex items-center gap-gutter">
+                <a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim font-label-md text-label-md hover:scale-105 transition-transform duration-200"
+                    href="#">Home</a>
+                <!-- Active Navigation Item -->
+                <a class="text-primary dark:text-primary-fixed-dim font-bold relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-soft-sage after:rounded-full font-label-md text-label-md scale-95 transition-all duration-150 pointer-events-none"
+                    href="#">Products</a>
+                <a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim font-label-md text-label-md hover:scale-105 transition-transform duration-200"
+                    href="#">Blog</a>
+                <a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim font-label-md text-label-md hover:scale-105 transition-transform duration-200"
+                    href="#">About</a>
+                <a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim font-label-md text-label-md hover:scale-105 transition-transform duration-200"
+                    href="#">Contact</a>
+            </nav>
+            <!-- Actions -->
+            <div class="flex items-center gap-md">
+                <!-- Search (Implicit from 'search_bar': 'on_right') -->
+                <button aria-label="Search"
+                    class="hidden md:flex text-primary hover:scale-105 transition-transform duration-200">
+                    <span class="material-symbols-outlined text-2xl">search</span>
+                </button>
+                <!-- Trailing Primary Action -->
+                <button
+                    class="hidden lg:inline-flex bg-primary text-on-primary font-label-md text-label-md rounded-full px-6 py-2 hover:bg-primary-container hover:shadow-ambient-md transition-all duration-200 items-center justify-center">
+                    Tư vấn ngay
+                </button>
+                <!-- Icon Actions -->
+                <button aria-label="Account" class="text-primary hover:scale-105 transition-transform duration-200">
+                    <span class="material-symbols-outlined text-2xl">account_circle</span>
+                </button>
+                <button aria-label="Cart"
+                    class="text-primary hover:scale-105 transition-transform duration-200 relative">
+                    <span class="material-symbols-outlined text-2xl">shopping_cart</span>
+                    <span
+                        class="absolute -top-1 -right-1 bg-tertiary text-on-primary text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">3</span>
+                </button>
+                <!-- Mobile Menu Toggle -->
+                <button aria-label="Menu" class="md:hidden text-primary">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content Area -->
+    <!-- pt-24 (96px) to account for h-20 (80px) nav + some breathing room -->
+    <main class="flex-grow pt-24 pb-xl px-gutter max-w-container-max mx-auto w-full">
+        <!-- Hero Title -->
+        <div class="mb-lg border-b border-border-warm pb-md">
+            <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">Sản phẩm NaHerbs</h1>
+            <p class="font-body-md text-body-md text-text-muted mt-2 max-w-2xl">Khám phá các dòng sản phẩm chăm sóc sức
+                khỏe và sắc đẹp từ thiên nhiên, được tinh chế với công nghệ hiện đại để giữ trọn tinh túy dược liệu.</p>
+        </div>
+        <!-- Layout Grid: Sidebar + Products -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-start">
+            <!-- Sidebar Filters -->
+            <aside class="md:col-span-3 space-y-md sticky top-32">
+                <!-- Filter Group: Nhu cầu (Needs) -->
+                <div class="bg-surface-container-low rounded-xl p-md border border-surface-variant">
+                    <h3 class="font-label-md text-label-md text-primary mb-sm border-b border-border-warm pb-2">Nhu cầu
+                    </h3>
+                    <ul class="space-y-sm">
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input checked="" class="form-checkbox" type="checkbox" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Tăng
+                                    cường miễn dịch</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input class="form-checkbox" type="checkbox" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Chăm
+                                    sóc sắc đẹp</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input class="form-checkbox" type="checkbox" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Hỗ
+                                    trợ tiêu hóa</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input class="form-checkbox" type="checkbox" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Giảm
+                                    căng thẳng</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Filter Group: Danh mục (Categories) -->
+                <div class="bg-surface-container-low rounded-xl p-md border border-surface-variant">
+                    <h3 class="font-label-md text-label-md text-primary mb-sm border-b border-border-warm pb-2">Danh mục
+                    </h3>
+                    <ul class="space-y-sm">
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input checked="" class="form-checkbox" type="checkbox" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Trà
+                                    thảo mộc</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input class="form-checkbox" type="checkbox" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Tinh
+                                    dầu thiên nhiên</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input class="form-checkbox" type="checkbox" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Thực
+                                    phẩm bổ sung</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input class="form-checkbox" type="checkbox" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Mỹ
+                                    phẩm hữu cơ</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Filter Group: Khoảng giá (Price Range) -->
+                <div class="bg-surface-container-low rounded-xl p-md border border-surface-variant">
+                    <h3 class="font-label-md text-label-md text-primary mb-sm border-b border-border-warm pb-2">Khoảng
+                        giá</h3>
+                    <ul class="space-y-sm">
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input class="form-checkbox rounded-full" name="price" type="radio" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Dưới
+                                    500.000đ</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input checked="" class="form-checkbox rounded-full" name="price" type="radio" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">500.000đ
+                                    - 1.000.000đ</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex items-center gap-xs cursor-pointer group">
+                                <input class="form-checkbox rounded-full" name="price" type="radio" />
+                                <span
+                                    class="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">Trên
+                                    1.000.000đ</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+            <!-- Product Grid -->
+            <div class="md:col-span-9">
+                <!-- Active Filters / Sorting Bar -->
+                <div class="flex flex-wrap justify-between items-center mb-md gap-sm">
+                    <div class="flex items-center gap-xs flex-wrap">
+                        <span class="font-caption text-caption text-text-muted">Đang lọc:</span>
+                        <span
+                            class="bg-secondary-fixed text-on-secondary-fixed font-caption text-caption px-3 py-1 rounded-full flex items-center gap-1">
+                            Tăng cường miễn dịch
+                            <button class="hover:text-primary"><span
+                                    class="material-symbols-outlined text-[14px]">close</span></button>
+                        </span>
+                        <span
+                            class="bg-secondary-fixed text-on-secondary-fixed font-caption text-caption px-3 py-1 rounded-full flex items-center gap-1">
+                            Trà thảo mộc
+                            <button class="hover:text-primary"><span
+                                    class="material-symbols-outlined text-[14px]">close</span></button>
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-xs">
+                        <span class="font-caption text-caption text-text-muted">Sắp xếp theo:</span>
+                        <select
+                            class="bg-transparent border-none font-label-md text-label-md text-primary cursor-pointer focus:ring-0 p-0">
+                            <option>Phổ biến nhất</option>
+                            <option>Giá thấp đến cao</option>
+                            <option>Giá cao đến thấp</option>
+                            <option>Mới nhất</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- The 3-Column Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
+                    <!-- Product Card 1 -->
+                    <div
+                        class="bg-surface-container-lowest rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-sm hover:shadow-ambient-md transition-shadow duration-300 flex flex-col group">
+                        <div
+                            class="relative aspect-[4/5] overflow-hidden bg-surface-container-low p-sm flex items-center justify-center">
+                            <img class="object-cover w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                                data-alt="A beautifully styled flat lay of organic herbal tea packaging. The box is minimalist with earthy tones, surrounded by loose dried chamomile flowers and mint leaves on a warm cream surface. Soft, natural sunlight filters in from a window, creating a serene, wellness-focused aesthetic."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdooTdX-hVPIeuYC_ASsgHeQnklgOBoeJjefXcq-y7Re3NbXehes6xM12qOaIaVvFkr8IOaUV-XEM_m8cPrUzn4N7d_VT5_oQP-rQ1CYG3T-9wxgUaOWrxq2Opz8KRkE8X2ZADxJDNhnSILuasQuV72CKY5FelECQ76mAH6kVb-rAZEzkLdt_250vg7INEJpGw4R9-Yzwlp-h9Zd4gcMWlQFO0L5uWFuYHPF_52oIm35tifUiBjmt4UMhVvAueB1pFCfp7TbGBfMI" />
+                            <!-- In-Stock Badge -->
+                            <span
+                                class="absolute top-sm left-sm bg-success-bg text-primary font-caption text-caption px-2 py-1 rounded-full border border-primary/20">Còn
+                                hàng</span>
+                        </div>
+                        <div class="p-md flex flex-col flex-grow justify-between gap-sm">
+                            <div>
+                                <span class="font-caption text-caption text-text-muted mb-1 block">Trà thảo mộc</span>
+                                <h4 class="font-body-lg text-body-lg text-text-main font-semibold line-clamp-2">Trà An
+                                    Thần Chamomile &amp; Mint Hữu Cơ</h4>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="font-price-display text-price-display text-tertiary mb-sm">350.000đ</div>
+                                <!-- Secondary action button styling for 'Buy Now' intent -->
+                                <button
+                                    class="w-full rounded-full border border-primary text-primary py-2.5 px-4 font-label-md hover:bg-primary hover:text-on-primary transition-colors text-center">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Card 2 -->
+                    <div
+                        class="bg-surface-container-lowest rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-sm hover:shadow-ambient-md transition-shadow duration-300 flex flex-col group">
+                        <div
+                            class="relative aspect-[4/5] overflow-hidden bg-surface-container-low p-sm flex items-center justify-center">
+                            <img class="object-cover w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                                data-alt="A sleek amber glass dropper bottle containing essential oil, resting on a smooth, slightly porous natural stone. A sprig of fresh lavender lies delicately next to it. The background is a soft, blurred earthy brown, enhancing the organic modern minimalism and premium quality of the product."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrk1wzAaTe1WA2shLv1j1Beph2X2SZeRvkBrzxKnRB9Zme9FzpXxpoobB1RygyDQGj9GQmzwQuaCGRiBTb9f3IN0e9gBoNpi-Z32_l3q9rRGMHCr-JSsHzLssI1oC1plUFqkpsbRtM7VDueTubOjVLFGmhQktVPEJiHKYG8HODCzou6hCP5ftsjdAqYOHZ3JRTtMvKbdFx2b84K9wdfjlqvySwr5x3t7RWU2bUJjr6WOaMGBGcEnLonv5cF4j5Z5o-afBRtjT4CXY" />
+                        </div>
+                        <div class="p-md flex flex-col flex-grow justify-between gap-sm">
+                            <div>
+                                <span class="font-caption text-caption text-text-muted mb-1 block">Tinh dầu thiên
+                                    nhiên</span>
+                                <h4 class="font-body-lg text-body-lg text-text-main font-semibold line-clamp-2">Tinh Dầu
+                                    Oải Hương Nguyên Chất 30ml</h4>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="font-price-display text-price-display text-tertiary mb-sm">520.000đ</div>
+                                <button
+                                    class="w-full rounded-full border border-primary text-primary py-2.5 px-4 font-label-md hover:bg-primary hover:text-on-primary transition-colors text-center">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Card 3 -->
+                    <div
+                        class="bg-surface-container-lowest rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-sm hover:shadow-ambient-md transition-shadow duration-300 flex flex-col group">
+                        <div
+                            class="relative aspect-[4/5] overflow-hidden bg-surface-container-low p-sm flex items-center justify-center">
+                            <img class="object-cover w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                                data-alt="A jar of premium wellness supplement capsules made of clear glass with a natural bamboo wooden lid. The jar sits on a clean, light beige surface next to a neatly folded linen napkin. The lighting is bright and clean, emphasizing a professional, healthcare-oriented yet natural vibe."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdPm5FA1KfJbaemBMUkb1nRNK8scAxbPRzKgAw_rreNS4QHQkaIlkpL3rzDwNkMi7LnJJqsLE-SVL_TMEkyvDvB4GcZzCWAZwKMX0t36oD48mSzx9YbXXQcbemSoEThAAwwhmWGAFA8bfOZ75sw6riN3gB2FLHp4MGj2-odD0RzE7wPlopyN5NjHEHE4YCQ9xVK1IoVsgHx8EXoMpXIb5s16SmLDZZmge59bKZFMDZh1XWUWLn13EwoRUKvkdg54bTpwHV2ZZgleg" />
+                            <!-- Popular Badge -->
+                            <span
+                                class="absolute top-sm left-sm bg-tertiary-fixed-dim text-on-tertiary-fixed-variant font-caption text-caption px-2 py-1 rounded-full">Bán
+                                chạy</span>
+                        </div>
+                        <div class="p-md flex flex-col flex-grow justify-between gap-sm">
+                            <div>
+                                <span class="font-caption text-caption text-text-muted mb-1 block">Thực phẩm bổ
+                                    sung</span>
+                                <h4 class="font-body-lg text-body-lg text-text-main font-semibold line-clamp-2">Viên
+                                    Uống Tăng Đề Kháng Chiết Xuất Nấm Linh Chi</h4>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="font-price-display text-price-display text-tertiary mb-sm">890.000đ</div>
+                                <button
+                                    class="w-full rounded-full border border-primary text-primary py-2.5 px-4 font-label-md hover:bg-primary hover:text-on-primary transition-colors text-center">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Card 4 -->
+                    <div
+                        class="bg-surface-container-lowest rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-sm hover:shadow-ambient-md transition-shadow duration-300 flex flex-col group">
+                        <div
+                            class="relative aspect-[4/5] overflow-hidden bg-surface-container-low p-sm flex items-center justify-center">
+                            <img class="object-cover w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                                data-alt="A minimalist white ceramic bowl filled with finely ground green matcha powder. A traditional bamboo whisk rests gently against the bowl. The setting is highly minimalist, with a warm off-white background and soft, diffused natural lighting that highlights the vibrant green texture."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3Zocuot1yUyceveD-3hg6ePmlFLJ8xKGRJcNPi2pCOPzGjLpwPDKUUM761HGD1fCDnwO1f4iaswcYIN-DFWgfQzJgUW1r1SinHXF9-j2-ymX_Tkw_ciWnKeZ4GjoPmrVpVwxXVVqNGFk7H5WhmKBU--2cajmBqctZzZedPpPtd-mVBdrsghez0ZqbUCTWVeqCdb5VYtQ-krTGQWYSYpKT5p42bXgS6boCZJfqj1dWfPsdX_Lbk2cE8ilx8ckFZc5DGdHxWnu39Kc" />
+                        </div>
+                        <div class="p-md flex flex-col flex-grow justify-between gap-sm">
+                            <div>
+                                <span class="font-caption text-caption text-text-muted mb-1 block">Trà thảo mộc</span>
+                                <h4 class="font-body-lg text-body-lg text-text-main font-semibold line-clamp-2">Bột
+                                    Matcha Hữu Cơ Thượng Hạng 100g</h4>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="font-price-display text-price-display text-tertiary mb-sm">450.000đ</div>
+                                <button
+                                    class="w-full rounded-full border border-primary text-primary py-2.5 px-4 font-label-md hover:bg-primary hover:text-on-primary transition-colors text-center">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Card 5 -->
+                    <div
+                        class="bg-surface-container-lowest rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-sm hover:shadow-ambient-md transition-shadow duration-300 flex flex-col group">
+                        <div
+                            class="relative aspect-[4/5] overflow-hidden bg-surface-container-low p-sm flex items-center justify-center">
+                            <img class="object-cover w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                                data-alt="A frosted glass pump bottle of organic face serum. The bottle is subtly back-lit, revealing the golden hue of the liquid inside. It stands in shallow, crystal-clear water with subtle ripples, surrounded by smooth river stones. The mood is pure, hydrating, and luxurious."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5I3aQz0VyFJHZh9SLC8XqxrpGyyPRO6EBortAzUiKlxVuHoBWWnCJhe2YHSfsqkluSjSSwvtl3PGr4N9UWUZMmHQMxOuBeiak09qZEckuevddSqUHMj0YnW3sYKUh7zIXW3uLsYJeirbGCtHYrnVpxsqtguTLahScnQK-EckubreNjCsqirkY-6yWcdDA83HesD6b7ipA2N-oik_c2T6XEREp91BDVLk4S9TgNI24risGvm_Kye6yqLB6Qnf2QLo8XqBVTKPU4vg" />
+                        </div>
+                        <div class="p-md flex flex-col flex-grow justify-between gap-sm">
+                            <div>
+                                <span class="font-caption text-caption text-text-muted mb-1 block">Mỹ phẩm hữu cơ</span>
+                                <h4 class="font-body-lg text-body-lg text-text-main font-semibold line-clamp-2">Serum
+                                    Phục Hồi Da Thảo Mộc NaHerbs</h4>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="font-price-display text-price-display text-tertiary mb-sm">1.150.000đ</div>
+                                <button
+                                    class="w-full rounded-full border border-primary text-primary py-2.5 px-4 font-label-md hover:bg-primary hover:text-on-primary transition-colors text-center">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Card 6 (Out of stock example) -->
+                    <div
+                        class="bg-surface-container-lowest rounded-xl border border-surface-variant overflow-hidden shadow-ambient-sm flex flex-col group opacity-75">
+                        <div
+                            class="relative aspect-[4/5] overflow-hidden bg-surface-variant p-sm flex items-center justify-center grayscale">
+                            <img class="object-cover w-full h-full mix-blend-multiply"
+                                data-alt="A rustic wooden tray holding a collection of unbleached tea bags arranged neatly. A small ceramic cup of brewed amber tea sits nearby. The setting is cozy, earthy, and warm, featuring muted colors and gentle shadows characteristic of modern organic minimalism."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_ogNpF3cZLexLhH-ZicjAeKsfNcs-9ebq3hvw6d272HhTSwvPaBObcSIH5nftRFaLtKvQLG_-JYuOeROrFCV7wG8sjZHYS8r4FJIbJl0BZpn5p2voIZO6SBwjeaXai3IiRKq22HNe5Z0xN1emvu1ii1Fb_bmMPUaVvWPv-zpqpCC4sW8xRmPey0vOp3WPHwWBwCvJKN97bzwuTRhuUyri-ih11_QAAgHg0RidZvyZ1IBCl3vDX_gEBl7GwqIGB1mt7Oy6OoKKem0" />
+                            <div
+                                class="absolute inset-0 bg-surface/50 backdrop-blur-[2px] flex items-center justify-center">
+                                <span
+                                    class="bg-surface text-text-main font-label-md text-label-md px-4 py-2 rounded-full border border-border-warm shadow-sm">Tạm
+                                    hết hàng</span>
+                            </div>
+                        </div>
+                        <div class="p-md flex flex-col flex-grow justify-between gap-sm">
+                            <div>
+                                <span class="font-caption text-caption text-text-muted mb-1 block">Trà thảo mộc</span>
+                                <h4 class="font-body-lg text-body-lg text-text-muted font-semibold line-clamp-2">Trà
+                                    Gừng Mật Ong Sấy Lạnh</h4>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="font-price-display text-price-display text-text-muted mb-sm">280.000đ</div>
+                                <button
+                                    class="w-full rounded-full border border-outline-variant text-outline-variant py-2.5 px-4 font-label-md text-center cursor-not-allowed"
+                                    disabled="">
+                                    Xem chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pagination -->
+                <div class="mt-xl flex justify-center items-center gap-2">
+                    <button aria-label="Previous page"
+                        class="w-10 h-10 rounded-full border border-border-warm flex items-center justify-center text-text-muted hover:text-primary hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+                    </button>
+                    <button
+                        class="w-10 h-10 rounded-full bg-primary text-on-primary font-label-md flex items-center justify-center transition-colors">1</button>
+                    <button
+                        class="w-10 h-10 rounded-full border border-border-warm text-text-main font-label-md flex items-center justify-center hover:border-primary hover:text-primary transition-colors">2</button>
+                    <button
+                        class="w-10 h-10 rounded-full border border-border-warm text-text-main font-label-md flex items-center justify-center hover:border-primary hover:text-primary transition-colors">3</button>
+                    <span class="text-text-muted px-1">...</span>
+                    <button aria-label="Next page"
+                        class="w-10 h-10 rounded-full border border-border-warm flex items-center justify-center text-text-muted hover:text-primary hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Footer (Shared Component) -->
+    <footer
+        class="w-full pt-xl pb-md bg-primary dark:bg-on-primary-fixed-variant text-on-primary dark:text-primary-fixed mt-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto">
+            <!-- Brand Column -->
+            <div class="col-span-1 md:col-span-1 flex flex-col gap-sm">
+                <a class="font-display-lg text-display-lg text-on-primary" href="#">NaHerbs</a>
+                <p class="font-body-md text-body-md text-on-primary/80 dark:text-primary-fixed/80">Khơi nguồn sức sống
+                    từ tự nhiên, mang đến giải pháp chăm sóc sức khỏe toàn diện và bền vững.</p>
+            </div>
+            <!-- Links Column 1 -->
+            <div class="flex flex-col gap-sm">
+                <h4 class="font-headline-md text-headline-md-mobile md:text-headline-md text-on-primary mb-2">Product
+                    Categories</h4>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit rounded"
+                    href="#">Trà thảo mộc</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit rounded"
+                    href="#">Tinh dầu</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit rounded"
+                    href="#">Thực phẩm chức năng</a>
+            </div>
+            <!-- Links Column 2 -->
+            <div class="flex flex-col gap-sm">
+                <h4 class="font-headline-md text-headline-md-mobile md:text-headline-md text-on-primary mb-2">Support
+                    Links</h4>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit rounded"
+                    href="#">Về chúng tôi</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit rounded"
+                    href="#">Chính sách bảo mật</a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit rounded"
+                    href="#">Điều khoản sử dụng</a>
+            </div>
+            <!-- Contact Column -->
+            <div class="flex flex-col gap-sm">
+                <h4 class="font-headline-md text-headline-md-mobile md:text-headline-md text-on-primary mb-2">Liên hệ
+                </h4>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit rounded flex items-center gap-2"
+                    href="#">
+                    <span class="material-symbols-outlined text-[18px]">call</span> Hotline
+                </a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit rounded flex items-center gap-2"
+                    href="#">
+                    <span class="material-symbols-outlined text-[18px]">forum</span> Zalo
+                </a>
+                <a class="font-label-md text-label-md text-on-primary/80 dark:text-primary-fixed/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit rounded flex items-center gap-2"
+                    href="#">
+                    <span class="material-symbols-outlined text-[18px]">mail</span> Email
+                </a>
+            </div>
+        </div>
+        <!-- Copyright -->
+        <div class="mt-xl pt-md border-t border-on-primary/20 text-center px-gutter max-w-container-max mx-auto">
+            <p class="font-body-md text-body-md text-on-primary/80 dark:text-primary-fixed/80">© 2024 NaHerbs. All
+                rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>

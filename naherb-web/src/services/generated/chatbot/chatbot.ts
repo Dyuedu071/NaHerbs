@@ -258,4 +258,68 @@ export const usePostChatbotMessages = <TError = unknown,
 
       return useMutation(mutationOptions, queryClient);
     }
+    /**
+ * @summary Stream chatbot message (SSE)
+ */
+export const postChatbotMessagesStream = (
+    chatbotMessageRequest: ChatbotMessageRequest,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<string>(
+      {url: `/chatbot/messages/stream`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: chatbotMessageRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getPostChatbotMessagesStreamMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postChatbotMessagesStream>>, TError,{data: ChatbotMessageRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postChatbotMessagesStream>>, TError,{data: ChatbotMessageRequest}, TContext> => {
+
+const mutationKey = ['postChatbotMessagesStream'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postChatbotMessagesStream>>, {data: ChatbotMessageRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postChatbotMessagesStream(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostChatbotMessagesStreamMutationResult = NonNullable<Awaited<ReturnType<typeof postChatbotMessagesStream>>>
+    export type PostChatbotMessagesStreamMutationBody = ChatbotMessageRequest
+    export type PostChatbotMessagesStreamMutationError = unknown
+
+    /**
+ * @summary Stream chatbot message (SSE)
+ */
+export const usePostChatbotMessagesStream = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postChatbotMessagesStream>>, TError,{data: ChatbotMessageRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postChatbotMessagesStream>>,
+        TError,
+        {data: ChatbotMessageRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getPostChatbotMessagesStreamMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
     

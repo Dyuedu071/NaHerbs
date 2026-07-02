@@ -92,13 +92,20 @@ paths:
         schema:
           type: string
       - in: query
-        name: categorySlug
+        name: categorySlugs
         schema:
-          type: string
+          type: array
+          items:
+            type: string
+        explode: true
       - in: query
-        name: need
+        name: minPrice
         schema:
-          type: string
+          type: number
+      - in: query
+        name: maxPrice
+        schema:
+          type: number
       - in: query
         name: inStockOnly
         schema:

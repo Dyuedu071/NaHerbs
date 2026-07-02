@@ -258,7 +258,7 @@ export default function AdminFaqManager() {
 
   if (isLoading) {
     return (
-      <main className="mx-auto flex w-full max-w-container-max flex-1 flex-col gap-md p-gutter">
+      <main className="mx-auto flex w-full max-w-none flex-1 flex-col gap-md p-gutter">
         <p className="text-body-md text-text-muted">Đang tải FAQ...</p>
       </main>
     );
@@ -266,7 +266,7 @@ export default function AdminFaqManager() {
 
   if (isError) {
     return (
-      <main className="mx-auto flex w-full max-w-container-max flex-1 flex-col gap-md p-gutter">
+      <main className="mx-auto flex w-full max-w-none flex-1 flex-col gap-md p-gutter">
         <p className="text-body-md text-error">
           Không thể tải FAQ. Hãy đăng nhập bằng tài khoản admin.
         </p>
@@ -275,7 +275,7 @@ export default function AdminFaqManager() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-container-max flex-1 flex-col gap-lg p-gutter">
+    <main className="mx-auto flex w-full max-w-none flex-1 flex-col gap-lg p-gutter">
       <div className="flex flex-wrap items-end justify-between gap-md">
         <div>
           <Link

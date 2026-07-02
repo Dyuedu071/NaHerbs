@@ -70,7 +70,9 @@ public class ProductService {
 
     public PublicProductPageResponse getPublishedProducts(
             String keyword,
-            String categorySlug,
+            List<String> categorySlugs,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
             Boolean inStockOnly,
             String sort,
             Integer page,
@@ -96,13 +98,14 @@ public class ProductService {
 
         List<PublicProductSummaryResponse> summaries = products.stream()
                 .filter(product -> matchesKeyword(product, keyword))
-                .filter(product -> matchesCategory(product, categorySlug))
+                .filter(product -> matchesCategories(product, categorySlugs))
                 .map(product -> toSummary(
                         product,
                         skusByProductId.getOrDefault(product.getId(), List.of()),
                         imagesByProductId.getOrDefault(product.getId(), List.of())))
                 .filter(summary -> !Boolean.TRUE.equals(inStockOnly)
                         || summary.stockStatus() != StockStatus.OUT_OF_STOCK)
+                .filter(summary -> matchesPriceRange(summary, minPrice, maxPrice))
                 .sorted(summaryComparator(sort))
                 .toList();
 
@@ -203,12 +206,26 @@ public class ProductService {
                 || containsIgnoreCase(product.getPrimaryKeyword(), normalizedKeyword);
     }
 
-    private boolean matchesCategory(Product product, String categorySlug) {
-        if (categorySlug == null || categorySlug.isBlank()) {
+    private boolean matchesCategories(Product product, List<String> categorySlugs) {
+        if (categorySlugs == null || categorySlugs.isEmpty()) {
             return true;
         }
         return product.getCategory() != null
-                && categorySlug.trim().equalsIgnoreCase(product.getCategory().getSlug());
+                && categorySlugs.stream().anyMatch(slug -> slug.trim().equalsIgnoreCase(product.getCategory().getSlug()));
+    }
+
+    private boolean matchesPriceRange(PublicProductSummaryResponse summary, BigDecimal minPrice, BigDecimal maxPrice) {
+        if (minPrice != null) {
+            if (summary.maxSalePrice() != null && summary.maxSalePrice().compareTo(minPrice) < 0) {
+                return false;
+            }
+        }
+        if (maxPrice != null) {
+            if (summary.minSalePrice() != null && summary.minSalePrice().compareTo(maxPrice) > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean containsIgnoreCase(String value, String normalizedKeyword) {

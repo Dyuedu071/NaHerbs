@@ -1,6 +1,6 @@
 package vn.io.naherb.chatbot.retrieval;
 
-import java.math.BigDecimal;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -399,9 +399,9 @@ public class ProductRetrievalService {
         }
         return skus.stream()
                 .filter(sku -> sku.getStockStatus() == StockStatus.IN_STOCK)
-                .min(Comparator.comparing(ProductSku::getSalePrice, Comparator.nullsLast(BigDecimal::compareTo)))
+                .min(Comparator.comparing(ProductSku::getSalePrice, Comparator.nullsLast(Comparator.naturalOrder())))
                 .orElse(skus.stream()
-                        .min(Comparator.comparing(ProductSku::getSalePrice, Comparator.nullsLast(BigDecimal::compareTo)))
+                        .min(Comparator.comparing(ProductSku::getSalePrice, Comparator.nullsLast(Comparator.naturalOrder())))
                         .orElse(skus.get(0)));
     }
 

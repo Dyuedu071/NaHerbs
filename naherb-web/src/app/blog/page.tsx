@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import PublicHeader from '@/components/common/PublicHeader';
+import PublicFooter from '@/components/common/PublicFooter';
 
 export default function Blog() {
   return (
@@ -249,73 +250,7 @@ export default function Blog() {
         </section>
     </main>
 
-    {/* Footer */}
-    <footer className="w-full pt-xl pb-md bg-primary">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto">
-            {/* Brand Column */}
-            <div className="flex flex-col gap-sm">
-                <Link className="font-display-lg text-display-lg text-on-primary" href="/">NaHerbs</Link>
-                <p className="font-body-md text-body-md text-on-primary/80 mt-xs">
-                    Giải pháp thư giãn và phục hồi năng lượng từ thảo dược thiên nhiên, mang spa về ngôi nhà của bạn.
-                </p>
-            </div>
-            {/* Links Column 1 */}
-            <div className="flex flex-col gap-sm">
-                <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Product Categories</h4>
-                <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Cổ Vai Gáy</Link>
-                <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Chườm Lưng Bụng</Link>
-                <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Thư Giãn Mắt</Link>
-                <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Phụ Kiện Thảo Dược</Link>
-            </div>
-            {/* Links Column 2 */}
-            <div className="flex flex-col gap-sm">
-                <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Support Links</h4>
-                <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Hướng dẫn sử dụng</Link>
-                <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Chính sách đổi trả</Link>
-                <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Chính sách bảo mật</Link>
-                <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">FAQ</Link>
-            </div>
-            {/* Contact Column */}
-            <div className="flex flex-col gap-sm">
-                <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Liên Hệ</h4>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed flex items-center gap-xs"
-                    href="#">
-                    <span className="material-symbols-outlined text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>phone</span> Hotline: 1900 xxxx
-                </a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed flex items-center gap-xs"
-                    href="#">
-                    <span className="material-symbols-outlined text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>forum</span> Zalo: NaHerbs Official
-                </a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed flex items-center gap-xs"
-                    href="#">
-                    <span className="material-symbols-outlined text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>mail</span> Email: care@naherbs.vn
-                </a>
-            </div>
-        </div>
-        <div
-            className="px-gutter max-w-container-max mx-auto mt-xl pt-md border-t border-on-primary/20 flex flex-col md:flex-row justify-between items-center">
-            <p className="font-caption text-caption text-on-primary/60">
-                © 2024 NaHerbs. All rights reserved.
-            </p>
-        </div>
-    </footer>
-    {/* Fixed AI Chat Trigger */}
-    <button
-        className="fixed bottom-lg right-lg w-14 h-14 bg-primary text-on-primary rounded-full shadow-ambient-3 flex items-center justify-center hover:scale-110 transition-transform duration-300 z-50">
-        <span className="material-symbols-outlined"
-            style={{ fontVariationSettings: "'FILL' 1", fontSize: "28px" }}>psychiatry</span>
-    </button>
+    <PublicFooter />
     </>
   );
 }

@@ -153,7 +153,7 @@ export default function AdminPosts() {
   };
 
   return (
-    <main className="flex-1 p-gutter max-w-container-max mx-auto w-full flex flex-col gap-md relative">
+    <main className="flex-1 p-gutter w-full flex flex-col gap-md relative">
       {/* Toast Notification */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-xs px-md py-sm rounded-lg shadow-ambient-lg border animate-fade-in transition-all ${

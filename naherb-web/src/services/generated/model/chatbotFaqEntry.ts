@@ -5,15 +5,9 @@
  * API contract for naherb-api (Spring Boot) used by naherb-web (Next.js). Updated for UUID IDs across accounts/profile/address/order/cart and Vietnam two-level address fields: province/city and ward/commune only.
  * OpenAPI spec version: 2.2.0
  */
-import type { GetProductsSort } from './getProductsSort';
 
-export type GetProductsParams = {
-keyword?: string;
-categorySlugs?: string[];
-minPrice?: number;
-maxPrice?: number;
-inStockOnly?: boolean;
-sort?: GetProductsSort;
-page?: number;
-size?: number;
-};
+export interface ChatbotFaqEntry {
+  question?: string;
+  answer?: string;
+  keywords?: string[];
+}

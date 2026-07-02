@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AXIOS_INSTANCE } from '@/services/api-client';
@@ -30,7 +30,7 @@ interface BlogPostDetail {
   }>;
 }
 
-export default function AdminPostPreview() {
+function AdminPostPreviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
@@ -257,5 +257,13 @@ export default function AdminPostPreview() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function AdminPostPreview() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center text-text-muted">Đang tải bản xem trước...</div>}>
+      <AdminPostPreviewContent />
+    </Suspense>
   );
 }

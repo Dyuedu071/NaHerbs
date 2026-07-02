@@ -1,5 +1,6 @@
 package vn.io.naherb.product;
 
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,13 +41,15 @@ public class PublicProductController {
     @GetMapping("/products")
     public ResponseEntity<ApiResponse<PublicProductPageResponse>> listPublishedProducts(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String categorySlug,
+            @RequestParam(required = false) List<String> categorySlugs,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) Boolean inStockOnly,
             @RequestParam(required = false, defaultValue = "latest") String sort,
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "12") Integer size) {
         return ResponseEntity.ok(ApiResponse.ok(productService.getPublishedProducts(
-                keyword, categorySlug, inStockOnly, sort, page, size)));
+                keyword, categorySlugs, minPrice, maxPrice, inStockOnly, sort, page, size)));
     }
 
     @GetMapping("/products/{slug}")
