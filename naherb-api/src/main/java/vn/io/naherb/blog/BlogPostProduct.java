@@ -13,7 +13,7 @@ import vn.io.naherb.product.Product;
 public class BlogPostProduct extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "blog_post_id", nullable = false)
     private BlogPost post;
 
     @ManyToOne(fetch = FetchType.LAZY)

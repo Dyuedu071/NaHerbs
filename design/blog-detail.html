@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NaHerbs - Bài viết</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "success-bg": "#E7F0E4",
+                        "surface": "#fff9ed",
+                        "secondary-fixed": "#c7eccf",
+                        "tertiary-fixed": "#ffdbcb",
+                        "tertiary": "#7e3d18",
+                        "on-surface": "#1d1c14",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#c7eccf",
+                        "primary-fixed": "#c8ecc8",
+                        "on-tertiary-fixed": "#341100",
+                        "text-muted": "#6F6A61",
+                        "inverse-primary": "#acd0ad",
+                        "herbal-beige": "#E8D8BD",
+                        "earth-brown": "#8A6A4F",
+                        "on-secondary-fixed-variant": "#2e4d39",
+                        "on-primary-container": "#ccf0cc",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#9c542d",
+                        "outline": "#737971",
+                        "on-error": "#ffffff",
+                        "error-text": "#B94A3A",
+                        "surface-container": "#f3ede1",
+                        "primary": "#37563b",
+                        "outline-variant": "#c2c8bf",
+                        "on-surface-variant": "#424841",
+                        "surface-container-high": "#ede8dc",
+                        "on-secondary-fixed": "#012110",
+                        "primary-fixed-dim": "#acd0ad",
+                        "on-primary-fixed": "#03210b",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#733510",
+                        "inverse-on-surface": "#f6f0e4",
+                        "surface-dim": "#dfd9ce",
+                        "error-bg": "#FBEAE5",
+                        "primary-container": "#4f6f52",
+                        "surface-tint": "#466649",
+                        "inverse-surface": "#333028",
+                        "background": "#fff9ed",
+                        "soft-sage": "#A8BFA3",
+                        "surface-container-low": "#f9f3e7",
+                        "tertiary-fixed-dim": "#ffb692",
+                        "on-secondary-container": "#4b6c55",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e8e2d6",
+                        "text-main": "#2B2B2B",
+                        "secondary": "#45664f",
+                        "secondary-fixed-dim": "#abcfb4",
+                        "surface-container-highest": "#e8e2d6",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fff9ed",
+                        "on-tertiary-container": "#ffe1d3",
+                        "on-primary-fixed-variant": "#2f4e33",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1d1c14",
+                        "border-warm": "#DDD0BC",
+                        "on-error-container": "#93000a"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        base: "4px",
+                        xs: "8px",
+                        sm: "16px",
+                        lg: "48px",
+                        md: "24px",
+                        "container-max": "1240px",
+                        xl: "80px",
+                        gutter: "32px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Merriweather"],
+                        "display-lg-mobile": ["Merriweather"],
+                        "headline-lg-mobile": ["Merriweather"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Merriweather"],
+                        "body-md": ["Inter"],
+                        "caption": ["Inter"],
+                        "price-display": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["40px", { lineHeight: "1.3", fontWeight: "600" }],
+                        "display-lg-mobile": ["32px", { lineHeight: "1.2", fontWeight: "700" }],
+                        "headline-lg-mobile": ["26px", { lineHeight: "1.3", fontWeight: "600" }],
+                        "label-md": ["15px", { lineHeight: "1.2", letterSpacing: "0.01em", fontWeight: "600" }],
+                        "display-lg": ["56px", { lineHeight: "1.2", fontWeight: "700" }],
+                        "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+                        "caption": ["12px", { lineHeight: "1.4", fontWeight: "400" }],
+                        "price-display": ["28px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-lg": ["18px", { lineHeight: "1.7", fontWeight: "400" }],
+                        "headline-md": ["32px", { lineHeight: "1.35", fontWeight: "600" }]
+                    },
+                    boxShadow: {
+                        'soft-1': '0 2px 8px -2px rgba(55, 86, 59, 0.08), 0 4px 16px -4px rgba(55, 86, 59, 0.04)',
+                        'soft-2': '0 4px 12px -2px rgba(55, 86, 59, 0.12), 0 8px 24px -4px rgba(55, 86, 59, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .blog-content h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 28px;
+            color: #37563b;
+            /* primary */
+            margin-top: 48px;
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+
+        .blog-content p {
+            margin-bottom: 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            line-height: 1.7;
+            color: #424841;
+            /* on-surface-variant */
+        }
+
+        .blog-content blockquote {
+            border-left: 4px solid #A8BFA3;
+            /* soft-sage */
+            padding-left: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #45664f;
+            /* secondary */
+            font-size: 20px;
+        }
+
+        .blog-content ul {
+            list-style-type: disc;
+            padding-left: 24px;
+            margin-bottom: 24px;
+        }
+
+        .blog-content li {
+            margin-bottom: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            line-height: 1.7;
+            color: #424841;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+    <!-- TopNavBar -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/88 backdrop-blur-md shadow-sm">
+        <div class="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
+            <a class="font-display-lg text-display-lg text-primary" href="#">NaHerbs</a>
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex gap-md items-center">
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md"
+                    href="#">Home</a>
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md"
+                    href="#">Products</a>
+                <a class="text-primary font-bold relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-soft-sage after:rounded-full font-label-md text-label-md"
+                    href="#">Blog</a>
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md"
+                    href="#">About</a>
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md"
+                    href="#">Contact</a>
+            </div>
+            <div class="flex items-center gap-sm md:gap-md">
+                <button class="text-primary hover:scale-105 transition-transform duration-200">
+                    <span class="material-symbols-outlined" data-icon="search">search</span>
+                </button>
+                <button
+                    class="hidden md:block bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md hover:scale-105 transition-transform duration-200">
+                    Tư vấn ngay
+                </button>
+                <button class="text-primary hover:scale-105 transition-transform duration-200">
+                    <span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+                </button>
+                <button class="text-primary hover:scale-105 transition-transform duration-200 hidden md:block">
+                    <span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+                </button>
+                <!-- Mobile menu button -->
+                <button class="md:hidden text-primary">
+                    <span class="material-symbols-outlined" data-icon="menu">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content -->
+    <main class="flex-grow pt-[120px] pb-xl px-sm md:px-gutter">
+        <!-- Breadcrumb -->
+        <div class="max-w-[820px] mx-auto mb-md flex items-center gap-xs text-text-muted font-caption text-caption">
+            <a class="hover:text-primary transition-colors" href="#">Trang chủ</a>
+            <span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+            <a class="hover:text-primary transition-colors" href="#">Blog</a>
+            <span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+            <span class="text-on-surface">Công dụng kỳ diệu của nấm linh chi</span>
+        </div>
+        <!-- Article Container -->
+        <article class="max-w-[820px] mx-auto">
+            <!-- Article Header -->
+            <header class="mb-lg">
+                <span
+                    class="inline-block bg-success-bg text-primary px-3 py-1 rounded-full font-caption text-caption mb-sm">Thảo
+                    dược &amp; Sức khỏe</span>
+                <h1 class="font-headline-lg text-headline-lg md:text-[48px] text-primary mb-md">Khám Phá Công Dụng Kỳ
+                    Diệu Của Nấm Linh Chi Đối Với Sức Khỏe Toàn Diện</h1>
+                <div class="flex items-center gap-sm">
+                    <img alt="Author avatar" class="w-12 h-12 rounded-full object-cover border border-border-warm"
+                        data-alt="A portrait of a holistic health expert with a calm and welcoming expression, bathed in soft, natural morning light, reflecting a modern organic aesthetic."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1D1lIvqisF4bDAqOd8OdB3CEum1tlZdV4QjlvXOE3jSUKR7XyOYeyDjy290ponwNb6q1wqawtWsph-RnEwIfWa5Amh4-F8rthKDDhDSVSX033SiL_9z1WUseGzmiI520etxfTSKQ6UT5af1kmanp0yghxWTKEeOt2CLNXYHkOwnuezxfnjc6Nwa-1dK4WfcaHEbpu-Qp1Op2t1MhLQ8-poIHTQyTGIuUNSaZxDRFOHUSxDSuVz8X2_6Ve8MwG8jqF4wETv3_RZCk" />
+                    <div>
+                        <div class="font-label-md text-label-md text-on-surface">Bác sĩ Nguyễn Văn A</div>
+                        <div class="font-caption text-caption text-text-muted flex items-center gap-xs">
+                            <span>15 Tháng 10, 2023</span>
+                            <span class="w-1 h-1 bg-border-warm rounded-full"></span>
+                            <span>5 phút đọc</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- Featured Image -->
+            <div class="mb-lg rounded-xl overflow-hidden shadow-soft-1 aspect-video">
+                <img alt="Nấm linh chi" class="w-full h-full object-cover"
+                    data-alt="A high-quality, beautifully styled lifestyle flat-lay of dried Reishi mushrooms arranged organically on a warm cream background, accompanied by subtle earth-brown botanical elements, conveying natural healing."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmj2Kfxs3VOSOk4s9ux9zOz-BvwECRoaYjzy3w-obwzUI_eIeJBqPvlF3VJA76SSLhHgd3OMkTJQ99LMu6lzSKGApqvWb-xTvfDsDFnNeNSv3q5J-OX5iKUYgMW-FdrvBR3I0k4S5GVl6tGsL11VZkHpe8ZpLOecm6G5i1wF893pnwIVkIFKKe-bK9cvEqjpPwQoLDA-QODVMomYWm1g5S90iovQt72K0llvWbNDznck1CkyRj_0Iim1yhQaZfxRYSP_c059_kt6w" />
+            </div>
+            <!-- Content Body -->
+            <div class="blog-content">
+                <p>Nấm linh chi từ lâu đã được mệnh danh là "thượng dược" trong y học cổ truyền Phương Đông. Với sự phát
+                    triển của khoa học hiện đại, những lợi ích tuyệt vời của loại thảo dược này ngày càng được chứng
+                    minh rõ ràng, từ việc tăng cường hệ miễn dịch đến hỗ trợ sức khỏe tinh thần trong cuộc sống hiện đại
+                    đầy căng thẳng.</p>
+                <h2>1. Tăng Cường Hệ Miễn Dịch Tự Nhiên</h2>
+                <p>Một trong những tác dụng nổi bật nhất của nấm linh chi là khả năng kích thích và điều hòa hệ thống
+                    miễn dịch. Các nghiên cứu đã chỉ ra rằng các hoạt chất có trong nấm linh chi có thể tác động tích
+                    cực đến các tế bào bạch cầu, giúp cơ thể chống lại sự xâm nhập của vi khuẩn và virus.</p>
+                <blockquote>"Sự kết hợp giữa lối sống lành mạnh và việc sử dụng nấm linh chi đều đặn tạo nên một lá chắn
+                    bảo vệ cơ thể hoàn hảo trước những tác nhân gây bệnh từ môi trường." - Viện Nghiên Cứu Thảo Dược
+                </blockquote>
+                <h2>2. Giảm Căng Thẳng &amp; Cải Thiện Chất Lượng Giấc Ngủ</h2>
+                <p>Trong nhịp sống hối hả, căng thẳng và mất ngủ là những vấn đề phổ biến. Nấm linh chi có chứa các hợp
+                    chất giúp an thần, làm dịu hệ thần kinh trung ương. Việc sử dụng trà linh chi vào buổi tối không chỉ
+                    giúp bạn dễ đi vào giấc ngủ mà còn đảm bảo giấc ngủ sâu và chất lượng hơn.</p>
+                <ul>
+                    <li>Giảm thiểu mệt mỏi và lo âu.</li>
+                    <li>Cân bằng trạng thái cảm xúc.</li>
+                    <li>Hỗ trợ phục hồi năng lượng sau ngày dài.</li>
+                </ul>
+                <h2>3. Chăm Sóc Sức Khỏe Tim Mạch</h2>
+                <p>Nấm linh chi hỗ trợ ổn định huyết áp, giảm lượng cholesterol xấu trong máu và cải thiện tuần hoàn.
+                    Điều này đóng vai trò quan trọng trong việc ngăn ngừa các bệnh lý về tim mạch, đặc biệt là ở người
+                    trung niên và cao tuổi.</p>
+            </div>
+            <!-- Health Disclaimer -->
+            <div
+                class="mt-lg p-md bg-surface-container-low rounded-xl border border-border-warm shadow-soft-1 flex gap-md items-start">
+                <div class="bg-primary-container text-on-primary-container p-2 rounded-full flex-shrink-0 mt-1">
+                    <span class="material-symbols-outlined" data-icon="info">info</span>
+                </div>
+                <div>
+                    <h4 class="font-label-md text-label-md text-primary mb-2">Lưu ý y tế</h4>
+                    <p class="font-caption text-caption text-on-surface-variant">Thông tin trong bài viết chỉ mang tính
+                        chất tham khảo và không thay thế cho lời khuyên, chẩn đoán hoặc điều trị y khoa chuyên nghiệp.
+                        Vui lòng tham khảo ý kiến bác sĩ trước khi sử dụng bất kỳ sản phẩm thảo dược nào, đặc biệt nếu
+                        bạn đang mang thai hoặc điều trị bệnh.</p>
+                </div>
+            </div>
+            <!-- Share and Tags -->
+            <div class="mt-md flex flex-wrap justify-between items-center py-sm border-t border-b border-border-warm">
+                <div class="flex gap-sm">
+                    <span class="font-label-md text-label-md text-on-surface-variant flex items-center">Tags:</span>
+                    <a class="text-sm bg-surface-variant text-on-surface-variant px-3 py-1 rounded-md hover:bg-secondary-container transition-colors"
+                        href="#">Nấm Linh Chi</a>
+                    <a class="text-sm bg-surface-variant text-on-surface-variant px-3 py-1 rounded-md hover:bg-secondary-container transition-colors"
+                        href="#">Sức khỏe</a>
+                </div>
+                <div class="flex gap-sm items-center mt-sm md:mt-0">
+                    <span class="font-label-md text-label-md text-on-surface-variant">Chia sẻ:</span>
+                    <button
+                        class="w-8 h-8 rounded-full bg-surface-variant text-on-surface flex items-center justify-center hover:bg-primary hover:text-on-primary transition-colors">
+                        <span class="material-symbols-outlined text-[18px]" data-icon="share">share</span>
+                    </button>
+                </div>
+            </div>
+        </article>
+        <!-- Related Products (Bento/Card Grid) -->
+        <section class="max-w-container-max mx-auto mt-xl">
+            <h3 class="font-headline-md text-headline-md text-primary mb-md text-center">Sản Phẩm Đề Xuất Cho Bạn</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+                <!-- Product Card 1 -->
+                <div
+                    class="bg-surface rounded-xl shadow-soft-1 border border-herbal-beige overflow-hidden group hover:shadow-soft-2 transition-shadow duration-300 flex flex-col">
+                    <div class="relative aspect-square overflow-hidden bg-surface-container-low p-sm">
+                        <div
+                            class="absolute top-2 left-2 z-10 bg-success-bg text-primary px-2 py-1 rounded-full font-caption text-caption">
+                            Còn hàng</div>
+                        <img alt="Sản phẩm"
+                            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                            data-alt="A beautifully lit studio shot of a premium Reishi mushroom extract bottle, resting on an organic wooden slab surrounded by deep green foliage, capturing a modern organic wellness vibe."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP7HqReWWHAx62l7LCWOpG7QyoZ9t2lMI2Ffab5yD0PsZqbjnzxk7oL-BvubUZYzOJrsU37Ys_DQFTtbOoVwyzpzsZn-n3GLvrKHVj3NBjlDcYTXfcuOsUogjhSHwxnvbqe6Gp7cTC2R_thJONwitxiLY0werEEfyEd4XJ2DZ-EyBpPij0QxUIjvVB8HSVN0Luc0tOdTCJibiWBkYHrj-BtgzscGzLhiWpSdAK-wKvi_q5z2WALjCVinADDYr5HZn6ZxesZyLk1co" />
+                    </div>
+                    <div class="p-md flex-grow flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-label-md text-label-md text-primary mb-1">Tinh Chất Nấm Linh Chi Đỏ</h4>
+                            <p class="font-caption text-caption text-text-muted mb-sm line-clamp-2">Hỗ trợ tăng cường
+                                miễn dịch, giảm căng thẳng mệt mỏi hiệu quả.</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-auto">
+                            <span class="font-price-display text-price-display text-tertiary-container">850.000đ</span>
+                            <button
+                                class="bg-tertiary-container text-on-primary w-10 h-10 rounded-full flex items-center justify-center hover:bg-tertiary transition-colors">
+                                <span class="material-symbols-outlined"
+                                    data-icon="add_shopping_cart">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product Card 2 -->
+                <div
+                    class="bg-surface rounded-xl shadow-soft-1 border border-herbal-beige overflow-hidden group hover:shadow-soft-2 transition-shadow duration-300 flex flex-col">
+                    <div class="relative aspect-square overflow-hidden bg-surface-container-low p-sm">
+                        <img alt="Sản phẩm"
+                            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                            data-alt="An elegant arrangement of sliced dried Reishi mushrooms in a natural linen pouch, presented on a warm beige surface under soft natural lighting, emphasizing natural health."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCc_mQSdy-ufnThoc1iLtZtHxfrB-kCSj9I9TlKcXcds0LizIkWU48eroR0-9NFl4n4Jr3AHq92nl-qga7Ez5qcdQTd_j1M5tHrcQ20C0f36pIzic4LuyLx5Yqi-N9tihoywHnOr0M4XNWMjvIaoNoilvIznhufpnkKCpdj_gdPF2WXTuoNA5TZiHQ3Cp5ccJu301tLUFPwJxBpaLTM2e5cqGn9CD2agSn-nbuZAvE6g9CZvw4jtmI2EJMYjUP9NsHGNvGP1uKa-a0" />
+                    </div>
+                    <div class="p-md flex-grow flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-label-md text-label-md text-primary mb-1">Nấm Linh Chi Thái Lát Thượng Hạng
+                            </h4>
+                            <p class="font-caption text-caption text-text-muted mb-sm line-clamp-2">Sản phẩm tự nhiên
+                                100%, dễ dàng hãm trà và sử dụng hằng ngày.</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-auto">
+                            <span
+                                class="font-price-display text-price-display text-tertiary-container">1.200.000đ</span>
+                            <button
+                                class="bg-tertiary-container text-on-primary w-10 h-10 rounded-full flex items-center justify-center hover:bg-tertiary transition-colors">
+                                <span class="material-symbols-outlined"
+                                    data-icon="add_shopping_cart">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product Card 3 -->
+                <div
+                    class="bg-surface rounded-xl shadow-soft-1 border border-herbal-beige overflow-hidden group hover:shadow-soft-2 transition-shadow duration-300 flex flex-col">
+                    <div class="relative aspect-square overflow-hidden bg-surface-container-low p-sm">
+                        <div
+                            class="absolute top-2 left-2 z-10 bg-success-bg text-primary px-2 py-1 rounded-full font-caption text-caption">
+                            Còn hàng</div>
+                        <img alt="Sản phẩm"
+                            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                            data-alt="A modern, minimalist box of Reishi mushroom tea bags next to a steaming ceramic cup on a natural stone surface, bathed in warm afternoon sunlight, conveying comfort and wellness."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwYS_CX-zNAjxOCu97DfnjeZf2iFo35feC10y6e8hp3Bi-3AVH9U22R4RUwTPVnFPzpvZeyeabAeC-VmYaa-AjYNjYOSDzvFQRFqSoLLuXN_DtwUzOO_jTWvUmtKT0RVgbFjg-yuzudmdn6f4quJuObeZ8xJ9kjQcWZHBhppaVH1TFHkb6dVaW93r2aHI19-1ErOqcIoqA02966jLgR0TWc6de2wevGsm_iZUMWXLypAgQSBOLxEObD4Hfxcl1f-0ZEXFBFqHRGJ4" />
+                    </div>
+                    <div class="p-md flex-grow flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-label-md text-label-md text-primary mb-1">Trà Linh Chi Mật Ong</h4>
+                            <p class="font-caption text-caption text-text-muted mb-sm line-clamp-2">Kết hợp hoàn hảo
+                                giữa vị đắng nhẹ của linh chi và sự ngọt ngào của mật ong.</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-auto">
+                            <span class="font-price-display text-price-display text-tertiary-container">350.000đ</span>
+                            <button
+                                class="bg-tertiary-container text-on-primary w-10 h-10 rounded-full flex items-center justify-center hover:bg-tertiary transition-colors">
+                                <span class="material-symbols-outlined"
+                                    data-icon="add_shopping_cart">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- AI CTA Banner -->
+        <section class="max-w-[820px] mx-auto mt-xl">
+            <div
+                class="bg-primary rounded-xl p-lg relative overflow-hidden shadow-soft-2 flex flex-col md:flex-row items-center justify-between gap-md">
+                <div class="absolute -right-20 -top-20 opacity-10 pointer-events-none">
+                    <span class="material-symbols-outlined text-[300px]" data-icon="auto_awesome">auto_awesome</span>
+                </div>
+                <div class="z-10 text-center md:text-left">
+                    <h3 class="font-headline-md text-headline-md text-on-primary mb-sm">Bạn cần tư vấn riêng?</h3>
+                    <p class="font-body-md text-body-md text-primary-fixed mb-0">Hỏi AI của NaHerbs để tìm ra sản phẩm
+                        phù hợp nhất với thể trạng của bạn.</p>
+                </div>
+                <button
+                    class="z-10 bg-on-primary text-primary px-6 py-3 rounded-full font-label-md text-label-md hover:bg-success-bg transition-colors flex items-center gap-2 whitespace-nowrap shadow-soft-1">
+                    <span class="material-symbols-outlined" data-icon="forum">forum</span>
+                    Hỏi AI Tư Vấn
+                </button>
+            </div>
+        </section>
+        <!-- Related Articles -->
+        <section class="max-w-container-max mx-auto mt-xl">
+            <div class="flex justify-between items-end mb-md border-b border-border-warm pb-sm">
+                <h3 class="font-headline-md text-headline-md text-primary">Bài Viết Cùng Chủ Đề</h3>
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md flex items-center"
+                    href="#">
+                    Xem tất cả <span class="material-symbols-outlined text-[18px] ml-1"
+                        data-icon="arrow_forward">arrow_forward</span>
+                </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+                <a class="group block" href="#">
+                    <div class="aspect-video rounded-lg overflow-hidden mb-sm shadow-soft-1">
+                        <img alt="Bài viết"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="A close up shot of a hand gently holding fresh, vibrant green herbs against a soft, out-of-focus garden background, embodying organic health."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5xODqnG9RZaprCt5krNPHeK6otEQrXn45lz-mFX1k9p7L5rnJORyK5K_m3ALsZTmkwz0YGP2qv7Lsl5gcB3-Gd1UTz_jQvMZdLhTRseZC4PvLK6td5e8Nm728YK2nZtlU-nDzJoJtpw1vSunk5Di3DADsX6-lmKhvZ8JeDmUN5Pbqw-Va76Xjj1L4kYIuARqZk2T7CGT7vK9-YLGAiCu90KoBXS6u_Zt54xQbMfcY6cm8bE_3fINvaNRpKe7_eJyCs7YCC_LpNw4" />
+                    </div>
+                    <div class="font-caption text-caption text-text-muted mb-1">10 Tháng 10, 2023</div>
+                    <h4
+                        class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                        5 Loại Thảo Dược Quanh Nhà Giúp Giảm Căng Thẳng Hiệu Quả</h4>
+                </a>
+                <a class="group block" href="#">
+                    <div class="aspect-video rounded-lg overflow-hidden mb-sm shadow-soft-1">
+                        <img alt="Bài viết"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="A serene image of a hot cup of herbal tea emitting steam on a rustic wooden table by a window, with morning light pouring in, creating a calm and peaceful mood."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtiN-aerY5qlH2gSepj2hoywdEncbkvEIl5DI5xtP0203H4n3C8yCDkuISn_JQQQL-j_yP55DWgYayEMwFF9DIGuhIueA8YaHN-gcj3c51qZsQ-tpMflNlVE5BinRYJ0lfstfwBhDNePs1HC6pau2GETgMCzSUSFh-KMvsFzytXQ-O9yEdN0qp8s2CJfDRQzx_q9MjjLVGj7kKV7p5jdviq3wvsaZuGqBujlMUjybz9Z3O6iwxPl8lbIvx4nmSfmOmqNVlxn3tWGI" />
+                    </div>
+                    <div class="font-caption text-caption text-text-muted mb-1">05 Tháng 10, 2023</div>
+                    <h4
+                        class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                        Bí Quyết Thanh Lọc Cơ Thể Bằng Trà Thảo Mộc Mỗi Sáng</h4>
+                </a>
+                <a class="group block" href="#">
+                    <div class="aspect-video rounded-lg overflow-hidden mb-sm shadow-soft-1">
+                        <img alt="Bài viết"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            data-alt="A flat lay composition of various colorful medicinal roots and dried flowers on a warm beige canvas, styled beautifully to showcase organic wellness ingredients."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNr414dNcrhJBLyD6q2DS6pHKBiM357MV7PVqWoqo-WJt8vriM2_UER_ttqQF_r0AWvHgB2c-jd-OPgGgIE5dTMap67UqcqQ6F08CnNhysvxsJKX0sF68WFPD-LC4TJo4x7qcZKXD4dY8VmkHfeSR9uLKcnYuPGWOxsrhKkmb3T6fdHcDWv_Z_oXFwXMxSyqNrqLYWrP2ABWhoYlag-Zt7PP0zhOdxARcbONR0qVLnWbs7onQqAPwm3X7Yz0kW5ekmfWqLHQLquIk" />
+                    </div>
+                    <div class="font-caption text-caption text-text-muted mb-1">28 Tháng 09, 2023</div>
+                    <h4
+                        class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                        Tầm Quan Trọng Của Việc Ngủ Đủ Giấc Và Cách Cải Thiện Bằng Tự Nhiên</h4>
+                </a>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer
+        class="w-full pt-xl pb-md bg-primary dark:bg-on-primary-fixed-variant text-on-primary dark:text-primary-fixed">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto mb-lg">
+            <div class="col-span-1 md:col-span-1">
+                <div class="font-display-lg text-display-lg text-on-primary mb-sm">NaHerbs</div>
+                <p class="font-body-md text-body-md text-on-primary/80 mb-sm">Giải pháp chăm sóc sức khỏe toàn diện từ
+                    thảo dược tự nhiên.</p>
+            </div>
+            <div>
+                <h4 class="font-headline-md text-headline-md mb-md">Product Categories</h4>
+                <ul class="space-y-sm">
+                    <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Trà Thảo Mộc</a></li>
+                    <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Tinh Chất Thảo Dược</a></li>
+                    <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Bộ Quà Tặng</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-headline-md text-headline-md mb-md">Support Links</h4>
+                <ul class="space-y-sm">
+                    <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Về Chúng Tôi</a></li>
+                    <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Chính Sách Mua Hàng</a></li>
+                    <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Câu Hỏi Thường Gặp</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-headline-md text-headline-md mb-md">Liên Hệ</h4>
+                <ul class="space-y-sm">
+                    <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors flex items-center gap-xs"
+                            href="#"><span class="material-symbols-outlined" data-icon="call">call</span> Hotline</a>
+                    </li>
+                    <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors flex items-center gap-xs"
+                            href="#"><span class="material-symbols-outlined" data-icon="forum">forum</span> Zalo</a>
+                    </li>
+                    <li><a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors flex items-center gap-xs"
+                            href="#"><span class="material-symbols-outlined" data-icon="mail">mail</span> Email</a></li>
+                </ul>
+            </div>
+        </div>
+        <div
+            class="px-gutter max-w-container-max mx-auto border-t border-on-primary/20 pt-md text-center font-caption text-caption text-on-primary/60">
+            © 2024 NaHerbs. All rights reserved.
+        </div>
+    </footer>
+    <!-- AI Advisor FAB -->
+    <button
+        class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-soft-2 flex items-center justify-center hover:scale-110 transition-transform duration-300 z-50 group">
+        <span class="material-symbols-outlined" data-icon="psychiatry">psychiatry</span>
+        <span
+            class="absolute right-full mr-4 bg-surface text-on-surface px-3 py-1 rounded-md font-caption text-caption shadow-soft-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Hỏi
+            AI Tư Vấn</span>
+    </button>
+</body>
+
+</html>

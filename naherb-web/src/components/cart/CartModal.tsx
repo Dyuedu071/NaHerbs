@@ -181,7 +181,7 @@ export default function CartModal() {
                 Đăng nhập để xem giỏ hàng
               </h3>
               <Link
-                href="/login"
+                href="/dang-nhap"
                 onClick={close}
                 className="mt-md inline-flex items-center justify-center gap-xs rounded-full bg-primary px-md py-sm text-label-md font-label-md text-on-primary transition-colors hover:bg-secondary"
               >

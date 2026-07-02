@@ -26,4 +26,9 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, UUID> {
     
     @Query("SELECT b FROM BlogPost b WHERE b.category.slug = :categorySlug AND b.status = :status")
     Page<BlogPost> findByCategorySlugAndStatus(@Param("categorySlug") String categorySlug, @Param("status") ContentStatus status, Pageable pageable);
+
+    @Query("SELECT b FROM BlogPost b WHERE " +
+           "(:search IS NULL OR :search = '' OR LOWER(b.title) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(b.content) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+           "(:categoryId IS NULL OR b.category.id = :categoryId)")
+    Page<BlogPost> findBySearchAndCategory(@Param("search") String search, @Param("categoryId") UUID categoryId, Pageable pageable);
 }

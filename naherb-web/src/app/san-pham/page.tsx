@@ -35,13 +35,29 @@ export default async function ProductsPage({
     }).catch(() => ({ items: [], totalPages: 0, page: 0, size: 12, totalItems: 0 })),
   ]);
 
-  // Backend currently returns the PageResponse/List directly without the wrapper, so we cast it.
-  const productsData = productsDataRaw as unknown as ProductPage;
-  const categories = categoriesData as unknown as ProductCategorySummary[];
+  // Robustly extract categories (handles direct array or wrapped in response.data)
+  let categories: ProductCategorySummary[] = [];
+  if (categoriesData) {
+    if (Array.isArray(categoriesData)) {
+      categories = categoriesData;
+    } else if (typeof categoriesData === 'object' && 'data' in categoriesData && Array.isArray((categoriesData as any).data)) {
+      categories = (categoriesData as any).data;
+    }
+  }
 
-  const products = Array.isArray(productsData.items) ? productsData.items : [];
-  const totalPages = productsData.totalPages || 0;
-  const currentPage = productsData.page || 0;
+  // Robustly extract productsPage (handles direct ProductPage or wrapped in response.data)
+  let productsPage: ProductPage | undefined = undefined;
+  if (productsDataRaw) {
+    if (productsDataRaw && typeof productsDataRaw === 'object' && 'items' in productsDataRaw) {
+      productsPage = productsDataRaw as unknown as ProductPage;
+    } else if (typeof productsDataRaw === 'object' && 'data' in productsDataRaw) {
+      productsPage = (productsDataRaw as any).data as ProductPage;
+    }
+  }
+
+  const products = productsPage && Array.isArray(productsPage.items) ? productsPage.items : [];
+  const totalPages = productsPage?.totalPages || 0;
+  const currentPage = productsPage?.page || 0;
 
   return (
     <div className="bg-gray-50 min-h-screen py-12">

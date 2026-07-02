@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
+import { useCart } from '@/components/cart/CartContext';
 import { logoutToGuestHome } from '@/lib/auth-logout';
 import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
 
@@ -12,6 +13,7 @@ export default function PublicHeader() {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const { open: openChatbot } = useChatbot();
+  const { open: openCart } = useCart();
   const { data } = useGetAuthMe({
     query: {
       retry: false,
@@ -55,9 +57,14 @@ export default function PublicHeader() {
           <button className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95" title="Tìm kiếm">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>search</span>
           </button>
-          <Link href="/san-pham" className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 relative inline-flex items-center" title="Giỏ hàng">
+          <button
+            type="button"
+            onClick={openCart}
+            className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 relative inline-flex items-center"
+            title="Giỏ hàng"
+          >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>shopping_cart</span>
-          </Link>
+          </button>
           
           {user ? (
             <div className="relative hidden md:flex items-center gap-xs">
@@ -105,6 +112,13 @@ export default function PublicHeader() {
                     className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
                   >
                     Địa chỉ giao hàng
+                  </Link>
+                  <Link
+                    href="/account/orders"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
+                  >
+                    Đơn hàng của tôi
                   </Link>
                   <button
                     type="button"
