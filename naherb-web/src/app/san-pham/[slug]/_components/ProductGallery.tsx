@@ -29,6 +29,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
             src={activeImage}
             alt="Main product image"
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
           />
         )}
@@ -44,7 +45,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                 activeImage === img.url ? 'border-green-600' : 'border-transparent opacity-70 hover:opacity-100'
               }`}
             >
-              <Image src={img.url!} alt={img.altText || 'Thumbnail'} fill className="object-cover" />
+              <Image src={img.url!} alt={img.altText || 'Thumbnail'} fill sizes="80px" className="object-cover" />
             </button>
           ))}
         </div>
