@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useToast } from '@/contexts/ToastContext';
 import { AXIOS_INSTANCE } from '@/services/api-client';
 
 const RichTextEditor = dynamic(() => import('@/components/common/RichTextEditor'), {
@@ -12,7 +13,7 @@ const RichTextEditor = dynamic(() => import('@/components/common/RichTextEditor'
 });
 
 
-export default function CreatePost() {
+function CreatePostContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('draftId') || searchParams.get('id');
@@ -41,11 +42,7 @@ export default function CreatePost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Custom Notifications & Modals
-  const [toast, setToast] = useState<{message: string, type: 'success'|'error'} | null>(null);
-  const showToast = (message: string, type: 'success' | 'error' = 'error') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  const { showToast } = useToast();
 
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [draftData, setDraftData] = useState<any>(null);
@@ -289,13 +286,7 @@ export default function CreatePost() {
   const handlePublish = async () => submitPost('PUBLISHED');
 
   return (
-    <main className="flex-1 p-gutter max-w-container-max mx-auto w-full flex flex-col gap-md pb-xl relative">
-      {/* Toast Notification */}
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-ambient-lg text-label-md font-label-md text-white transition-all transform duration-300 ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
-          {toast.message}
-        </div>
-      )}
+    <main className="flex-1 p-gutter w-full flex gap-xl relative">
 
       {/* Draft Restore Modal */}
       {showDraftModal && (
@@ -527,5 +518,13 @@ export default function CreatePost() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CreatePost() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center text-text-muted">Đang tải...</div>}>
+      <CreatePostContent />
+    </Suspense>
   );
 }

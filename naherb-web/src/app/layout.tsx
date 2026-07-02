@@ -22,6 +22,7 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 import ChatbotShell from "@/components/chatbot/ChatbotShell";
 import CartShell from "@/components/cart/CartShell";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { ToastProvider } from '@/contexts/ToastContext';
 
 export default function RootLayout({
   children,
@@ -41,11 +42,13 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col">
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "dummy-google-client-id.apps.googleusercontent.com"}>
-          <QueryProvider>
-            <CartShell>
-              <ChatbotShell>{children}</ChatbotShell>
-            </CartShell>
-          </QueryProvider>
+          <ToastProvider>
+            <QueryProvider>
+              <CartShell>
+                <ChatbotShell>{children}</ChatbotShell>
+              </CartShell>
+            </QueryProvider>
+          </ToastProvider>
         </GoogleOAuthProvider>
       </body>
     </html>

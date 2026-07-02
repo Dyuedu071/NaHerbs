@@ -92,13 +92,20 @@ paths:
         schema:
           type: string
       - in: query
-        name: categorySlug
+        name: categorySlugs
         schema:
-          type: string
+          type: array
+          items:
+            type: string
+        explode: true
       - in: query
-        name: need
+        name: minPrice
         schema:
-          type: string
+          type: number
+      - in: query
+        name: maxPrice
+        schema:
+          type: number
       - in: query
         name: inStockOnly
         schema:
@@ -1636,6 +1643,13 @@ components:
       required:
       - paymentMethod
       properties:
+        cartItemIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+          description: Optional list of cart item IDs to checkout. If not provided, checks out the whole cart.
         shippingAddressId:
           type: string
           format: uuid

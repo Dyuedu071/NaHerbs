@@ -110,7 +110,7 @@ export default function AdminChatbotConfigPage() {
 
   if (isLoading) {
     return (
-      <main className="mx-auto flex w-full max-w-container-max flex-1 flex-col gap-md p-gutter">
+      <main className="mx-auto flex w-full max-w-none flex-1 flex-col gap-md p-gutter">
         <p className="text-body-md text-text-muted">Đang tải cấu hình chatbot...</p>
       </main>
     );
@@ -118,7 +118,7 @@ export default function AdminChatbotConfigPage() {
 
   if (isError) {
     return (
-      <main className="mx-auto flex w-full max-w-container-max flex-1 flex-col gap-md p-gutter">
+      <main className="mx-auto flex w-full max-w-none flex-1 flex-col gap-md p-gutter">
         <p className="text-body-md text-error">
           Không thể tải cấu hình. Hãy đăng nhập bằng tài khoản admin.
         </p>

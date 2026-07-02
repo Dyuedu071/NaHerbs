@@ -26,7 +26,7 @@ export default function AdminOrderDetailPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-container-max flex-1 flex-col gap-md p-gutter">
+    <main className="mx-auto flex w-full max-w-none flex-1 flex-col gap-md p-gutter">
       <Link
         href="/admin/orders"
         className="inline-flex w-fit items-center gap-xs text-caption text-primary hover:text-secondary"
@@ -52,7 +52,7 @@ function AdminShell({
   tone?: "muted" | "error";
 }) {
   return (
-    <main className="mx-auto flex w-full max-w-container-max flex-1 items-center justify-center p-gutter">
+    <main className="mx-auto flex w-full max-w-none flex-1 items-center justify-center p-gutter">
       <p className={`text-body-md ${tone === "error" ? "text-error" : "text-text-muted"}`}>
         {children}
       </p>

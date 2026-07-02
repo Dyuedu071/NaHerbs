@@ -223,8 +223,8 @@ function StatusPill({
 }) {
   const label =
     tone === "order"
-      ? orderStatusLabels[value as any]
-      : paymentStatusLabels[value as any];
+      ? orderStatusLabels[value as keyof typeof orderStatusLabels]
+      : paymentStatusLabels[value as keyof typeof paymentStatusLabels];
 
   let colorStyle = "bg-surface-container text-text-muted border border-border-warm/40";
   if (value === "CANCELLED" || value === "FAILED") {

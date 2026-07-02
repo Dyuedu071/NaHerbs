@@ -12,6 +12,11 @@ import type { PaymentMethod } from './paymentMethod';
  * Create order from current cart. Use either shippingAddressId from saved account_addresses or provide shippingAddress inline. Address uses province/city and ward/commune only; no district field.
  */
 export interface CheckoutRequest {
+  /**
+   * Optional list of cart item IDs to checkout. If not provided, checks out the whole cart.
+   * @nullable
+   */
+  cartItemIds?: string[] | null;
   /** @nullable */
   shippingAddressId?: string | null;
   /** @nullable */

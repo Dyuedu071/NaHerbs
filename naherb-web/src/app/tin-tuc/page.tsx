@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import PublicHeader from '@/components/common/PublicHeader';
+import PublicFooter from '@/components/common/PublicFooter';
 import { AXIOS_INSTANCE } from '@/services/api-client';
 
 interface BlogCategory {
@@ -294,47 +295,7 @@ export default function Blog() {
                 </section>
             </main>
 
-            <footer className="w-full pt-xl pb-md bg-primary">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto">
-                    <div className="flex flex-col gap-sm">
-                        <Link className="font-display-lg text-display-lg text-on-primary" href="/">NaHerbs</Link>
-                        <p className="font-body-md text-body-md text-on-primary/80 mt-xs">
-                            Giải pháp thư giãn và phục hồi năng lượng từ thảo dược thiên nhiên, mang spa về ngôi nhà của bạn.
-                        </p>
-                    </div>
-                    <div className="flex flex-col gap-sm">
-                        <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Danh mục</h4>
-                        <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors" href="#">Cổ Vai Gáy</Link>
-                        <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors" href="#">Chườm Lưng Bụng</Link>
-                        <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors" href="#">Thư Giãn Mắt</Link>
-                        <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors" href="#">Phụ Kiện Thảo Dược</Link>
-                    </div>
-                    <div className="flex flex-col gap-sm">
-                        <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Hỗ trợ</h4>
-                        <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors" href="#">Hướng dẫn sử dụng</Link>
-                        <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors" href="#">Chính sách đổi trả</Link>
-                        <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors" href="#">Chính sách bảo mật</Link>
-                        <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors" href="#">FAQ</Link>
-                    </div>
-                    <div className="flex flex-col gap-sm">
-                        <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Liên Hệ</h4>
-                        <div className="font-body-md text-body-md text-on-primary/80 flex items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">phone</span> Hotline: 1900 xxxx
-                        </div>
-                        <div className="font-body-md text-body-md text-on-primary/80 flex items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">forum</span> Zalo: NaHerbs Official
-                        </div>
-                        <div className="font-body-md text-body-md text-on-primary/80 flex items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">mail</span> Email: care@naherbs.vn
-                        </div>
-                    </div>
-                </div>
-                <div className="px-gutter max-w-container-max mx-auto mt-xl pt-md border-t border-on-primary/20 flex flex-col md:flex-row justify-between items-center">
-                    <p className="font-caption text-caption text-on-primary/60">
-                        © 2024 NaHerbs. All rights reserved.
-                    </p>
-                </div>
-            </footer>
+            <PublicFooter />
         </>
     );
 }

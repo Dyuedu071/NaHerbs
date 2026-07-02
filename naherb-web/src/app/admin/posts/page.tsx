@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/contexts/ToastContext';
 import { AXIOS_INSTANCE } from '@/services/api-client';
 
 interface BlogPost {
@@ -51,12 +52,7 @@ export default function AdminPosts() {
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Custom Toast notification
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  const { showToast } = useToast();
 
   // Debounce search input
   useEffect(() => {
@@ -153,21 +149,7 @@ export default function AdminPosts() {
   };
 
   return (
-    <main className="flex-1 p-gutter max-w-container-max mx-auto w-full flex flex-col gap-md relative">
-      {/* Toast Notification */}
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-xs px-md py-sm rounded-lg shadow-ambient-lg border animate-fade-in transition-all ${
-          toast.type === 'success' 
-            ? 'bg-success-bg text-primary border-green-200' 
-            : 'bg-error-container text-error border-red-200'
-        }`}>
-          <span className="material-symbols-outlined text-[20px]">
-            {toast.type === 'success' ? 'check_circle' : 'error'}
-          </span>
-          <span className="text-label-md font-label-md">{toast.message}</span>
-        </div>
-      )}
-
+    <main className="flex-1 p-gutter w-full flex flex-col gap-md relative">
       {/* Page Header */}
       <div className="flex justify-between items-end mb-sm">
         <div>

@@ -5,15 +5,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
-import { useCart } from '@/components/cart/CartContext';
 import { logoutToGuestHome } from '@/lib/auth-logout';
 import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
+
+import { useGetCart } from '@/services/generated/cart/cart';
+import type { Cart } from '@/services/generated/model/cart';
 
 export default function PublicHeader() {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const { open: openChatbot } = useChatbot();
-  const { open: openCart } = useCart();
   const { data } = useGetAuthMe({
     query: {
       retry: false,
@@ -22,6 +23,18 @@ export default function PublicHeader() {
   });
 
   const user = data as unknown as { id: string; email: string; name: string; role: string; avatarUrl?: string } | undefined;
+  const isAuthenticated = !!user;
+
+  const { data: cartResponse } = useGetCart({
+    query: {
+      enabled: isAuthenticated,
+      retry: false,
+    },
+  });
+  
+  const cart = (cartResponse as { data?: Cart } | undefined)?.data;
+  const cartItemCount = cart?.items?.reduce((acc, item) => acc + (item.quantity ?? 0), 0) ?? 0;
+
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -45,26 +58,30 @@ export default function PublicHeader() {
         
         {/* Navigation Links */}
         <nav className="hidden md:flex gap-gutter items-center">
-          <Link className={getLinkClass('/', true)} href="/">Home</Link>
-          <Link className={getLinkClass('/san-pham')} href="/san-pham">Products</Link>
-          <Link className={getLinkClass('/tin-tuc')} href="/tin-tuc">Blog</Link>
-          <Link className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200" href="/#about">About</Link>
-          <Link className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200" href="/#contact">Contact</Link>
+          <Link className={getLinkClass('/', true)} href="/">Trang chủ</Link>
+          <Link className={getLinkClass('/san-pham')} href="/san-pham">Sản phẩm</Link>
+          <Link className={getLinkClass('/tin-tuc')} href="/tin-tuc">Tin tức</Link>
+          <Link className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200" href="/#about">Giới thiệu</Link>
+          <Link className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200" href="/#contact">Liên hệ</Link>
         </nav>
 
         {/* Trailing Actions */}
         <div className="flex items-center gap-md">
-          <button className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95" title="Tìm kiếm">
+          <Link href="/san-pham" className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95" title="Tìm kiếm">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>search</span>
-          </button>
-          <button
-            type="button"
-            onClick={openCart}
+          </Link>
+          <Link
+            href="/cart"
             className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 relative inline-flex items-center"
             title="Giỏ hàng"
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>shopping_cart</span>
-          </button>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-error text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center border border-surface">
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </span>
+            )}
+          </Link>
           
           {user ? (
             <div className="relative hidden md:flex items-center gap-xs">

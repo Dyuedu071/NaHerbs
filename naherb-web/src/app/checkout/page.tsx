@@ -19,7 +19,8 @@ import type { UpsertAddressRequest } from "@/services/generated/model/upsertAddr
 import { getCsrfToken } from "@/services/csrf";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 
 const emptyAddress: UpsertAddressRequest = {
   receiverName: "",
@@ -39,6 +40,14 @@ function formatAddress(address: AccountAddress): string {
 }
 
 export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<CheckoutShell>Đang tải thông tin thanh toán...</CheckoutShell>}>
+      <CheckoutContent />
+    </Suspense>
+  );
+}
+
+function CheckoutContent() {
   const queryClient = useQueryClient();
   const { open: openCart } = useCart();
   const { isLoading: authLoading, isAuthenticated } = useRequireAuth();
@@ -68,8 +77,19 @@ export default function CheckoutPage() {
     void getCsrfToken();
   }, []);
 
+  const searchParams = useSearchParams();
+  const itemsParam = searchParams.get("items");
+  const selectedItemIds = useMemo(() => {
+    if (!itemsParam) return null;
+    return new Set(itemsParam.split(",").filter(Boolean));
+  }, [itemsParam]);
+
   const cart = (cartResponse as { data?: Cart } | undefined)?.data;
-  const items = cart?.items ?? [];
+  const allItems = cart?.items ?? [];
+  const items = useMemo(() => {
+    if (!selectedItemIds) return allItems;
+    return allItems.filter((item) => item.id && selectedItemIds.has(item.id));
+  }, [allItems, selectedItemIds]);
   const addresses = useMemo(
     () => (addressesResponse as { data?: AccountAddress[] } | undefined)?.data ?? [],
     [addressesResponse],
@@ -118,6 +138,7 @@ export default function CheckoutPage() {
         data: {
           paymentMethod,
           shippingAddressId: effectiveSelectedAddressId,
+          cartItemIds: selectedItemIds ? Array.from(selectedItemIds) : undefined,
           note: note.trim() || null,
         },
       });
@@ -139,6 +160,7 @@ export default function CheckoutPage() {
       data: {
         paymentMethod,
         saveAddress,
+        cartItemIds: selectedItemIds ? Array.from(selectedItemIds) : undefined,
         note: note.trim() || null,
         shippingAddress: {
           receiverName: addressForm.receiverName.trim(),

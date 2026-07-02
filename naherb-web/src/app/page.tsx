@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
 import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
-import { useCart } from '@/components/cart/CartContext';
+
 import { extractApiErrorMessage } from '@/lib/api-error';
+import { useToast } from '@/contexts/ToastContext';
 import { formatMoney } from '@/lib/order-format';
 import { getGetCartQueryKey, usePostCartItems } from '@/services/generated/cart/cart';
 import { getProductsSlug, useGetProducts } from '@/services/generated/public-products/public-products';
@@ -15,6 +16,7 @@ import type { ProductSku } from '@/services/generated/model/productSku';
 import type { ProductSummary } from '@/services/generated/model/productSummary';
 import { useQueryClient } from '@tanstack/react-query';
 import PublicHeader from '@/components/common/PublicHeader';
+import PublicFooter from '@/components/common/PublicFooter';
 
 const fallbackProductImages = [
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCCHIGHpyiH_H6cd9_8Zslswa-mB_l-tp5H_0vn7u3WIMjMMnJY7Gl2AHTm2ZHsVUifzbG8EqLQm_Ixt9t8Vx6pOFbt6Dnyqw-ws8jjMUOL7dT-eoB0UiNVffG1mx5yV0Yt6PFc0k4DxdRLRW6XiG26G9nE62FJONsIsnH_ZG0o9R4e_TLJnVtJuj_Dbfde9XuaRyy8WboVSQRO9eDqyiGWc5DhIFUN4pvK2VY2a0BssBOHGBU4TU07jylZpmTjT4fMQUZiW3y9O4g",
@@ -48,8 +50,7 @@ function formatProductPrice(product: ProductSummary): string {
 export default function Home() {
   const queryClient = useQueryClient();
   const { open: openChatbot } = useChatbot();
-  const { open: openCart } = useCart();
-  const [addCartError, setAddCartError] = useState<string | null>(null);
+
   const [addingProductSlug, setAddingProductSlug] = useState<string | null>(null);
   const { data: productsResponse, isLoading: productsLoading } = useGetProducts(
     { size: 4, inStockOnly: true, sort: "latest" },
@@ -57,14 +58,14 @@ export default function Home() {
   );
   const { mutateAsync: addCartItem } = usePostCartItems();
 
+  const { showToast } = useToast();
+
   const featuredProducts =
     (productsResponse as { data?: ProductPage } | undefined)?.data?.items ?? [];
 
   const handleAddProduct = async (product: ProductSummary) => {
-    setAddCartError(null);
-
     if (!product.slug) {
-      setAddCartError("Sản phẩm chưa có dữ liệu để thêm vào giỏ.");
+      showToast("Sản phẩm chưa có dữ liệu để thêm vào giỏ.", "error");
       return;
     }
 
@@ -75,15 +76,15 @@ export default function Home() {
       const sku = findPurchasableSku(detail);
 
       if (!sku?.id) {
-        setAddCartError("Sản phẩm hiện chưa có SKU còn hàng.");
+        showToast("Sản phẩm hiện chưa có SKU còn hàng.", "error");
         return;
       }
 
       await addCartItem({ data: { skuId: sku.id, quantity: 1 } });
       await queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
-      openCart();
+      showToast("Thêm sản phẩm vào giỏ hàng thành công!", "success");
     } catch (addError) {
-      setAddCartError(extractApiErrorMessage(addError));
+      showToast(extractApiErrorMessage(addError), "error");
     } finally {
       setAddingProductSlug(null);
     }
@@ -109,14 +110,14 @@ export default function Home() {
                         tại nhà với các liệu pháp chườm nóng truyền thống kết hợp hiện đại.
                     </p>
                     <div className="flex gap-sm mt-sm">
-                        <button
+                        <Link href="/san-pham"
                             className="bg-primary text-on-primary rounded-full px-md py-sm font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-all shadow-ambient-2 hover:-translate-y-0.5">
                             Khám Phá Sản Phẩm
-                        </button>
-                        <button
+                        </Link>
+                        <Link href="/#about"
                             className="border border-primary text-primary rounded-full px-md py-sm font-label-md text-label-md hover:bg-success-bg transition-colors">
                             Tìm Hiểu Thêm
-                        </button>
+                        </Link>
                     </div>
                 </div>
                 <div className="h-full min-h-[400px] w-full relative">
@@ -174,10 +175,10 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
                 {/* Category 1 */}
-                <a className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
-                    href="#">
+                <Link className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
+                    href="/san-pham?need=co-vai-gay">
                     <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                        data-alt="A stylized, softly lit close-up of a person's neck and shoulders draped with a warm, natural linen herbal compress pad. The lighting is warm and comforting, suggesting a relaxing evening atmosphere. The background is a soft gradient of creamy beige and muted sage green. The overall aesthetic is modern, clean, and organic, emphasizing health and wellness."
+                        data-alt="A stylized, softly lit close-up of a person's neck and shoulders draped with a warm, natural linen herbal compress pad."
                         style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8u-Pb9_W9jEDxC9-Wh8JBusTNpvaxS_X45dZ4hPbNIdwFkW2CxiDVHGIt5I0XRglSGyfzsm-Fb0W6Hmf-cZ8QCSRJvI18aTA86ozSEYDFGAunhiyrJiJQXJpoyRUn-D9oUBgvMZ2v7alitiKvNmjD_nPOwWrfrxCpHEdlRYCQMqO70oan7jVafF0d8LiIr7RYFP0yK4tPPX6BZfnO00vvhZtnyASBGi65hfMbD3NyBQLgt0t75Ep6UpBChHony6rZxHkt2MkJols')" }}>
                     </div>
                     <div
@@ -189,12 +190,12 @@ export default function Home() {
                             Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
                         </p>
                     </div>
-                </a>
+                </Link>
                 {/* Category 2 */}
-                <a className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
-                    href="#">
+                <Link className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
+                    href="/san-pham?need=chuom-nong">
                     <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                        data-alt="A minimal, aesthetically pleasing flat lay composition featuring a rectangular herbal heating pad placed on a pristine bamboo tray. Surrounding the pad are sprigs of dried lavender, chamomile flowers, and a small ceramic bowl holding loose organic herbs. The surface is a textured warm cream linen. Lighting is bright, diffused, and natural, evoking a premium spa environment."
+                        data-alt="A minimal flat lay composition featuring a rectangular herbal heating pad on a bamboo tray."
                         style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDU7Hg-nRJRypliTAzxSs5krgiNSxMW3rKV9hWJ8vet76xLN48JzIa7vDioWHnv8HqPXkdp9G8hKpgmTglsn-P1fdgoA3CGU03pnAJ8Ujwso2DyVPuvK8VvxqhP-Fv0YDE-_8efnv3dQhvgy-kAytVJvrMnSyMksS39ZbntQm6vAbQQ59nOy6ossHCXBozSNAgw9plzyGPSTBEwb0B1aikKUUDX_lLwWNod9sFc6Z1qzlkCIGqFQiAqaiG5Hb68UqwTmdqSukSm9eU')" }}>
                     </div>
                     <div
@@ -206,12 +207,12 @@ export default function Home() {
                             Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
                         </p>
                     </div>
-                </a>
+                </Link>
                 {/* Category 3 */}
-                <a className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
-                    href="#">
+                <Link className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
+                    href="/san-pham?need=thu-gian-mat">
                     <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                        data-alt="A peaceful image showing a person lying back with their eyes closed, wearing a soft, padded herbal eye mask. The setting is deeply relaxing, with soft ambient lighting filtering through linen curtains. The color palette focuses on soft greens, warm whites, and hints of natural wood. The mood is tranquil, meditative, and organic."
+                        data-alt="A peaceful image showing a person wearing a soft herbal eye mask."
                         style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuABJZSNEW3ls3UPS_Nfv-b4r4hlwn2FmDH4ySn_3fDBPvDHygptxHFlqDpkcbFI8Obmnuk5v-35LypmsaBYp1TR8yzf8ALWhPQEdHb5bSaziowppeSB9s2Tal1v4U8bUDkhpzi9Tc4gI41cz70fQ0CiELkMq2wgbNbODO4LG-_GVxc3ibWoZmPhFJBIl-Ju5Kb2-c3koCiR4fAcUD4mZTjK4c66isWpoibanQ2bLNQhwbqIvfOcHY94rX0C2F-1Q91QGv_vbCdTIVo')" }}>
                     </div>
                     <div
@@ -223,17 +224,13 @@ export default function Home() {
                             Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
                         </p>
                     </div>
-                </a>
+                </Link>
             </div>
         </section>
         {/* Featured Products */}
         <section className="px-gutter max-w-container-max mx-auto py-xl">
             <h2 className="font-headline-lg text-headline-lg text-primary text-center mb-xl">Sản Phẩm Nổi Bật</h2>
-            {addCartError && (
-                <p className="mx-auto mb-md max-w-[640px] rounded-lg bg-error-container px-sm py-2 text-center text-caption text-error">
-                    {addCartError}
-                </p>
-            )}
+
             {productsLoading ? (
                 <p className="text-center text-body-md text-text-muted">Đang tải sản phẩm...</p>
             ) : featuredProducts.length === 0 ? (
@@ -284,10 +281,10 @@ export default function Home() {
                 </div>
             )}
             <div className="flex justify-center mt-lg">
-                <button
+                <Link href="/san-pham"
                     className="bg-surface border-2 border-primary text-primary rounded-full px-lg py-sm font-label-md text-label-md hover:bg-primary-fixed hover:border-transparent transition-colors">
                     Xem Tất Cả Sản Phẩm
-                </button>
+                </Link>
             </div>
         </section>
         {/* AI Advisor Section */}
@@ -331,67 +328,7 @@ export default function Home() {
             </div>
         </section>
     </main>
-    {/* Footer */}
-    <footer id="contact" className="w-full pt-xl pb-md bg-primary dark:bg-on-primary-fixed-variant">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto">
-            {/* Brand Column */}
-            <div className="flex flex-col gap-sm">
-                <a className="font-display-lg text-display-lg text-on-primary" href="#">NaHerbs</a>
-                <p className="font-body-md text-body-md text-on-primary/80 mt-xs">
-                    Giải pháp thư giãn và phục hồi năng lượng từ thảo dược thiên nhiên, mang spa về ngôi nhà của bạn.
-                </p>
-            </div>
-            {/* Links Column 1 */}
-            <div className="flex flex-col gap-sm">
-                <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Product Categories</h4>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Cổ Vai Gáy</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Chườm Lưng Bụng</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Thư Giãn Mắt</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Phụ Kiện Thảo Dược</a>
-            </div>
-            {/* Links Column 2 */}
-            <div className="flex flex-col gap-sm">
-                <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Support Links</h4>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Hướng dẫn sử dụng</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Chính sách đổi trả</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Chính sách bảo mật</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">FAQ</a>
-            </div>
-            {/* Contact Column */}
-            <div className="flex flex-col gap-sm">
-                <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Liên Hệ</h4>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed flex items-center gap-xs"
-                    href="#">
-                    <span className="material-symbols-outlined text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>phone</span> Hotline: 1900 xxxx
-                </a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed flex items-center gap-xs"
-                    href="#">
-                    <span className="material-symbols-outlined text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>forum</span> Zalo: NaHerbs Official
-                </a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed flex items-center gap-xs"
-                    href="#">
-                    <span className="material-symbols-outlined text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>mail</span> Email: care@naherbs.vn
-                </a>
-            </div>
-        </div>
-        <div
-            className="px-gutter max-w-container-max mx-auto mt-xl pt-md border-t border-on-primary/20 flex flex-col md:flex-row justify-between items-center">
-            <p className="font-caption text-caption text-on-primary/60">
-                © 2024 NaHerbs. All rights reserved.
-            </p>
-        </div>
-    </footer>
+    <PublicFooter />
     </>
   );
 }

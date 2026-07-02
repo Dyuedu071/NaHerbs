@@ -99,7 +99,7 @@ export default function AdminOrdersPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-container-max flex-1 flex-col gap-md p-gutter">
+    <main className="mx-auto flex w-full max-w-none flex-1 flex-col gap-md p-gutter">
       <div className="flex flex-wrap items-end justify-between gap-md">
         <div>
           <h1 className="text-headline-md font-headline-md text-primary">
@@ -316,7 +316,7 @@ function AdminShell({
   tone?: "muted" | "error";
 }) {
   return (
-    <main className="mx-auto flex w-full max-w-container-max flex-1 items-center justify-center p-gutter">
+    <main className="mx-auto flex w-full max-w-none flex-1 items-center justify-center p-gutter">
       <p className={`text-body-md ${tone === "error" ? "text-error" : "text-text-muted"}`}>
         {children}
       </p>

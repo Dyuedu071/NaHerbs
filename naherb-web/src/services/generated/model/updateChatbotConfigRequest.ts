@@ -5,6 +5,7 @@
  * API contract for naherb-api (Spring Boot) used by naherb-web (Next.js). Updated for UUID IDs across accounts/profile/address/order/cart and Vietnam two-level address fields: province/city and ward/commune only.
  * OpenAPI spec version: 2.2.0
  */
+import type { ChatbotFaqEntry } from './chatbotFaqEntry';
 
 export interface UpdateChatbotConfigRequest {
   enabled?: boolean;
@@ -12,4 +13,10 @@ export interface UpdateChatbotConfigRequest {
   disclaimer?: string;
   suggestedQuestions?: string[];
   fallbackMessage?: string;
+  faqEntries?: ChatbotFaqEntry[];
+  /**
+   * @minimum 1
+   * @maximum 5
+   */
+  maxProductsPerAnswer?: number;
 }

@@ -24,6 +24,7 @@ export * from './blogPostSummary';
 export * from './cart';
 export * from './cartItem';
 export * from './chatbotConversation';
+export * from './chatbotFaqEntry';
 export * from './chatbotMessageRequest';
 export * from './chatbotMessageResponse';
 export * from './checkoutRequest';

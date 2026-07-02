@@ -1,5 +1,6 @@
 import React from 'react';
 import PublicHeader from '@/components/common/PublicHeader';
+import PublicFooter from '@/components/common/PublicFooter';
 
 export default function ProductsLayout({
   children,
@@ -7,11 +8,12 @@ export default function ProductsLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-surface-container-lowest flex flex-col">
       <PublicHeader />
-      <div className="pt-20 flex-grow">
+      <div className="flex-grow">
         {children}
       </div>
+      <PublicFooter />
     </div>
   );
 }
