@@ -22,9 +22,9 @@ public class MediaService {
     }
 
     public MediaAsset uploadImage(MultipartFile file) throws IOException {
-        // Validate file size (< 5MB)
-        if (file.getSize() > 5 * 1024 * 1024) {
-            throw new IllegalArgumentException("File size exceeds 5MB limit");
+        // Validate file size (< 10MB)
+        if (file.getSize() > 10 * 1024 * 1024) {
+            throw new IllegalArgumentException("File size exceeds 10MB limit");
         }
 
         // Validate content type

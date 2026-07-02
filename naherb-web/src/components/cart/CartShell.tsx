@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import CartModal from "./CartModal";
 import { CartProvider } from "./CartContext";
 
-const HIDDEN_PREFIXES = ["/admin", "/login", "/register"];
+const HIDDEN_PREFIXES = ["/admin", "/dang-nhap", "/dang-ky"];
 
 function shouldShowCart(pathname: string): boolean {
   return !HIDDEN_PREFIXES.some(

@@ -16,8 +16,8 @@ public class AccountUserDetailsService implements UserDetailsService {
     private final AccountRepository accountRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) {
-        Account account = accountRepository.findByEmailIgnoreCase(email)
+    public UserDetails loadUserByUsername(String login) {
+        Account account = accountRepository.findByEmailOrPhone(login)
                 .orElseThrow(() -> new UsernameNotFoundException("Email hoặc mật khẩu không đúng"));
 
         return User.withUsername(account.getEmail())

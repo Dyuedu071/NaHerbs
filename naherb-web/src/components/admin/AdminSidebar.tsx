@@ -18,7 +18,7 @@ export default function AdminSidebar() {
 
   const navItems = [
     { name: "Dashboard", href: "/admin/dashboard", icon: "dashboard" },
-    { name: "Products", href: "/admin/products", icon: "inventory_2" },
+    { name: "Products", href: "/admin/san-pham", icon: "inventory_2" },
     { name: "Orders", href: "/admin/orders", icon: "shopping_cart" },
     { name: "QR Payments", href: "/admin/qr-payments", icon: "qr_code_2" },
     { name: "Blog", href: "/admin/posts", icon: "edit_note" },
@@ -87,9 +87,12 @@ export default function AdminSidebar() {
           <span className="material-symbols-outlined">help_outline</span>
           <span className="text-label-md font-label-md">Support</span>
         </a>
-        <button className="mt-sm w-full rounded-full bg-primary py-sm text-label-md font-label-md text-on-primary transition-colors hover:bg-secondary">
+        <Link
+          href="/"
+          className="mt-sm w-full rounded-full bg-primary py-sm text-center text-label-md font-label-md text-on-primary transition-colors hover:bg-secondary"
+        >
           View Store
-        </button>
+        </Link>
       </div>
     </aside>
   );

@@ -105,8 +105,10 @@ AXIOS_INSTANCE.interceptors.response.use(
 
         if (typeof window !== "undefined") {
           const currentPath = window.location.pathname;
-          if (currentPath !== "/login" && currentPath !== "/register") {
-            window.location.href = "/login";
+          const protectedPrefixes = ["/tai-khoan", "/checkout", "/account", "/admin"];
+          const isProtected = protectedPrefixes.some((prefix) => currentPath.startsWith(prefix));
+          if (isProtected) {
+            window.location.href = "/dang-nhap";
           }
         }
         return Promise.reject(refreshError);

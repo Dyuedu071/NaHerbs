@@ -28,17 +28,21 @@ export default function AccountOrderDetailPage() {
 
   return (
     <section className="flex flex-col gap-md">
+      {/* Detail Page Header */}
       <div className="rounded-[24px] border border-herbal-beige bg-surface p-md shadow-ambient-sm">
         <Link
           href="/account/orders"
-          className="inline-flex items-center gap-xs text-caption text-primary hover:text-secondary"
+          className="inline-flex items-center gap-xs text-caption font-semibold text-primary transition-colors hover:text-secondary"
         >
           <span className="material-symbols-outlined text-[16px]">arrow_back</span>
-          Quay lại danh sách
+          Quay lại danh sách đơn hàng
         </Link>
         <div className="mt-sm flex flex-wrap items-end justify-between gap-sm">
           <div>
-            <h1 className="font-headline-md text-headline-md text-primary">
+            <span className="text-caption font-semibold text-text-muted uppercase tracking-wider">
+              Chi tiết đơn hàng
+            </span>
+            <h1 className="font-headline-md text-headline-md text-primary mt-1">
               {order.orderCode}
             </h1>
             <p className="mt-xs text-body-md text-text-muted">
@@ -47,105 +51,194 @@ export default function AccountOrderDetailPage() {
           </div>
           <div className="flex flex-wrap gap-xs">
             {order.orderStatus && (
-              <span className="rounded-full bg-surface-container px-sm py-1 text-caption text-text-muted">
-                {orderStatusLabels[order.orderStatus]}
-              </span>
+              <StatusPill tone="order" value={order.orderStatus} />
             )}
             {order.paymentStatus && (
-              <span className="rounded-full bg-success-bg px-sm py-1 text-caption text-primary">
-                {paymentStatusLabels[order.paymentStatus]}
-              </span>
+              <StatusPill tone="payment" value={order.paymentStatus} />
             )}
           </div>
         </div>
       </div>
 
       <div className="grid gap-md lg:grid-cols-[1fr_340px]">
-        <div className="rounded-[24px] border border-herbal-beige bg-surface p-md shadow-ambient-sm">
-          <h2 className="text-body-lg font-body-lg font-semibold text-text-main">
-            Sản phẩm
-          </h2>
-          <div className="mt-md flex flex-col gap-sm">
+        {/* Left Column: Products List */}
+        <div className="rounded-[24px] border border-herbal-beige bg-surface-container-lowest p-md shadow-ambient-sm flex flex-col gap-md">
+          <div className="flex items-center gap-xs border-b border-border-warm/40 pb-sm">
+            <span className="material-symbols-outlined text-primary text-[20px]">
+              shopping_bag
+            </span>
+            <h2 className="text-body-lg font-body-lg font-bold text-text-main">
+              Sản phẩm trong đơn
+            </h2>
+          </div>
+          
+          <div className="flex flex-col gap-sm">
             {(order.items ?? []).map((item) => (
               <div
                 key={item.id}
-                className="grid gap-sm border-b border-border-warm pb-sm md:grid-cols-[1fr_auto]"
+                className="flex gap-md border-b border-border-warm/30 pb-sm last:border-0 last:pb-0"
               >
-                <div>
-                  <p className="text-label-md font-label-md text-text-main">
-                    {item.productNameSnapshot}
-                  </p>
-                  <p className="mt-xs text-caption text-text-muted">
-                    {item.skuNameSnapshot} · SL {item.quantity}
-                  </p>
+                {/* Product Icon Box */}
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-surface-container border border-border-warm/40 text-primary">
+                  <span className="material-symbols-outlined text-[24px]">
+                    inventory_2
+                  </span>
                 </div>
-                <div className="text-left md:text-right">
-                  <p className="text-caption text-text-muted">
-                    {formatMoney(item.unitPrice)}
-                  </p>
-                  <p className="text-body-md font-semibold text-text-main">
-                    {formatMoney(item.lineTotal)}
-                  </p>
+                
+                {/* Details */}
+                <div className="flex flex-1 flex-wrap justify-between gap-sm">
+                  <div className="min-w-[180px]">
+                    <p className="text-label-md font-bold text-text-main">
+                      {item.productNameSnapshot}
+                    </p>
+                    <p className="mt-xs text-caption text-text-muted font-medium">
+                      Phiên bản: {item.skuNameSnapshot} · Số lượng: <span className="font-bold text-text-main">{item.quantity}</span>
+                    </p>
+                  </div>
+                  <div className="text-left md:text-right flex flex-col justify-center">
+                    <p className="text-caption text-text-muted font-medium">
+                      Đơn giá: {formatMoney(item.unitPrice)}
+                    </p>
+                    <p className="text-body-md font-bold text-primary mt-1">
+                      {formatMoney(item.lineTotal)}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Right Column: Order Summary & Info */}
         <aside className="flex flex-col gap-md">
+          {/* Summary Section */}
           <section className="rounded-[24px] border border-herbal-beige bg-surface p-md shadow-ambient-sm">
-            <h2 className="text-body-lg font-body-lg font-semibold text-text-main">
-              Tổng quan
-            </h2>
-            <dl className="mt-md flex flex-col gap-sm text-body-md">
+            <div className="flex items-center gap-xs border-b border-border-warm/40 pb-sm mb-md">
+              <span className="material-symbols-outlined text-primary text-[20px]">
+                analytics
+              </span>
+              <h2 className="text-body-lg font-body-lg font-bold text-text-main">
+                Tổng quan hóa đơn
+              </h2>
+            </div>
+            
+            <dl className="flex flex-col gap-sm text-body-md">
               <div className="flex justify-between gap-sm">
-                <dt className="text-text-muted">Thanh toán</dt>
-                <dd className="font-semibold text-text-main">
+                <dt className="text-text-muted font-medium">Hình thức thanh toán</dt>
+                <dd className="font-bold text-text-main">
                   {order.paymentMethod ? paymentMethodLabels[order.paymentMethod] : "-"}
                 </dd>
               </div>
-              <div className="flex justify-between gap-sm border-t border-border-warm pt-sm">
-                <dt className="text-primary">Tổng tiền</dt>
-                <dd className="font-semibold text-primary">{formatMoney(order.totalAmount)}</dd>
+              <div className="flex justify-between gap-sm border-t border-border-warm/40 pt-sm">
+                <dt className="text-primary font-bold">Tổng thanh toán</dt>
+                <dd className="font-headline-md text-title-md font-black text-tertiary-container">
+                  {formatMoney(order.totalAmount)}
+                </dd>
               </div>
             </dl>
           </section>
 
+          {/* Shipping Section */}
           <section className="rounded-[24px] border border-herbal-beige bg-surface p-md shadow-ambient-sm">
-            <h2 className="text-body-lg font-body-lg font-semibold text-text-main">
-              Giao hàng
-            </h2>
-            <div className="mt-sm text-body-md text-text-main">
-              <p className="font-semibold">{order.shippingAddress?.receiverName}</p>
-              <p className="text-text-muted">{order.shippingAddress?.receiverPhone}</p>
+            <div className="flex items-center gap-xs border-b border-border-warm/40 pb-sm mb-sm">
+              <span className="material-symbols-outlined text-primary text-[20px]">
+                local_shipping
+              </span>
+              <h2 className="text-body-lg font-body-lg font-bold text-text-main">
+                Thông tin nhận hàng
+              </h2>
+            </div>
+            <div className="text-body-md text-text-main flex flex-col gap-1.5 pt-xs">
+              <div className="flex items-center gap-xs">
+                <span className="material-symbols-outlined text-text-muted text-[16px]">person</span>
+                <span className="font-bold text-text-main">{order.shippingAddress?.receiverName}</span>
+              </div>
+              <div className="flex items-center gap-xs">
+                <span className="material-symbols-outlined text-text-muted text-[16px]">call</span>
+                <span className="text-text-muted font-semibold">{order.shippingAddress?.receiverPhone}</span>
+              </div>
               {order.shippingAddress?.email && (
-                <p className="text-text-muted">{order.shippingAddress.email}</p>
+                <div className="flex items-center gap-xs">
+                  <span className="material-symbols-outlined text-text-muted text-[16px]">mail</span>
+                  <span className="text-text-muted font-medium">{order.shippingAddress.email}</span>
+                </div>
               )}
-              <p className="mt-xs">{order.shippingAddress?.fullAddress}</p>
+              <div className="flex items-start gap-xs mt-1 border-t border-border-warm/30 pt-sm">
+                <span className="material-symbols-outlined text-text-muted text-[18px] mt-0.5">location_on</span>
+                <span className="text-body-md leading-relaxed">{order.shippingAddress?.fullAddress}</span>
+              </div>
+              
               {order.note && (
-                <p className="mt-xs text-caption text-text-muted">Ghi chú: {order.note}</p>
+                <div className="mt-sm p-sm bg-surface-container rounded-xl border border-border-warm/40">
+                  <p className="text-caption text-text-muted italic">
+                    <span className="font-bold not-italic">Ghi chú:</span> {order.note}
+                  </p>
+                </div>
               )}
             </div>
           </section>
 
+          {/* QR Bank Transfer Section */}
           {order.qrInstruction && (
-            <section className="rounded-[24px] border border-primary/30 bg-success-bg p-md shadow-ambient-sm">
-              <h2 className="text-body-lg font-body-lg font-semibold text-primary">
-                Chuyển khoản QR
-              </h2>
-              <div className="mt-sm text-body-md text-text-main">
-                <p>{order.qrInstruction.bankName}</p>
-                <p>{order.qrInstruction.accountName}</p>
-                <p className="font-semibold">{order.qrInstruction.accountNumber}</p>
-                <p className="mt-xs text-caption text-text-muted">
-                  Nội dung: {order.qrInstruction.transferContent}
-                </p>
+            <section className="rounded-[24px] border border-primary/30 bg-success-bg p-md shadow-ambient-sm flex flex-col gap-sm">
+              <div className="flex items-center gap-xs border-b border-primary/20 pb-sm">
+                <span className="material-symbols-outlined text-primary text-[20px]">
+                  qr_code_2
+                </span>
+                <h2 className="text-body-lg font-body-lg font-bold text-primary">
+                  Chuyển khoản qua mã QR
+                </h2>
+              </div>
+              <div className="text-body-md text-text-main flex flex-col gap-1">
+                <p className="text-caption text-text-muted font-bold uppercase">Ngân hàng</p>
+                <p className="font-bold text-primary">{order.qrInstruction.bankName}</p>
+                
+                <p className="text-caption text-text-muted font-bold uppercase mt-sm">Tên tài khoản</p>
+                <p className="font-bold text-text-main">{order.qrInstruction.accountName}</p>
+                
+                <p className="text-caption text-text-muted font-bold uppercase mt-sm">Số tài khoản</p>
+                <p className="font-mono text-lg font-black text-text-main tracking-wider">{order.qrInstruction.accountNumber}</p>
+                
+                <div className="mt-sm p-sm bg-white/70 rounded-xl border border-primary/10">
+                  <p className="text-caption text-text-muted font-bold uppercase">Nội dung chuyển khoản</p>
+                  <p className="font-mono text-body-md font-bold text-primary mt-1">
+                    {order.qrInstruction.transferContent}
+                  </p>
+                </div>
               </div>
             </section>
           )}
         </aside>
       </div>
     </section>
+  );
+}
+
+function StatusPill({
+  tone,
+  value,
+}: {
+  tone: "order" | "payment";
+  value: string;
+}) {
+  const label =
+    tone === "order"
+      ? orderStatusLabels[value as any]
+      : paymentStatusLabels[value as any];
+
+  let colorStyle = "bg-surface-container text-text-muted border border-border-warm/40";
+  if (value === "CANCELLED" || value === "FAILED") {
+    colorStyle = "bg-error-bg text-error-text border border-error/20";
+  } else if (value === "PAID" || value === "COMPLETED" || value === "DELIVERED") {
+    colorStyle = "bg-success-bg text-primary border border-primary/20";
+  } else {
+    colorStyle = "bg-tertiary-fixed text-on-tertiary-fixed-variant border border-tertiary-fixed-dim/30";
+  }
+
+  return (
+    <span className={`inline-flex items-center rounded-full px-sm py-[2px] text-caption font-semibold ${colorStyle}`}>
+      {label}
+    </span>
   );
 }
 
@@ -157,8 +250,11 @@ function PanelText({
   tone?: "muted" | "error";
 }) {
   return (
-    <section className="rounded-[24px] border border-herbal-beige bg-surface p-md shadow-ambient-sm">
-      <p className={`text-body-md ${tone === "error" ? "text-error" : "text-text-muted"}`}>
+    <section className="rounded-[24px] border border-herbal-beige bg-surface p-lg shadow-ambient-sm flex flex-col items-center justify-center min-h-[220px] text-center">
+      <span className={`material-symbols-outlined text-[40px] mb-sm ${tone === "error" ? "text-error" : "text-soft-sage animate-pulse"}`}>
+        {tone === "error" ? "error_outline" : "hourglass_empty"}
+      </span>
+      <p className={`text-body-md font-semibold ${tone === "error" ? "text-error" : "text-text-muted"}`}>
         {children}
       </p>
     </section>

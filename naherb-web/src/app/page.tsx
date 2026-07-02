@@ -1,11 +1,9 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
 import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
-import { AXIOS_INSTANCE } from '@/services/api-client';
-import { extractSessionUser } from '@/lib/current-user';
-import { useState } from 'react';
 import { useCart } from '@/components/cart/CartContext';
 import { extractApiErrorMessage } from '@/lib/api-error';
 import { formatMoney } from '@/lib/order-format';
@@ -16,6 +14,7 @@ import type { ProductPage } from '@/services/generated/model/productPage';
 import type { ProductSku } from '@/services/generated/model/productSku';
 import type { ProductSummary } from '@/services/generated/model/productSummary';
 import { useQueryClient } from '@tanstack/react-query';
+import PublicHeader from '@/components/common/PublicHeader';
 
 const fallbackProductImages = [
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCCHIGHpyiH_H6cd9_8Zslswa-mB_l-tp5H_0vn7u3WIMjMMnJY7Gl2AHTm2ZHsVUifzbG8EqLQm_Ixt9t8Vx6pOFbt6Dnyqw-ws8jjMUOL7dT-eoB0UiNVffG1mx5yV0Yt6PFc0k4DxdRLRW6XiG26G9nE62FJONsIsnH_ZG0o9R4e_TLJnVtJuj_Dbfde9XuaRyy8WboVSQRO9eDqyiGWc5DhIFUN4pvK2VY2a0BssBOHGBU4TU07jylZpmTjT4fMQUZiW3y9O4g",
@@ -52,23 +51,14 @@ export default function Home() {
   const { open: openCart } = useCart();
   const [addCartError, setAddCartError] = useState<string | null>(null);
   const [addingProductSlug, setAddingProductSlug] = useState<string | null>(null);
-  const { data } = useGetAuthMe({
-    query: {
-      retry: false,
-      refetchOnWindowFocus: false,
-    }
-  });
   const { data: productsResponse, isLoading: productsLoading } = useGetProducts(
     { size: 4, inStockOnly: true, sort: "latest" },
     { query: { retry: false } },
   );
   const { mutateAsync: addCartItem } = usePostCartItems();
 
-  const user = extractSessionUser(data);
-  const avatarUrl = user?.avatarUrl;
   const featuredProducts =
     (productsResponse as { data?: ProductPage } | undefined)?.data?.items ?? [];
-  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
   const handleAddProduct = async (product: ProductSummary) => {
     setAddCartError(null);
@@ -99,132 +89,12 @@ export default function Home() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await AXIOS_INSTANCE.post('/auth/logout');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      window.location.href = '/login';
-    }
-  };
-
   return (
     <>
-
-    {/* TopNavBar */}
-    <header className="fixed top-0 w-full z-50 bg-surface/88 backdrop-blur-md shadow-sm">
-        <div className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
-            {/* Brand Logo */}
-            <Link className="font-display-lg text-display-lg text-primary tracking-tight" href="/">NaHerbs</Link>
-            {/* Navigation Links */}
-            <nav className="hidden md:flex gap-gutter items-center">
-                <a className="text-primary font-bold relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-soft-sage after:rounded-full font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">Home</a>
-                <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">Products</a>
-                <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">Blog</a>
-                <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">About</a>
-                <a className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200"
-                    href="#">Contact</a>
-            </nav>
-            {/* Trailing Actions */}
-            <div className="flex items-center gap-md">
-                {/* Search Icon (Search bar on right implied) */}
-                <button className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>search</span>
-                </button>
-                <button
-                    type="button"
-                    onClick={openCart}
-                    aria-label="Mở giỏ hàng"
-                    className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 relative"
-                >
-                    <span className="material-symbols-outlined"
-                        style={{ fontVariationSettings: "'FILL' 0" }}>shopping_cart</span>
-                </button>
-                {user ? (
-                    <div className="relative hidden md:flex items-center gap-xs">
-                        <button
-                            type="button"
-                            onClick={() => setAccountMenuOpen((open) => !open)}
-                            className="flex items-center gap-xs rounded-full py-1 pl-1 pr-2 hover:bg-success-bg transition-colors"
-                        >
-                            <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 shadow-sm">
-                                <img
-                                    src={avatarUrl || '/images/avatars/default-avatar.jpg'}
-                                    alt="User Avatar"
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            <span className="font-label-md text-label-md text-primary font-semibold max-w-[120px] truncate">
-                                {user.name}
-                            </span>
-                            <span className="material-symbols-outlined text-primary text-[18px]">
-                                expand_more
-                            </span>
-                        </button>
-                        {accountMenuOpen && (
-                            <div className="absolute right-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-herbal-beige bg-surface py-2 shadow-ambient-2">
-                                <Link
-                                    href="/account/profile"
-                                    onClick={() => setAccountMenuOpen(false)}
-                                    className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
-                                >
-                                    Hồ sơ cá nhân
-                                </Link>
-                                <Link
-                                    href="/account/addresses"
-                                    onClick={() => setAccountMenuOpen(false)}
-                                    className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
-                                >
-                                    Địa chỉ giao hàng
-                                </Link>
-                                <Link
-                                    href="/account/orders"
-                                    onClick={() => setAccountMenuOpen(false)}
-                                    className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
-                                >
-                                    Đơn hàng của tôi
-                                </Link>
-                                <button
-                                    type="button"
-                                    onClick={handleLogout}
-                                    className="flex w-full items-center gap-xs px-md py-2 font-label-md text-label-md text-error hover:bg-error-container"
-                                >
-                                    <span className="material-symbols-outlined text-[18px]">logout</span>
-                                    Đăng xuất
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <>
-                        <Link href="/login" className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 hidden md:block">
-                            <span className="material-symbols-outlined"
-                                style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
-                        </Link>
-                        <Link
-                            href="/login"
-                            className="border border-primary text-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-success-bg transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
-                            Đăng nhập
-                        </Link>
-                    </>
-                )}
-                <button
-                    type="button"
-                    onClick={openChatbot}
-                    className="bg-primary text-on-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
-                    Tư vấn ngay
-                </button>
-            </div>
-        </div>
-    </header>
+    <PublicHeader />
     <main className="flex-grow pt-24 pb-xl">
         {/* Hero Section */}
-        <section className="px-gutter max-w-container-max mx-auto py-xl">
+        <section id="about" className="px-gutter max-w-container-max mx-auto py-xl">
             <div
                 className="grid grid-cols-1 md:grid-cols-2 gap-lg items-center bg-surface-container-low rounded-[2rem] overflow-hidden border border-border-warm shadow-ambient-1">
                 <div className="p-lg md:p-xl flex flex-col items-start gap-md">
@@ -462,7 +332,7 @@ export default function Home() {
         </section>
     </main>
     {/* Footer */}
-    <footer className="w-full pt-xl pb-md bg-primary dark:bg-on-primary-fixed-variant">
+    <footer id="contact" className="w-full pt-xl pb-md bg-primary dark:bg-on-primary-fixed-variant">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto">
             {/* Brand Column */}
             <div className="flex flex-col gap-sm">

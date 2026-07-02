@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.io.naherb.blog.dto.BlogPostRequest;
 import vn.io.naherb.blog.dto.BlogPostResponse;
 import vn.io.naherb.product.repository.ProductRepository;
+import vn.io.naherb.product.repository.ProductImageRepository;
 import vn.io.naherb.product.Product;
 import vn.io.naherb.exception.NotFoundException;
 import vn.io.naherb.common.enums.ContentStatus;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -29,23 +29,26 @@ public class BlogService {
     private final BlogPostRepository blogPostRepository;
     private final BlogCategoryRepository categoryRepository;
     private final BlogPostProductRepository postProductRepository;
-    private final ProductRepository productRepository; // needed to resolve products
+    private final ProductRepository productRepository;
     private final vn.io.naherb.media.MediaAssetRepository mediaAssetRepository;
+    private final ProductImageRepository productImageRepository;
 
-    public BlogService(BlogPostRepository blogPostRepository, 
+    public BlogService(BlogPostRepository blogPostRepository,
                        BlogCategoryRepository categoryRepository,
                        BlogPostProductRepository postProductRepository,
                        ProductRepository productRepository,
-                       vn.io.naherb.media.MediaAssetRepository mediaAssetRepository) {
+                       vn.io.naherb.media.MediaAssetRepository mediaAssetRepository,
+                       ProductImageRepository productImageRepository) {
         this.blogPostRepository = blogPostRepository;
         this.categoryRepository = categoryRepository;
         this.postProductRepository = postProductRepository;
         this.productRepository = productRepository;
         this.mediaAssetRepository = mediaAssetRepository;
+        this.productImageRepository = productImageRepository;
     }
 
     @CacheEvict(value = {RedisCacheConfig.CACHE_BLOGS_LIST, RedisCacheConfig.CACHE_BLOG_DETAIL}, allEntries = true)
-    public BlogPost createPost(BlogPostRequest request) {
+    public BlogPostResponse createPost(BlogPostRequest request) {
         if (request.getProductIds() != null && request.getProductIds().size() > 6) {
             throw new IllegalArgumentException("A blog post can have a maximum of 6 associated products.");
         }
@@ -109,13 +112,92 @@ public class BlogService {
             postProductRepository.saveAll(postProducts);
         }
 
-        return savedPost;
+        return mapToResponse(savedPost);
     }
 
     @CacheEvict(value = {RedisCacheConfig.CACHE_BLOGS_LIST, RedisCacheConfig.CACHE_BLOG_DETAIL}, allEntries = true)
-    public BlogPost updatePost(UUID id, BlogPostRequest request) {
-        // To be implemented via TDD
-        return null;
+    public BlogPostResponse updatePost(UUID id, BlogPostRequest request) {
+        if (request.getProductIds() != null && request.getProductIds().size() > 6) {
+            throw new IllegalArgumentException("A blog post can have a maximum of 6 associated products.");
+        }
+
+        BlogPost post = blogPostRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Blog post not found"));
+
+        post.setTitle(request.getTitle());
+        post.setContent(request.getContent());
+        post.setSummary(request.getSummary());
+        post.setStatus(request.getStatus());
+        post.setSeoTitle(request.getSeoTitle());
+        post.setSeoDescription(request.getSeoDescription());
+        post.setPrimaryKeyword(request.getPrimaryKeyword());
+        post.setFeatured(request.isFeatured());
+
+        // Setup Slug
+        String slug = request.getSlug();
+        if (slug == null || slug.trim().isEmpty()) {
+            slug = generateSlug(request.getTitle());
+        }
+
+        // Check duplicate slug (excluding current post)
+        java.util.Optional<BlogPost> existingPost = blogPostRepository.findBySlug(slug);
+        if (existingPost.isPresent() && !existingPost.get().getId().equals(id)) {
+            if (request.getSlug() != null && !request.getSlug().trim().isEmpty()) {
+                throw new IllegalArgumentException("Slug already exists");
+            } else {
+                int suffix = 2;
+                String originalSlug = slug;
+                while (true) {
+                    slug = originalSlug + "-" + suffix;
+                    java.util.Optional<BlogPost> pOpt = blogPostRepository.findBySlug(slug);
+                    if (!pOpt.isPresent() || pOpt.get().getId().equals(id)) {
+                        break;
+                    }
+                    suffix++;
+                }
+            }
+        }
+        post.setSlug(slug);
+
+        if (request.getCategoryId() != null) {
+            BlogCategory category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+            post.setCategory(category);
+        } else {
+            post.setCategory(null);
+        }
+
+        if (request.getThumbnailMediaId() != null) {
+            vn.io.naherb.media.MediaAsset thumbnail = mediaAssetRepository.findById(request.getThumbnailMediaId())
+                .orElseThrow(() -> new IllegalArgumentException("Ảnh đại diện không tồn tại hoặc đã bị xóa. Vui lòng chọn lại ảnh khác."));
+            post.setThumbnailMedia(thumbnail);
+        } else {
+            post.setThumbnailMedia(null);
+        }
+
+        BlogPost savedPost = blogPostRepository.save(post);
+
+        // Update associated products
+        postProductRepository.deleteByPostId(id);
+        postProductRepository.flush();
+        if (request.getProductIds() != null && !request.getProductIds().isEmpty()) {
+            List<Product> products = productRepository.findAllById(request.getProductIds());
+            List<BlogPostProduct> postProducts = products.stream().map(prod -> {
+                BlogPostProduct bpp = new BlogPostProduct();
+                bpp.setPost(savedPost);
+                bpp.setProduct(prod);
+                return bpp;
+            }).collect(Collectors.toList());
+            postProductRepository.saveAll(postProducts);
+        }
+
+        return mapToResponse(savedPost);
+    }
+
+    public BlogPostResponse getPostById(UUID id) {
+        BlogPost post = blogPostRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Blog post not found"));
+        return mapToResponse(post);
     }
 
     @Cacheable(value = RedisCacheConfig.CACHE_BLOG_DETAIL, key = "#slug")
@@ -134,6 +216,19 @@ public class BlogService {
             posts = blogPostRepository.findByStatus(ContentStatus.PUBLISHED, pageable);
         }
         return posts.map(this::mapToResponse);
+    }
+
+    public Page<BlogPostResponse> listAllPosts(Pageable pageable, String search, UUID categoryId) {
+        Page<BlogPost> posts = blogPostRepository.findBySearchAndCategory(search, categoryId, pageable);
+        return posts.map(this::mapToResponse);
+    }
+
+    @CacheEvict(value = {RedisCacheConfig.CACHE_BLOGS_LIST, RedisCacheConfig.CACHE_BLOG_DETAIL}, allEntries = true)
+    public void deletePost(UUID id) {
+        BlogPost post = blogPostRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Blog post not found"));
+        postProductRepository.deleteByPostId(id);
+        blogPostRepository.delete(post);
     }
 
     public List<vn.io.naherb.blog.dto.BlogCategoryDto> getAllCategories() {
@@ -161,8 +256,40 @@ public class BlogService {
         response.setCreatedAt(post.getCreatedAt());
         response.setUpdatedAt(post.getUpdatedAt());
 
+        if (post.getThumbnailMedia() != null) {
+            response.setThumbnailUrl(post.getThumbnailMedia().getUrl());
+            response.setThumbnailMediaId(post.getThumbnailMedia().getId());
+        }
+
+        if (post.getCategory() != null) {
+            vn.io.naherb.blog.dto.BlogCategoryDto catDto = new vn.io.naherb.blog.dto.BlogCategoryDto();
+            catDto.setId(post.getCategory().getId());
+            catDto.setName(post.getCategory().getName());
+            catDto.setSlug(post.getCategory().getSlug());
+            response.setCategory(catDto);
+        }
+
         List<BlogPostProduct> postProducts = postProductRepository.findByPostId(post.getId());
         if (postProducts != null && !postProducts.isEmpty()) {
+            // Collect all published product IDs
+            List<UUID> productIds = postProducts.stream()
+                    .map(BlogPostProduct::getProduct)
+                    .filter(p -> p.getStatus() == ContentStatus.PUBLISHED)
+                    .map(Product::getId)
+                    .collect(Collectors.toList());
+
+            // Batch-fetch thumbnails using JPQL to avoid lazy loading issues
+            // Returns Object[] { UUID productId, String url }
+            java.util.Map<UUID, String> thumbnailByProductId = new java.util.HashMap<>();
+            if (!productIds.isEmpty()) {
+                productImageRepository.findThumbnailUrlsByProductIdIn(productIds)
+                        .forEach(row -> {
+                            UUID pid = (UUID) row[0];
+                            String url = (String) row[1];
+                            thumbnailByProductId.putIfAbsent(pid, url);
+                        });
+            }
+
             List<BlogPostResponse.ProductSummary> productSummaries = postProducts.stream()
                     .map(BlogPostProduct::getProduct)
                     .filter(p -> p.getStatus() == ContentStatus.PUBLISHED)
@@ -173,6 +300,7 @@ public class BlogService {
                         ps.setSlug(p.getSlug());
                         ps.setSeoTitle(p.getSeoTitle());
                         ps.setStatus(p.getStatus());
+                        ps.setThumbnailUrl(thumbnailByProductId.get(p.getId()));
                         return ps;
                     })
                     .collect(Collectors.toList());
