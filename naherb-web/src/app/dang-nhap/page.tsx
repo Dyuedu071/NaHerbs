@@ -3,12 +3,15 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { GoogleLogin } from '@react-oauth/google';
 import { usePostAuthGoogle } from '@/services/generated/auth/auth';
 import { usePostAuthLogin } from '@/services/generated/customer-auth/customer-auth';
+import { getGetAuthMeQueryKey } from '@/services/generated/customer-profile/customer-profile';
 
 export default function Login() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +20,7 @@ export default function Login() {
   const { mutate: loginMutate, isPending } = usePostAuthLogin({
     mutation: {
       onSuccess: (data: any) => {
+        void queryClient.invalidateQueries({ queryKey: getGetAuthMeQueryKey() });
         const userRole = data?.role || data?.account?.role || data?.data?.user?.account?.role;
         if (userRole === 'ADMIN') {
           router.push('/admin/dashboard');
@@ -37,6 +41,7 @@ export default function Login() {
   const { mutate: googleLoginMutate, isPending: isGooglePending } = usePostAuthGoogle({
     mutation: {
       onSuccess: (data: any) => {
+        void queryClient.invalidateQueries({ queryKey: getGetAuthMeQueryKey() });
         const userRole = data?.role || data?.account?.role || data?.data?.user?.account?.role;
         if (userRole === 'ADMIN') {
           router.push('/admin/dashboard');

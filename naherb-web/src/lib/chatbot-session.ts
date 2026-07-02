@@ -1,33 +1,38 @@
-const SESSION_KEY = "naherb_chatbot_session_id";
-const CONVERSATION_KEY = "naherb_chatbot_conversation_id";
+let activeSessionId: string | null = null;
 
 export function getOrCreateSessionId(): string {
-  if (typeof window === "undefined") {
-    return "";
+  if (!activeSessionId) {
+    activeSessionId = crypto.randomUUID();
   }
-  const existing = localStorage.getItem(SESSION_KEY);
-  if (existing) {
-    return existing;
-  }
-  const sessionId = crypto.randomUUID();
-  localStorage.setItem(SESSION_KEY, sessionId);
-  return sessionId;
+  return activeSessionId;
 }
 
-export function getStoredConversationId(): string | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-  return localStorage.getItem(CONVERSATION_KEY);
+export function rotateSessionId(): string {
+  activeSessionId = crypto.randomUUID();
+  return activeSessionId;
 }
 
-export function setStoredConversationId(conversationId: string): void {
-  localStorage.setItem(CONVERSATION_KEY, conversationId);
+export function clearSessionId(): void {
+  activeSessionId = null;
 }
 
-export function clearStoredConversationId(): void {
+export function clearLegacyChatbotStorage(): void {
   if (typeof window === "undefined") {
     return;
   }
-  localStorage.removeItem(CONVERSATION_KEY);
+  const keysToRemove: string[] = [];
+  for (let index = 0; index < localStorage.length; index += 1) {
+    const key = localStorage.key(index);
+    if (key?.startsWith("naherb_chatbot_")) {
+      keysToRemove.push(key);
+    }
+  }
+  for (const key of keysToRemove) {
+    localStorage.removeItem(key);
+  }
+  try {
+    sessionStorage.removeItem("naherb_chatbot_messages");
+  } catch {
+    // Ignore cleanup errors.
+  }
 }

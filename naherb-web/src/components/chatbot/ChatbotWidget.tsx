@@ -1,22 +1,17 @@
 "use client";
 
+import type { ChatMessage } from "@/lib/chatbot-messages";
 import {
-  getStoredMessages,
-  setStoredMessages,
-  clearStoredMessages,
-  type StoredChatMessage,
-} from "@/lib/chatbot-messages";
-import {
-  clearStoredConversationId,
+  clearSessionId,
   getOrCreateSessionId,
-  getStoredConversationId,
-  setStoredConversationId,
+  rotateSessionId,
 } from "@/lib/chatbot-session";
 import {
   postChatbotConversations,
-  postChatbotMessages,
   useGetChatbotConfigPublic,
 } from "@/services/generated/chatbot/chatbot";
+import { streamChatbotMessage } from "@/services/chatbot-stream";
+import { useGetAuthMe } from "@/services/generated/customer-profile/customer-profile";
 import { usePathname } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import ChatBubble from "./ChatBubble";
@@ -43,13 +38,23 @@ function extractApiErrorMessage(error: unknown): string {
 export default function ChatbotWidget() {
   const pathname = usePathname();
   const { isOpen, open, close } = useChatbot();
-  const [messages, setMessages] = useState<StoredChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isBootstrapping, setIsBootstrapping] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const previousAccountIdRef = useRef<string | null | undefined>(undefined);
+
+  const { data: authResponse } = useGetAuthMe({
+    query: {
+      retry: false,
+      refetchOnWindowFocus: true,
+    },
+  });
+  const authUser = authResponse as { id?: string } | undefined;
+  const accountId = authUser?.id ?? null;
 
   const { data: configResponse, isLoading: isConfigLoading } =
     useGetChatbotConfigPublic({
@@ -66,26 +71,31 @@ export default function ChatbotWidget() {
     "Thông tin từ chatbot chỉ mang tính tham khảo, không thay thế tư vấn y khoa.";
   const suggestedQuestions = config?.suggestedQuestions?.filter(Boolean) ?? [];
 
-  const persistMessages = useCallback(
-    (updater: StoredChatMessage[] | ((prev: StoredChatMessage[]) => StoredChatMessage[])) => {
-      setMessages((prev) => {
-        const next = typeof updater === "function" ? updater(prev) : updater;
-        setStoredMessages(next);
-        return next;
-      });
-    },
-    [],
-  );
+  const resetChatState = useCallback(() => {
+    clearSessionId();
+    setConversationId(null);
+    setMessages([]);
+    setInput("");
+  }, []);
+
+  useEffect(() => {
+    if (previousAccountIdRef.current === undefined) {
+      previousAccountIdRef.current = accountId;
+      return;
+    }
+    if (previousAccountIdRef.current !== accountId) {
+      resetChatState();
+      previousAccountIdRef.current = accountId;
+    }
+  }, [accountId, resetChatState]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   const ensureConversation = useCallback(async (): Promise<string> => {
-    const stored = getStoredConversationId();
-    if (stored) {
-      setConversationId(stored);
-      return stored;
+    if (conversationId) {
+      return conversationId;
     }
 
     const sessionId = getOrCreateSessionId();
@@ -97,40 +107,27 @@ export default function ChatbotWidget() {
     if (!id) {
       throw new Error("Không thể tạo hội thoại chatbot");
     }
-    setStoredConversationId(id);
     setConversationId(id);
     return id;
-  }, [pathname]);
+  }, [conversationId, pathname]);
 
   const startNewConversation = useCallback(async () => {
-    clearStoredConversationId();
-    clearStoredMessages();
-    setConversationId(null);
-    setMessages([]);
+    resetChatState();
     setIsBootstrapping(true);
     try {
-      const sessionId = getOrCreateSessionId();
+      const sessionId = rotateSessionId();
       const response = await postChatbotConversations({
         sessionId,
         sourcePage: pathname || "/",
       });
       const id = response.data?.id;
       if (id) {
-        setStoredConversationId(id);
         setConversationId(id);
       }
     } finally {
       setIsBootstrapping(false);
     }
-  }, [pathname]);
-
-  useEffect(() => {
-    setMessages(getStoredMessages());
-    const stored = getStoredConversationId();
-    if (stored) {
-      setConversationId(stored);
-    }
-  }, []);
+  }, [pathname, resetChatState]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -173,56 +170,106 @@ export default function ChatbotWidget() {
       }
 
       setIsSending(true);
-      const userMessage: StoredChatMessage = {
+      const userMessage: ChatMessage = {
         id: createMessageId(),
         role: "user",
         content: text,
       };
-      persistMessages((prev) => [...prev, userMessage]);
+      setMessages((prev) => [...prev, userMessage]);
       setInput("");
+
+      const assistantId = createMessageId();
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: assistantId,
+          role: "assistant",
+          content: "",
+        },
+      ]);
 
       try {
         const activeConversationId = conversationId ?? (await ensureConversation());
         const sessionId = getOrCreateSessionId();
-        const response = await postChatbotMessages({
-          conversationId: activeConversationId,
-          sessionId,
-          message: text,
-          sourcePage: pathname || "/",
-        });
 
-        const data = response.data;
-        const answer =
-          data?.answer?.trim() ||
-          "Xin lỗi, tôi chưa có câu trả lời phù hợp. Vui lòng thử lại.";
-
-        const assistantMessage: StoredChatMessage = {
-          id: createMessageId(),
-          role: "assistant",
-          content: answer,
-          disclaimer: data?.disclaimer,
-          recommendedProducts: data?.recommendedProducts,
-          suggestedActions: data?.suggestedActions,
-        };
-
-        persistMessages((prev) => [...prev, assistantMessage]);
-
-        if (data?.conversationId) {
-          setStoredConversationId(data.conversationId);
-          setConversationId(data.conversationId);
-        }
+        await streamChatbotMessage(
+          {
+            conversationId: activeConversationId,
+            sessionId,
+            message: text,
+            sourcePage: pathname || "/",
+          },
+          {
+            onMeta: (data) => {
+              if (data.conversationId) {
+                setConversationId(data.conversationId);
+              }
+              if (data.recommendedProducts?.length) {
+                setMessages((prev) =>
+                  prev.map((message) =>
+                    message.id === assistantId
+                      ? {
+                          ...message,
+                          recommendedProducts: data.recommendedProducts,
+                        }
+                      : message,
+                  ),
+                );
+              }
+            },
+            onToken: (token) => {
+              setMessages((prev) =>
+                prev.map((message) =>
+                  message.id === assistantId
+                    ? { ...message, content: `${message.content}${token}` }
+                    : message,
+                ),
+              );
+              scrollToBottom();
+            },
+            onDone: (data) => {
+              setMessages((prev) =>
+                prev.map((message) =>
+                  message.id === assistantId
+                    ? {
+                        ...message,
+                        content:
+                          data.answer?.trim() ||
+                          message.content?.trim() ||
+                          "Xin lỗi, tôi chưa có câu trả lời phù hợp. Vui lòng thử lại.",
+                        disclaimer: data.disclaimer,
+                        recommendedProducts:
+                          data.recommendedProducts ?? message.recommendedProducts,
+                      }
+                    : message,
+                ),
+              );
+              if (data.conversationId) {
+                setConversationId(data.conversationId);
+              }
+            },
+            onError: (message) => {
+              setMessages((prev) =>
+                prev.map((item) =>
+                  item.id === assistantId ? { ...item, content: message } : item,
+                ),
+              );
+            },
+          },
+        );
       } catch (error) {
-        const errorMessage: StoredChatMessage = {
-          id: createMessageId(),
-          role: "assistant",
-          content: extractApiErrorMessage(error),
-        };
-        persistMessages((prev) => [...prev, errorMessage]);
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === assistantId
+              ? { ...message, content: extractApiErrorMessage(error) }
+              : message,
+          ),
+        );
       } finally {
         setIsSending(false);
       }
     },
-    [conversationId, ensureConversation, isSending, pathname, persistMessages],
+    [conversationId, ensureConversation, isSending, pathname, scrollToBottom],
   );
 
   const handleSubmit = (event: FormEvent) => {
@@ -310,7 +357,7 @@ export default function ChatbotWidget() {
             </header>
 
             <div className="flex min-h-0 flex-1 flex-col bg-surface-container-low">
-              <div className="flex-1 space-y-sm overflow-y-auto px-md py-sm">
+              <div className="flex-1 space-y-sm overflow-x-hidden overflow-y-auto px-md py-sm">
                 {showWelcome && (
                   <div className="max-w-[88%] rounded-2xl rounded-tl-sm border border-border-warm bg-surface px-sm py-xs font-body-md text-body-md text-text-main shadow-sm">
                     {welcomeMessage}
@@ -320,13 +367,13 @@ export default function ChatbotWidget() {
                 {messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                    className={`flex w-full min-w-0 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <ChatBubble message={message} />
                   </div>
                 ))}
 
-                {(isSending || isBootstrapping) && (
+                {isBootstrapping && (
                   <div className="flex justify-start">
                     <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm border border-border-warm bg-surface px-sm py-2 shadow-sm">
                       <span className="h-2 w-2 animate-bounce rounded-full bg-soft-sage [animation-delay:-0.3s]" />

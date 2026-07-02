@@ -9,4 +9,6 @@ import vn.io.naherb.product.ProductSku;
 @Repository
 public interface ProductSkuRepository extends JpaRepository<ProductSku, UUID> {
     List<ProductSku> findByProductId(UUID productId);
+
+    List<ProductSku> findByProductIdIn(List<UUID> productIds);
 }

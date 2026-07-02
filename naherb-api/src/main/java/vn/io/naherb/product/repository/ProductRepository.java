@@ -1,5 +1,6 @@
 package vn.io.naherb.product.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +12,8 @@ import vn.io.naherb.product.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
     Optional<Product> findBySlugAndStatus(String slug, ContentStatus status);
+
+    long countByStatus(ContentStatus status);
+
+    List<Product> findByStatusOrderByDisplayOrderAsc(ContentStatus status);
 }

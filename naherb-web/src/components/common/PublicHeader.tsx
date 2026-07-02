@@ -3,12 +3,14 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
+import { logoutToGuestHome } from '@/lib/auth-logout';
 import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
-import { AXIOS_INSTANCE } from '@/services/api-client';
 
 export default function PublicHeader() {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const { open: openChatbot } = useChatbot();
   const { data } = useGetAuthMe({
     query: {
@@ -21,13 +23,8 @@ export default function PublicHeader() {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
   const handleLogout = async () => {
-    try {
-      await AXIOS_INSTANCE.post('/auth/logout');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      window.location.href = '/dang-nhap';
-    }
+    setAccountMenuOpen(false);
+    await logoutToGuestHome(queryClient);
   };
 
   const getLinkClass = (path: string, exact = false) => {

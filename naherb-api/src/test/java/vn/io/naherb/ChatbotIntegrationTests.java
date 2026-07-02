@@ -3,12 +3,14 @@ package vn.io.naherb;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jakarta.servlet.http.Cookie;
@@ -157,6 +159,68 @@ class ChatbotIntegrationTests {
                 .andExpect(jsonPath("$.data.answer", containsString("Gối")))
                 .andExpect(jsonPath("$.data.disclaimer", notNullValue()))
                 .andExpect(jsonPath("$.data.recommendedProducts", notNullValue()));
+    }
+
+    @Test
+    void sendMessageUsesFaqWithoutOpenAi() throws Exception {
+        MvcResult conversation = mockMvc.perform(post("/api/chatbot/conversations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"sessionId":"session-faq"}
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String conversationId = readJsonPath(conversation, "$.data.id");
+
+        mockMvc.perform(post("/api/chatbot/messages")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "conversationId": "%s",
+                                  "sessionId": "session-faq",
+                                  "message": "NaHerbs có giao hàng toàn quốc không?",
+                                  "sourcePage": "/"
+                                }
+                                """.formatted(conversationId)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.answer", containsString("giao hàng")))
+                .andExpect(jsonPath("$.data.recommendedProducts", notNullValue()));
+    }
+
+    @Test
+    void streamMessageReturnsSseEvents() throws Exception {
+        MvcResult conversation = mockMvc.perform(post("/api/chatbot/conversations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"sessionId":"session-stream"}
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String conversationId = readJsonPath(conversation, "$.data.id");
+
+        MvcResult streamResult = mockMvc.perform(post("/api/chatbot/messages/stream")
+                        .accept(MediaType.TEXT_EVENT_STREAM)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "conversationId": "%s",
+                                  "sessionId": "session-stream",
+                                  "message": "Tôi mỏi cổ vai gáy, dùng gối nào?",
+                                  "sourcePage": "/"
+                                }
+                                """.formatted(conversationId)))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        MvcResult asyncResult = mockMvc.perform(asyncDispatch(streamResult))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String body = asyncResult.getResponse().getContentAsString();
+        org.assertj.core.api.Assertions.assertThat(body).contains("event:token");
+        org.assertj.core.api.Assertions.assertThat(body).contains("event:done");
     }
 
     @Test

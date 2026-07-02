@@ -43,6 +43,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import vn.io.naherb.security.AccountUserDetailsService;
 import vn.io.naherb.security.CookieBearerTokenResolver;
+import vn.io.naherb.security.LenientCookieBearerTokenResolver;
 import vn.io.naherb.security.token.RevokedAccessTokenValidator;
 import vn.io.naherb.security.token.TokenStore;
 
@@ -60,12 +61,24 @@ public class SecurityConfig {
          */
         @Bean
         @Order(1)
-        SecurityFilterChain chatbotSecurityFilterChain(HttpSecurity http) throws Exception {
+        SecurityFilterChain chatbotSecurityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
+                JwtAuthenticationProvider jwtProvider = new JwtAuthenticationProvider(jwtDecoder);
+                jwtProvider.setJwtAuthenticationConverter(jwtAuthenticationConverter());
+                BearerTokenAuthenticationFilter jwtFilter = new BearerTokenAuthenticationFilter(
+                                new ProviderManager(jwtProvider));
+                jwtFilter.setBearerTokenResolver(new LenientCookieBearerTokenResolver(
+                                new CookieBearerTokenResolver(
+                                                properties.getCookie().getAccessName(),
+                                                Set.of(),
+                                                Set.of()),
+                                jwtDecoder));
+
                 http.securityMatcher("/api/chatbot/**")
                                 .cors(Customizer.withDefaults())
                                 .csrf(csrf -> csrf.disable())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
                 return http.build();
         }

@@ -12,7 +12,8 @@ export default function AdminSidebar() {
     { name: "Đơn hàng", href: "/admin/orders", icon: "shopping_cart" },
     { name: "Thanh toán QR", href: "/admin/qr-payments", icon: "qr_code_2" },
     { name: "Bài viết", href: "/admin/posts", icon: "edit_note" },
-    { name: "Chatbot AI", href: "/admin/chatbot", icon: "psychiatry" },
+    { name: "Chatbot AI", href: "/admin/chatbot", icon: "psychiatry", exact: true },
+    { name: "FAQ Chatbot", href: "/admin/chatbot/faq", icon: "quiz" },
   ];
 
   return (
@@ -29,7 +30,10 @@ export default function AdminSidebar() {
 
       <nav className="flex-1 py-md flex flex-col gap-base">
         {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+          const isActive =
+            "exact" in item && item.exact
+              ? pathname === item.href
+              : pathname.startsWith(item.href);
 
           return (
             <Link

@@ -2,7 +2,7 @@ package vn.io.naherb.chatbot.rag;
 
 import java.util.Locale;
 
-final class RetrievalScoring {
+public final class RetrievalScoring {
 
     private static final double COSINE_WEIGHT = 0.5;
     private static final double KEYWORD_WEIGHT = 0.25;
@@ -10,13 +10,13 @@ final class RetrievalScoring {
 
     private RetrievalScoring() {}
 
-    static double relevanceScore(String query, String content, double cosineSimilarity) {
+    public static double relevanceScore(String query, String content, double cosineSimilarity) {
         double keyword = keywordOverlapScore(query, content);
         double phrase = phraseOverlapScore(query, content);
         return (cosineSimilarity * COSINE_WEIGHT) + (keyword * KEYWORD_WEIGHT) + (phrase * PHRASE_WEIGHT);
     }
 
-    static double keywordOverlapScore(String query, String content) {
+    public static double keywordOverlapScore(String query, String content) {
         if (query == null || content == null || query.isBlank() || content.isBlank()) {
             return 0;
         }
@@ -39,7 +39,7 @@ final class RetrievalScoring {
         return (double) hits / considered;
     }
 
-    static double phraseOverlapScore(String query, String content) {
+    public static double phraseOverlapScore(String query, String content) {
         if (query == null || content == null || query.isBlank() || content.isBlank()) {
             return 0;
         }

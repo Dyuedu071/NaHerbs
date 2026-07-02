@@ -7,4 +7,6 @@ public record UpdateChatbotConfigRequest(
         String welcomeMessage,
         String disclaimer,
         List<String> suggestedQuestions,
-        String fallbackMessage) {}
+        String fallbackMessage,
+        List<ChatbotFaqEntry> faqEntries,
+        Integer maxProductsPerAnswer) {}

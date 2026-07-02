@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import vn.io.naherb.chatbot.dto.AdminChatbotConfigResponse;
+import vn.io.naherb.chatbot.dto.ChatbotFaqEntry;
 import vn.io.naherb.chatbot.dto.PublicChatbotConfigResponse;
 import vn.io.naherb.chatbot.dto.UpdateChatbotConfigRequest;
 import vn.io.naherb.chatbot.repository.ChatbotConfigRepository;
@@ -17,6 +18,16 @@ import vn.io.naherb.chatbot.repository.ChatbotConfigRepository;
 @Service
 @RequiredArgsConstructor
 public class ChatbotConfigService {
+
+    private static final List<ChatbotFaqEntry> DEFAULT_FAQ = List.of(
+            new ChatbotFaqEntry(
+                    "NaHerbs có giao hàng toàn quốc không?",
+                    "Có, NaHerbs hỗ trợ giao hàng trên toàn quốc. Thời gian giao hàng tùy khu vực, thường từ 2–5 ngày làm việc.",
+                    List.of("giao hàng", "ship", "vận chuyển", "toàn quốc")),
+            new ChatbotFaqEntry(
+                    "Thông tin chatbot có thay thế tư vấn y kế không?",
+                    "Không. Thông tin từ chatbot chỉ mang tính tham khảo, không thay thế tư vấn y kế hay chẩn đoán bệnh.",
+                    List.of("y kế", "bác sĩ", "chẩn đoán", "thay thế", "y tế")));
 
     private static final List<String> DEFAULT_SUGGESTIONS = List.of(
             "Gối thảo dược NaHerbs phù hợp với ai?",
@@ -49,6 +60,14 @@ public class ChatbotConfigService {
             config.setDescription("Gợi ý câu hỏi");
             chatbotConfigRepository.save(config);
         }
+        if (chatbotConfigRepository.findByConfigKey(ChatbotConfigKeys.FAQ_ENTRIES).isEmpty()) {
+            ChatbotConfig config = new ChatbotConfig();
+            config.setConfigKey(ChatbotConfigKeys.FAQ_ENTRIES);
+            config.setConfigValue(writeJson(DEFAULT_FAQ));
+            config.setDescription("FAQ chatbot");
+            chatbotConfigRepository.save(config);
+        }
+        putDefault(ChatbotConfigKeys.MAX_PRODUCTS_PER_ANSWER, "3", "Số sản phẩm gợi ý tối đa");
     }
 
     @Transactional(readOnly = true)
@@ -67,7 +86,9 @@ public class ChatbotConfigService {
                 getString(ChatbotConfigKeys.WELCOME_MESSAGE, ""),
                 getString(ChatbotConfigKeys.DISCLAIMER, ""),
                 getSuggestedQuestions(),
-                getString(ChatbotConfigKeys.FALLBACK_MESSAGE, ""));
+                getString(ChatbotConfigKeys.FALLBACK_MESSAGE, ""),
+                getFaqEntries(),
+                getMaxProductsPerAnswer());
     }
 
     @Transactional
@@ -87,6 +108,13 @@ public class ChatbotConfigService {
         if (request.fallbackMessage() != null) {
             upsert(ChatbotConfigKeys.FALLBACK_MESSAGE, request.fallbackMessage());
         }
+        if (request.faqEntries() != null) {
+            upsert(ChatbotConfigKeys.FAQ_ENTRIES, writeJson(request.faqEntries()));
+        }
+        if (request.maxProductsPerAnswer() != null) {
+            int capped = Math.min(5, Math.max(1, request.maxProductsPerAnswer()));
+            upsert(ChatbotConfigKeys.MAX_PRODUCTS_PER_ANSWER, String.valueOf(capped));
+        }
         return getAdminConfig();
     }
 
@@ -100,6 +128,29 @@ public class ChatbotConfigService {
 
     public String getFallbackMessage() {
         return getString(ChatbotConfigKeys.FALLBACK_MESSAGE, "Hiện tôi chưa thể trả lời. Vui lòng thử lại sau.");
+    }
+
+    public List<ChatbotFaqEntry> getFaqEntries() {
+        return chatbotConfigRepository
+                .findByConfigKey(ChatbotConfigKeys.FAQ_ENTRIES)
+                .map(ChatbotConfig::getConfigValue)
+                .map(this::readFaqEntries)
+                .orElse(DEFAULT_FAQ);
+    }
+
+    public int getMaxProductsPerAnswer() {
+        return chatbotConfigRepository
+                .findByConfigKey(ChatbotConfigKeys.MAX_PRODUCTS_PER_ANSWER)
+                .map(ChatbotConfig::getConfigValue)
+                .map(value -> {
+                    try {
+                        return Integer.parseInt(value.trim());
+                    } catch (NumberFormatException exception) {
+                        return 3;
+                    }
+                })
+                .map(value -> Math.min(5, Math.max(1, value)))
+                .orElse(3);
     }
 
     private void putDefault(String key, String value, String description) {
@@ -156,11 +207,19 @@ public class ChatbotConfigService {
         }
     }
 
-    private String writeJson(List<String> values) {
+    private List<ChatbotFaqEntry> readFaqEntries(String json) {
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<ChatbotFaqEntry>>() {});
+        } catch (JsonProcessingException exception) {
+            return DEFAULT_FAQ;
+        }
+    }
+
+    private String writeJson(List<?> values) {
         try {
             return objectMapper.writeValueAsString(values);
         } catch (JsonProcessingException exception) {
-            throw new IllegalStateException("Không thể serialize suggested questions", exception);
+            throw new IllegalStateException("Không thể serialize JSON config", exception);
         }
     }
 }

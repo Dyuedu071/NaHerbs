@@ -1,9 +1,11 @@
 "use client";
 
-import { AXIOS_INSTANCE } from '@/services/api-client';
+import { logoutToGuestHome } from '@/lib/auth-logout';
 import { useGetAuthMe } from "@/services/generated/customer-profile/customer-profile";
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function AdminHeader() {
+  const queryClient = useQueryClient();
   const { data } = useGetAuthMe({
     query: {
       retry: false,
@@ -12,13 +14,7 @@ export default function AdminHeader() {
   });
   const user = data as unknown as { avatarUrl?: string } | undefined;
   const handleLogout = async () => {
-    try {
-      await AXIOS_INSTANCE.post('/auth/logout');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      window.location.href = '/dang-nhap';
-    }
+    await logoutToGuestHome(queryClient);
   };
 
   return (
