@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NaHerbs - Giỏ hàng</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Merriweather:wght@400;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#c7eccf",
+                        "herbal-beige": "#E8D8BD",
+                        "tertiary-fixed-dim": "#ffb692",
+                        "surface-variant": "#e8e2d6",
+                        "on-surface": "#1d1c14",
+                        "soft-sage": "#A8BFA3",
+                        "on-error-container": "#93000a",
+                        "text-main": "#2B2B2B",
+                        "primary-fixed-dim": "#acd0ad",
+                        "secondary-fixed-dim": "#abcfb4",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#2e4d39",
+                        "on-secondary-container": "#4b6c55",
+                        "surface-container-high": "#ede8dc",
+                        "inverse-surface": "#333028",
+                        "error-text": "#B94A3A",
+                        "surface-container-low": "#f9f3e7",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#2f4e33",
+                        "primary-fixed": "#c8ecc8",
+                        "surface-dim": "#dfd9ce",
+                        "on-primary-fixed": "#03210b",
+                        "on-tertiary-fixed": "#341100",
+                        "surface-bright": "#fff9ed",
+                        "on-tertiary-fixed-variant": "#733510",
+                        "surface-container": "#f3ede1",
+                        "on-primary-container": "#ccf0cc",
+                        "tertiary": "#7e3d18",
+                        "tertiary-fixed": "#ffdbcb",
+                        "secondary": "#45664f",
+                        "on-background": "#1d1c14",
+                        "on-tertiary-container": "#ffe1d3",
+                        "border-warm": "#DDD0BC",
+                        "on-secondary": "#ffffff",
+                        "text-muted": "#6F6A61",
+                        "outline": "#737971",
+                        "on-secondary-fixed": "#012110",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fff9ed",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#424841",
+                        "success-bg": "#E7F0E4",
+                        "surface": "#fff9ed",
+                        "surface-tint": "#466649",
+                        "tertiary-container": "#9c542d",
+                        "surface-container-highest": "#e8e2d6",
+                        "primary": "#37563b",
+                        "earth-brown": "#8A6A4F",
+                        "outline-variant": "#c2c8bf",
+                        "error-bg": "#FBEAE5",
+                        "primary-container": "#4f6f52",
+                        "secondary-container": "#c7eccf",
+                        "inverse-on-surface": "#f6f0e4",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#acd0ad"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "xs": "8px",
+                        "base": "4px",
+                        "md": "24px",
+                        "lg": "48px",
+                        "gutter": "32px",
+                        "container-max": "1240px",
+                        "xl": "80px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Merriweather"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Merriweather"],
+                        "price-display": ["Inter"],
+                        "display-lg": ["Merriweather"],
+                        "caption": ["Inter"],
+                        "headline-lg-mobile": ["Merriweather"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-md": ["15px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.35", "fontWeight": "600" }],
+                        "headline-lg": ["40px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "price-display": ["28px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["56px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "1.3", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ambient Tonal Shadows */
+        .shadow-ambient-sm {
+            box-shadow: 0 2px 8px -2px rgba(55, 86, 59, 0.08), 0 4px 16px -4px rgba(55, 86, 59, 0.04);
+        }
+
+        .shadow-ambient-md {
+            box-shadow: 0 4px 12px -2px rgba(55, 86, 59, 0.12), 0 8px 24px -4px rgba(55, 86, 59, 0.08);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+    <!-- TopNavBar -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/88 backdrop-blur-md shadow-sm">
+        <div class="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
+            <!-- Brand Logo -->
+            <a class="font-display-lg text-display-lg text-primary md:text-[32px] md:font-bold" href="#">
+                NaHerbs
+            </a>
+            <!-- Navigation Links (Desktop) -->
+            <div class="hidden md:flex items-center gap-8">
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md"
+                    href="#">Home</a>
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md"
+                    href="#">Products</a>
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md"
+                    href="#">Blog</a>
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md"
+                    href="#">About</a>
+                <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md"
+                    href="#">Contact</a>
+            </div>
+            <!-- Trailing Actions -->
+            <div class="flex items-center gap-4">
+                <button
+                    class="hidden md:block bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md hover:scale-105 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:ring-offset-2 focus:ring-offset-surface">
+                    Tư vấn ngay
+                </button>
+                <button class="p-2 text-primary hover:scale-105 transition-transform duration-200">
+                    <span class="material-symbols-outlined">shopping_cart</span>
+                </button>
+                <button class="p-2 text-primary hover:scale-105 transition-transform duration-200 hidden md:block">
+                    <span class="material-symbols-outlined">account_circle</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content Canvas -->
+    <main class="pt-32 pb-xl px-gutter max-w-container-max mx-auto min-h-[819px]">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1
+                class="font-headline-lg text-headline-lg md:font-headline-lg-mobile md:text-headline-lg-mobile text-primary mb-2">
+                Giỏ hàng của bạn</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Bạn đang có 2 sản phẩm trong giỏ hàng.</p>
+        </header>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+            <!-- Cart Items List (Left Column) -->
+            <div class="lg:col-span-8 space-y-md">
+                <!-- Cart Item 1 -->
+                <article
+                    class="flex flex-col sm:flex-row gap-6 p-6 bg-surface-container-low rounded-xl border border-border-warm shadow-ambient-sm relative group transition-all duration-300 hover:shadow-ambient-md">
+                    <!-- Thumbnail -->
+                    <div
+                        class="w-full sm:w-32 h-32 shrink-0 bg-surface-variant rounded-lg overflow-hidden flex items-center justify-center">
+                        <img class="w-full h-full object-cover"
+                            data-alt="A luxurious glass bottle of dark liquid premium ginseng extract resting on a natural warm grey stone block, surrounded by soft organic light and delicately blurred green herbal leaves in the background. The aesthetic is modern wellness boutique, clean, and highly tactile."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4Rzk-IHbXtjcqP5BhFMOBIKrBfj9FxhH0R_7Ld9oGRke6pOqzeBPmJcK7uHiJvLyON-mamdsrB7S-EI_-ntDQdBLAGy1BNeX3M91uwStpFthJkFAM-cvcYTn1lqu1vJHCsSyEGyAHS331cDizapLZfnorQ_uzDWPB_-bhHOlNmnP669CeZl3mBl_GspOFZdeAGlHqgF-0TSqhgPjloB-jUQxt2AjHB6HeWO0tBOygn9L_HuyUzxpa-5GisY7e18dS3ibfU3lWd5Y" />
+                    </div>
+                    <!-- Details -->
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start pr-8">
+                                <h3 class="font-headline-md text-headline-md text-primary !text-[20px]">Tinh chất Sâm
+                                    Ngọc Linh</h3>
+                                <button aria-label="Remove item"
+                                    class="absolute top-6 right-6 text-outline-variant hover:text-error transition-colors p-1 rounded-full hover:bg-error-bg">
+                                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                                </button>
+                            </div>
+                            <p class="font-caption text-caption text-on-surface-variant mt-1">SKU: NH-SNG-50ML</p>
+                            <div
+                                class="mt-2 inline-flex items-center px-2 py-1 rounded-full bg-success-bg text-primary text-xs font-semibold">
+                                Còn hàng
+                            </div>
+                        </div>
+                        <!-- Price & Quantity -->
+                        <div class="flex flex-wrap items-end justify-between mt-4 gap-4">
+                            <div class="font-price-display text-price-display text-primary !text-[24px]">
+                                2.450.000 ₫
+                            </div>
+                            <!-- Stepper -->
+                            <div
+                                class="flex items-center gap-3 bg-surface border border-border-warm rounded-full px-2 py-1 h-[42px]">
+                                <button
+                                    class="w-8 h-8 flex items-center justify-center text-primary hover:bg-secondary-fixed rounded-full transition-colors focus:outline-none">
+                                    <span class="material-symbols-outlined text-[18px]">remove</span>
+                                </button>
+                                <span class="font-label-md text-label-md w-6 text-center select-none">1</span>
+                                <button
+                                    class="w-8 h-8 flex items-center justify-center text-primary hover:bg-secondary-fixed rounded-full transition-colors focus:outline-none">
+                                    <span class="material-symbols-outlined text-[18px]">add</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- Cart Item 2 -->
+                <article
+                    class="flex flex-col sm:flex-row gap-6 p-6 bg-surface-container-low rounded-xl border border-border-warm shadow-ambient-sm relative group transition-all duration-300 hover:shadow-ambient-md">
+                    <!-- Thumbnail -->
+                    <div
+                        class="w-full sm:w-32 h-32 shrink-0 bg-surface-variant rounded-lg overflow-hidden flex items-center justify-center">
+                        <img class="w-full h-full object-cover"
+                            data-alt="A beautifully designed, eco-friendly kraft paper box of loose-leaf organic sleep tea resting on a textured wooden table surface, alongside a delicate ceramic cup steaming gently. Warm, earthy color palette illuminated by soft, inviting morning sunlight."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuByvkPIPyTPYyAPB4ZzMvunCIZV3txrkeJ0GnCilr6oYduEhcg_nHfuozMeDCVmsL6E1m9U7OXBsRr9wPbZTjqHXhx_tu_Oh-ovpoDjoiAjQLXArVkVzHLLKBx-yffjpe7FZvnNIEaZIEIXtJEpZGg7Ut7SAXu4ZHA5y8CM9tdWeLYsgq1iN1Ri9KP9qMGjtPMEgeVVtApSB5P-kt4oY5fJAl_7KnreVOujFQsRjhvrusFe6FL3OsWKO5sv9xEWznTF51EweSxvofA" />
+                    </div>
+                    <!-- Details -->
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start pr-8">
+                                <h3 class="font-headline-md text-headline-md text-primary !text-[20px]">Trà Thảo Mộc An
+                                    Thần</h3>
+                                <button aria-label="Remove item"
+                                    class="absolute top-6 right-6 text-outline-variant hover:text-error transition-colors p-1 rounded-full hover:bg-error-bg">
+                                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                                </button>
+                            </div>
+                            <p class="font-caption text-caption text-on-surface-variant mt-1">SKU: NH-TEA-AN-100</p>
+                            <div
+                                class="mt-2 inline-flex items-center px-2 py-1 rounded-full bg-success-bg text-primary text-xs font-semibold">
+                                Còn hàng
+                            </div>
+                        </div>
+                        <!-- Price & Quantity -->
+                        <div class="flex flex-wrap items-end justify-between mt-4 gap-4">
+                            <div class="font-price-display text-price-display text-primary !text-[24px]">
+                                320.000 ₫
+                            </div>
+                            <!-- Stepper -->
+                            <div
+                                class="flex items-center gap-3 bg-surface border border-border-warm rounded-full px-2 py-1 h-[42px]">
+                                <button
+                                    class="w-8 h-8 flex items-center justify-center text-primary hover:bg-secondary-fixed rounded-full transition-colors focus:outline-none">
+                                    <span class="material-symbols-outlined text-[18px]">remove</span>
+                                </button>
+                                <span class="font-label-md text-label-md w-6 text-center select-none">2</span>
+                                <button
+                                    class="w-8 h-8 flex items-center justify-center text-primary hover:bg-secondary-fixed rounded-full transition-colors focus:outline-none">
+                                    <span class="material-symbols-outlined text-[18px]">add</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            <!-- Order Summary (Right Column - Sticky) -->
+            <div class="lg:col-span-4 sticky top-32">
+                <div class="bg-surface-container-lowest rounded-xl p-8 border border-border-warm shadow-ambient-sm">
+                    <h2 class="font-headline-md text-headline-md text-primary mb-6 !text-[24px]">Tóm tắt đơn hàng</h2>
+                    <div
+                        class="space-y-4 font-body-md text-body-md text-on-surface mb-6 border-b border-border-warm pb-6">
+                        <div class="flex justify-between items-center">
+                            <span class="text-on-surface-variant">Tạm tính (3 sản phẩm)</span>
+                            <span class="font-medium">3.090.000 ₫</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-on-surface-variant">Phí vận chuyển</span>
+                            <span class="text-primary font-medium text-sm bg-success-bg px-2 py-0.5 rounded-full">Miễn
+                                phí</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-end mb-8">
+                        <span class="font-label-md text-label-md text-on-surface">Tổng cộng</span>
+                        <div class="text-right">
+                            <span class="font-price-display text-price-display text-primary block">3.090.000 ₫</span>
+                            <span class="font-caption text-caption text-on-surface-variant block mt-1">(Đã bao gồm
+                                VAT)</span>
+                        </div>
+                    </div>
+                    <button
+                        class="w-full bg-primary text-on-primary rounded-full py-4 font-label-md text-label-md flex justify-center items-center gap-2 hover:bg-on-primary-fixed-variant hover:shadow-ambient-md transition-all duration-300 transform hover:-translate-y-0.5">
+                        <span class="material-symbols-outlined text-[20px]">lock</span>
+                        Tiến hành thanh toán
+                    </button>
+                    <div class="mt-6 flex items-center justify-center gap-2 text-sm text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[16px] text-soft-sage">verified_user</span>
+                        <span>Thanh toán an toàn &amp; bảo mật 100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="w-full pt-xl pb-md bg-primary dark:bg-on-primary-fixed-variant">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto">
+            <div class="md:col-span-1 space-y-6">
+                <div class="font-display-lg text-display-lg text-on-primary md:text-[40px]">
+                    NaHerbs
+                </div>
+                <p class="font-body-md text-body-md text-on-primary/80">Tinh hoa thảo mộc tự nhiên cho sức khỏe bền
+                    vững.</p>
+            </div>
+            <div>
+                <h4 class="font-headline-md text-headline-md text-on-primary mb-4 !text-[20px]">Sản phẩm</h4>
+                <ul class="space-y-3 flex flex-col">
+                    <a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed inline-block w-fit"
+                        href="#">Product Categories</a>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-headline-md text-headline-md text-on-primary mb-4 !text-[20px]">Hỗ trợ</h4>
+                <ul class="space-y-3 flex flex-col">
+                    <a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed inline-block w-fit"
+                        href="#">Support Links</a>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-headline-md text-headline-md text-on-primary mb-4 !text-[20px]">Liên hệ</h4>
+                <ul class="space-y-3 flex flex-col">
+                    <a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed inline-block w-fit flex items-center gap-2"
+                        href="#">
+                        <span class="material-symbols-outlined text-[18px]">phone</span> Hotline
+                    </a>
+                    <a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed inline-block w-fit flex items-center gap-2"
+                        href="#">
+                        <span class="material-symbols-outlined text-[18px]">forum</span> Zalo
+                    </a>
+                    <a class="font-label-md text-label-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed inline-block w-fit flex items-center gap-2"
+                        href="#">
+                        <span class="material-symbols-outlined text-[18px]">mail</span> Email
+                    </a>
+                </ul>
+            </div>
+        </div>
+        <div
+            class="mt-16 pt-8 border-t border-on-primary/10 px-gutter max-w-container-max mx-auto text-center font-caption text-caption text-on-primary/60">
+            © 2024 NaHerbs. All rights reserved.
+        </div>
+    </footer>
+</body>
+
+</html>

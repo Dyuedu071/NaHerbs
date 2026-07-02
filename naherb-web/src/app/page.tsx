@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
 import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
-import { useCart } from '@/components/cart/CartContext';
+
 import { extractApiErrorMessage } from '@/lib/api-error';
+import { useToast } from '@/contexts/ToastContext';
 import { formatMoney } from '@/lib/order-format';
 import { getGetCartQueryKey, usePostCartItems } from '@/services/generated/cart/cart';
 import { getProductsSlug, useGetProducts } from '@/services/generated/public-products/public-products';
@@ -49,8 +50,7 @@ function formatProductPrice(product: ProductSummary): string {
 export default function Home() {
   const queryClient = useQueryClient();
   const { open: openChatbot } = useChatbot();
-  const { open: openCart } = useCart();
-  const [addCartError, setAddCartError] = useState<string | null>(null);
+
   const [addingProductSlug, setAddingProductSlug] = useState<string | null>(null);
   const { data: productsResponse, isLoading: productsLoading } = useGetProducts(
     { size: 4, inStockOnly: true, sort: "latest" },
@@ -58,14 +58,14 @@ export default function Home() {
   );
   const { mutateAsync: addCartItem } = usePostCartItems();
 
+  const { showToast } = useToast();
+
   const featuredProducts =
     (productsResponse as { data?: ProductPage } | undefined)?.data?.items ?? [];
 
   const handleAddProduct = async (product: ProductSummary) => {
-    setAddCartError(null);
-
     if (!product.slug) {
-      setAddCartError("Sản phẩm chưa có dữ liệu để thêm vào giỏ.");
+      showToast("Sản phẩm chưa có dữ liệu để thêm vào giỏ.", "error");
       return;
     }
 
@@ -76,15 +76,15 @@ export default function Home() {
       const sku = findPurchasableSku(detail);
 
       if (!sku?.id) {
-        setAddCartError("Sản phẩm hiện chưa có SKU còn hàng.");
+        showToast("Sản phẩm hiện chưa có SKU còn hàng.", "error");
         return;
       }
 
       await addCartItem({ data: { skuId: sku.id, quantity: 1 } });
       await queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
-      openCart();
+      showToast("Thêm sản phẩm vào giỏ hàng thành công!", "success");
     } catch (addError) {
-      setAddCartError(extractApiErrorMessage(addError));
+      showToast(extractApiErrorMessage(addError), "error");
     } finally {
       setAddingProductSlug(null);
     }
@@ -230,11 +230,7 @@ export default function Home() {
         {/* Featured Products */}
         <section className="px-gutter max-w-container-max mx-auto py-xl">
             <h2 className="font-headline-lg text-headline-lg text-primary text-center mb-xl">Sản Phẩm Nổi Bật</h2>
-            {addCartError && (
-                <p className="mx-auto mb-md max-w-[640px] rounded-lg bg-error-container px-sm py-2 text-center text-caption text-error">
-                    {addCartError}
-                </p>
-            )}
+
             {productsLoading ? (
                 <p className="text-center text-body-md text-text-muted">Đang tải sản phẩm...</p>
             ) : featuredProducts.length === 0 ? (

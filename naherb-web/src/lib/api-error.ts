@@ -1,7 +1,12 @@
+const ERROR_TRANSLATIONS: Record<string, string> = {
+  "Quantity exceeds available stock": "Số lượng yêu cầu vượt quá kho hàng hiện có.",
+};
+
 export function extractApiErrorMessage(
   error: unknown,
   fallback = "Đã xảy ra lỗi. Vui lòng thử lại.",
 ): string {
+  let message = fallback;
   if (
     typeof error === "object" &&
     error !== null &&
@@ -9,10 +14,10 @@ export function extractApiErrorMessage(
     typeof (error as { response?: { data?: { message?: string } } }).response?.data
       ?.message === "string"
   ) {
-    return (error as { response: { data: { message: string } } }).response.data.message;
+    message = (error as { response: { data: { message: string } } }).response.data.message;
+  } else if (error instanceof Error && error.message) {
+    message = error.message;
   }
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-  return fallback;
+  return ERROR_TRANSLATIONS[message] || message;
 }
+

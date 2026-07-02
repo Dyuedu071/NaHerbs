@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useToast } from '@/contexts/ToastContext';
 import { AXIOS_INSTANCE } from '@/services/api-client';
 
 const RichTextEditor = dynamic(() => import('@/components/common/RichTextEditor'), {
@@ -41,11 +42,7 @@ function CreatePostContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Custom Notifications & Modals
-  const [toast, setToast] = useState<{message: string, type: 'success'|'error'} | null>(null);
-  const showToast = (message: string, type: 'success' | 'error' = 'error') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  const { showToast } = useToast();
 
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [draftData, setDraftData] = useState<any>(null);
@@ -289,13 +286,7 @@ function CreatePostContent() {
   const handlePublish = async () => submitPost('PUBLISHED');
 
   return (
-    <main className="flex-1 p-gutter w-full flex flex-col gap-md pb-xl relative">
-      {/* Toast Notification */}
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-ambient-lg text-label-md font-label-md text-white transition-all transform duration-300 ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
-          {toast.message}
-        </div>
-      )}
+    <main className="flex-1 p-gutter w-full flex gap-xl relative">
 
       {/* Draft Restore Modal */}
       {showDraftModal && (
