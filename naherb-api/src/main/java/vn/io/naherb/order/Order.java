@@ -56,13 +56,13 @@ public class Order extends BaseEntity {
     @Column(name = "receiver_email", length = 254)
     private String receiverEmail;
 
-    @Column(name = "receiver_province_city")
+    @Column(name = "shipping_province_name", nullable = false)
     private String receiverProvinceCity;
 
-    @Column(name = "receiver_ward_commune")
+    @Column(name = "shipping_ward_name", nullable = false)
     private String receiverWardCommune;
 
-    @Column(name = "receiver_address_detail", columnDefinition = "TEXT")
+    @Column(name = "shipping_address_line", nullable = false, columnDefinition = "TEXT")
     private String receiverAddressDetail;
 
     @Column(name = "receiver_address_note", columnDefinition = "TEXT")

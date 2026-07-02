@@ -19,14 +19,14 @@ export function clearCsrfToken(): void {
 }
 
 export async function getCsrfToken(): Promise<string | null> {
-  if (cachedCsrfToken) {
-    return cachedCsrfToken;
-  }
-
   const fromCookie = readCsrfTokenFromCookie();
   if (fromCookie) {
     cachedCsrfToken = fromCookie;
     return cachedCsrfToken;
+  }
+
+  if (cachedCsrfToken) {
+    cachedCsrfToken = null;
   }
 
   if (!csrfFetchPromise) {

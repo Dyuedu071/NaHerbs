@@ -1,8 +1,8 @@
 package vn.io.naherb.product.dto;
 
-import lombok.Data;
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.Data;
 import vn.io.naherb.common.enums.ContentStatus;
 import vn.io.naherb.common.enums.StockStatus;
 
