@@ -1,7 +1,6 @@
 package vn.io.naherb.order;
 
 import jakarta.persistence.criteria.JoinType;
-import java.time.Instant;
 import java.util.Locale;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class OrderService {
     private final AccountRepository accountRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final PaymentRepository paymentRepository;
+    private final PaymentRecordService paymentRecordService;
     private final QrInstructionService qrInstructionService;
 
     @Transactional(readOnly = true)
@@ -107,17 +106,7 @@ public class OrderService {
         }
         orderRepository.save(order);
 
-        Payment payment = paymentRepository.findByOrder_Id(order.getId()).orElseGet(() -> {
-            Payment newPayment = new Payment();
-            newPayment.setOrder(order);
-            newPayment.setAmount(order.getFinalAmount());
-            newPayment.setPaymentGateway(order.getPaymentMethod().name());
-            return newPayment;
-        });
-        if (request.paymentStatus() == PaymentStatus.PAID) {
-            payment.setPaidAt(Instant.now());
-        }
-        paymentRepository.save(payment);
+        paymentRecordService.updateStatus(order, request.paymentStatus());
     }
 
     private OrderDetailResponse toDetail(Order order) {

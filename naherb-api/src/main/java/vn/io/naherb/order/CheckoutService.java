@@ -51,7 +51,7 @@ public class CheckoutService {
     private final ProductSkuRepository productSkuRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final PaymentRepository paymentRepository;
+    private final PaymentRecordService paymentRecordService;
     private final QrInstructionService qrInstructionService;
 
     @Transactional
@@ -87,7 +87,7 @@ public class CheckoutService {
         order.setReceiverAddressNote(shipping.note());
         order.setShippingAddress(shipping.fullAddress());
         order.setCustomerNote(blankToNull(request.note()));
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = orderRepository.saveAndFlush(order);
 
         for (CartItem cartItem : cartItems) {
             ProductSku sku = cartItem.getSku();
@@ -108,11 +108,9 @@ public class CheckoutService {
             productSkuRepository.save(sku);
         }
 
-        Payment payment = new Payment();
-        payment.setOrder(savedOrder);
-        payment.setAmount(savedOrder.getFinalAmount());
-        payment.setPaymentGateway(savedOrder.getPaymentMethod().name());
-        paymentRepository.save(payment);
+        paymentRecordService.createForOrder(
+                savedOrder,
+                PaymentRecordService.toRecordStatus(savedOrder.getPaymentStatus()));
 
         cartItemRepository.deleteByCart_Id(cart.getId());
         cart.setTotalAmount(BigDecimal.ZERO);

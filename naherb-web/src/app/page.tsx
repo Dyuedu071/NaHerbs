@@ -4,19 +4,100 @@ import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
 import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
 import { AXIOS_INSTANCE } from '@/services/api-client';
+import { extractSessionUser } from '@/lib/current-user';
 import { useState } from 'react';
+import { useCart } from '@/components/cart/CartContext';
+import { extractApiErrorMessage } from '@/lib/api-error';
+import { formatMoney } from '@/lib/order-format';
+import { getGetCartQueryKey, usePostCartItems } from '@/services/generated/cart/cart';
+import { getProductsSlug, useGetProducts } from '@/services/generated/public-products/public-products';
+import type { ProductDetail } from '@/services/generated/model/productDetail';
+import type { ProductPage } from '@/services/generated/model/productPage';
+import type { ProductSku } from '@/services/generated/model/productSku';
+import type { ProductSummary } from '@/services/generated/model/productSummary';
+import { useQueryClient } from '@tanstack/react-query';
+
+const fallbackProductImages = [
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuCCHIGHpyiH_H6cd9_8Zslswa-mB_l-tp5H_0vn7u3WIMjMMnJY7Gl2AHTm2ZHsVUifzbG8EqLQm_Ixt9t8Vx6pOFbt6Dnyqw-ws8jjMUOL7dT-eoB0UiNVffG1mx5yV0Yt6PFc0k4DxdRLRW6XiG26G9nE62FJONsIsnH_ZG0o9R4e_TLJnVtJuj_Dbfde9XuaRyy8WboVSQRO9eDqyiGWc5DhIFUN4pvK2VY2a0BssBOHGBU4TU07jylZpmTjT4fMQUZiW3y9O4g",
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuBQvwT_9-iT2SOajLu-FldGTE-JS02fCYW4Vn3r6HDGFmBcZAE6J1z4YGOPZz5TFuYXNl6TxtI7FYYw8e-p0kSgd8TCry0ZfSEEWdlJTKExoQpQJEC_IskQDCVFWnzJfUEarDOkZcPk2qhcENY_ci_MusEhUOPLOsg7LMNYnCSAKGGfYs0A86_rAalkCY3Jwg7C1Xmt2xtKOj16IyETjLs3IvU1Ef23zXjwmR4eRtyupcA3jLaZEMx4bZeghMprhbXBI0wdkUio9nY",
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuClRWBEUV4yi6_EIQr2oLX9IdPyqCpOZoTrmR7LsFQrQQgeS9fZB-qUANmy34zDMA4-7OJt7DTem0YGYmdsdKu5K077DJya5XIQ-Bjq70AzAp9cHyvOkwYA_7SdNDtaY-AjVSwUwVVT1ELVY7sS9iQJFijRu3yI8tzU9pGRDTqoIqVcJGu0eroB2H34q-jjESBDoWzt_xM8gxHU8W-SixGuonhHoyxGkVwkkelHBWgxAcmIHaLHGza_zoGne-MK5dbfaNN85jBqtXg",
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuDzCQwZw62I0hglOAs3IAoSmW3kupqhrDkCy-POmeYr7l2nw0YzDDf61GMar_cc4ynai-1Yt59GbzL6LwL-pOdqFzxmJQToKbBOJZP1a2DVmNF5xiz6bThlmXbFPblg_2TSUbMQn4NAXuP-XrJjllZ4y95M2KdVlBSciBebh7bjTn_qi8Ox5vqUjgYhviRF_Xw7V3fdUpR06DozgCYWFf6PbpuUElMUH3pX_cPNMP4z2lNegeXQ_3CTB472QRnEdaHhb0MGdJt3sAw",
+];
+
+function findPurchasableSku(product?: ProductDetail): ProductSku | undefined {
+  return product?.versions
+    ?.flatMap((version) => version.skus ?? [])
+    .find(
+      (sku) =>
+        sku.id &&
+        sku.status === "ACTIVE" &&
+        sku.stockStatus !== "OUT_OF_STOCK" &&
+        (sku.stockQuantity ?? 0) > 0,
+    );
+}
+
+function formatProductPrice(product: ProductSummary): string {
+  if (product.minSalePrice == null && product.maxSalePrice == null) {
+    return "Liên hệ";
+  }
+  if (product.minSalePrice === product.maxSalePrice || product.maxSalePrice == null) {
+    return formatMoney(product.minSalePrice);
+  }
+  return `${formatMoney(product.minSalePrice)} - ${formatMoney(product.maxSalePrice)}`;
+}
 
 export default function Home() {
+  const queryClient = useQueryClient();
   const { open: openChatbot } = useChatbot();
+  const { open: openCart } = useCart();
+  const [addCartError, setAddCartError] = useState<string | null>(null);
+  const [addingProductSlug, setAddingProductSlug] = useState<string | null>(null);
   const { data } = useGetAuthMe({
     query: {
       retry: false,
       refetchOnWindowFocus: false,
     }
   });
+  const { data: productsResponse, isLoading: productsLoading } = useGetProducts(
+    { size: 4, inStockOnly: true, sort: "latest" },
+    { query: { retry: false } },
+  );
+  const { mutateAsync: addCartItem } = usePostCartItems();
 
-  const user = data as unknown as { id: string; email: string; name: string; role: string; avatarUrl?: string } | undefined;
+  const user = extractSessionUser(data);
+  const avatarUrl = user?.avatarUrl;
+  const featuredProducts =
+    (productsResponse as { data?: ProductPage } | undefined)?.data?.items ?? [];
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+
+  const handleAddProduct = async (product: ProductSummary) => {
+    setAddCartError(null);
+
+    if (!product.slug) {
+      setAddCartError("Sản phẩm chưa có dữ liệu để thêm vào giỏ.");
+      return;
+    }
+
+    setAddingProductSlug(product.slug);
+    try {
+      const detailResponse = await getProductsSlug(product.slug);
+      const detail = (detailResponse as { data?: ProductDetail }).data;
+      const sku = findPurchasableSku(detail);
+
+      if (!sku?.id) {
+        setAddCartError("Sản phẩm hiện chưa có SKU còn hàng.");
+        return;
+      }
+
+      await addCartItem({ data: { skuId: sku.id, quantity: 1 } });
+      await queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
+      openCart();
+    } catch (addError) {
+      setAddCartError(extractApiErrorMessage(addError));
+    } finally {
+      setAddingProductSlug(null);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -55,7 +136,12 @@ export default function Home() {
                 <button className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95">
                     <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>search</span>
                 </button>
-                <button className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 relative">
+                <button
+                    type="button"
+                    onClick={openCart}
+                    aria-label="Mở giỏ hàng"
+                    className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 relative"
+                >
                     <span className="material-symbols-outlined"
                         style={{ fontVariationSettings: "'FILL' 0" }}>shopping_cart</span>
                 </button>
@@ -68,7 +154,7 @@ export default function Home() {
                         >
                             <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 shadow-sm">
                                 <img
-                                    src={user.avatarUrl || '/images/avatars/default-avatar.jpg'}
+                                    src={avatarUrl || '/images/avatars/default-avatar.jpg'}
                                     alt="User Avatar"
                                     className="w-full h-full object-cover"
                                 />
@@ -95,6 +181,13 @@ export default function Home() {
                                     className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
                                 >
                                     Địa chỉ giao hàng
+                                </Link>
+                                <Link
+                                    href="/account/orders"
+                                    onClick={() => setAccountMenuOpen(false)}
+                                    className="block px-md py-2 font-label-md text-label-md text-text-main hover:bg-success-bg"
+                                >
+                                    Đơn hàng của tôi
                                 </Link>
                                 <button
                                     type="button"
@@ -266,89 +359,60 @@ export default function Home() {
         {/* Featured Products */}
         <section className="px-gutter max-w-container-max mx-auto py-xl">
             <h2 className="font-headline-lg text-headline-lg text-primary text-center mb-xl">Sản Phẩm Nổi Bật</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
-                {/* Product 1 */}
-                <div
-                    className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow">
-                    <div className="relative aspect-square overflow-hidden bg-surface-container-low">
-                        <span
-                            className="absolute top-sm left-sm z-10 bg-success-bg text-primary px-xs py-1 rounded-full font-caption text-caption border border-primary/20">Bán
-                            chạy</span>
-                        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                            data-alt="A product shot of a premium herbal neck wrap, neatly rolled and tied with a natural twine string. It rests on a clean, light beige surface with a subtle soft shadow. Minimalist aesthetic, bright studio lighting, emphasizing the natural texture of the fabric."
-                            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCCHIGHpyiH_H6cd9_8Zslswa-mB_l-tp5H_0vn7u3WIMjMMnJY7Gl2AHTm2ZHsVUifzbG8EqLQm_Ixt9t8Vx6pOFbt6Dnyqw-ws8jjMUOL7dT-eoB0UiNVffG1mx5yV0Yt6PFc0k4DxdRLRW6XiG26G9nE62FJONsIsnH_ZG0o9R4e_TLJnVtJuj_Dbfde9XuaRyy8WboVSQRO9eDqyiGWc5DhIFUN4pvK2VY2a0BssBOHGBU4TU07jylZpmTjT4fMQUZiW3y9O4g')" }}>
-                        </div>
-                    </div>
-                    <div className="p-sm flex flex-col flex-grow gap-xs">
-                        <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">Đai Chườm Nóng Cổ
-                            Vai Gáy Thảo Dược</h3>
-                        <p className="font-price-display text-price-display text-text-main mt-auto">350.000đ</p>
-                        <button
-                            className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">add_shopping_cart</span> Thêm vào giỏ
-                        </button>
-                    </div>
+            {addCartError && (
+                <p className="mx-auto mb-md max-w-[640px] rounded-lg bg-error-container px-sm py-2 text-center text-caption text-error">
+                    {addCartError}
+                </p>
+            )}
+            {productsLoading ? (
+                <p className="text-center text-body-md text-text-muted">Đang tải sản phẩm...</p>
+            ) : featuredProducts.length === 0 ? (
+                <p className="text-center text-body-md text-text-muted">Chưa có sản phẩm còn hàng để hiển thị.</p>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+                    {featuredProducts.map((product, index) => {
+                        const imageUrl = product.thumbnailUrl ?? fallbackProductImages[index % fallbackProductImages.length];
+                        const isAdding = addingProductSlug === product.slug;
+                        const isOutOfStock = product.stockStatus === "OUT_OF_STOCK";
+
+                        return (
+                            <article
+                                key={product.id ?? product.slug ?? product.name}
+                                className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow"
+                            >
+                                <div className="relative aspect-square overflow-hidden bg-surface-container-low">
+                                    {index === 0 && (
+                                        <span className="absolute top-sm left-sm z-10 bg-success-bg text-primary px-xs py-1 rounded-full font-caption text-caption border border-primary/20">
+                                            Bán chạy
+                                        </span>
+                                    )}
+                                    <div
+                                        className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
+                                        style={{ backgroundImage: `url('${imageUrl}')` }}
+                                    />
+                                </div>
+                                <div className="p-sm flex flex-col flex-grow gap-xs">
+                                    <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">
+                                        {product.name ?? "Sản phẩm NaHerbs"}
+                                    </h3>
+                                    <p className="font-price-display text-price-display text-text-main mt-auto">
+                                        {formatProductPrice(product)}
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => void handleAddProduct(product)}
+                                        disabled={isAdding || isOutOfStock}
+                                        className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs disabled:cursor-not-allowed disabled:border-outline disabled:text-text-muted disabled:hover:bg-transparent"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
+                                        {isAdding ? "Đang thêm..." : "Thêm vào giỏ"}
+                                    </button>
+                                </div>
+                            </article>
+                        );
+                    })}
                 </div>
-                {/* Product 2 */}
-                <div
-                    className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow">
-                    <div className="relative aspect-square overflow-hidden bg-surface-container-low">
-                        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                            data-alt="A close-up studio shot of a soft herbal eye mask with a delicate floral pattern. The mask is laid flat on a smooth warm cream background, accompanied by a single sprig of dried lavender. The lighting is soft and shadowless, highlighting the premium quality and calming nature of the product."
-                            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBQvwT_9-iT2SOajLu-FldGTE-JS02fCYW4Vn3r6HDGFmBcZAE6J1z4YGOPZz5TFuYXNl6TxtI7FYYw8e-p0kSgd8TCry0ZfSEEWdlJTKExoQpQJEC_IskQDCVFWnzJfUEarDOkZcPk2qhcENY_ci_MusEhUOPLOsg7LMNYnCSAKGGfYs0A86_rAalkCY3Jwg7C1Xmt2xtKOj16IyETjLs3IvU1Ef23zXjwmR4eRtyupcA3jLaZEMx4bZeghMprhbXBI0wdkUio9nY')" }}>
-                        </div>
-                    </div>
-                    <div className="p-sm flex flex-col flex-grow gap-xs">
-                        <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">Túi Chườm Mắt Hương
-                            Lavender &amp; Thảo Quyết Minh</h3>
-                        <p className="font-price-display text-price-display text-text-main mt-auto">180.000đ</p>
-                        <button
-                            className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">add_shopping_cart</span> Thêm vào giỏ
-                        </button>
-                    </div>
-                </div>
-                {/* Product 3 */}
-                <div
-                    className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow">
-                    <div className="relative aspect-square overflow-hidden bg-surface-container-low">
-                        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                            data-alt="A high-quality image of a large, rectangular multi-purpose herbal heating pad. It has a natural, unbleached cotton cover. The pad is presented folded in half on a wooden surface with a soft, out-of-focus background of greenery. Earthy, organic, and comforting visual tone."
-                            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuClRWBEUV4yi6_EIQr2oLX9IdPyqCpOZoTrmR7LsFQrQQgeS9fZB-qUANmy34zDMA4-7OJt7DTem0YGYmdsdKu5K077DJya5XIQ-Bjq70AzAp9cHyvOkwYA_7SdNDtaY-AjVSwUwVVT1ELVY7sS9iQJFijRu3yI8tzU9pGRDTqoIqVcJGu0eroB2H34q-jjESBDoWzt_xM8gxHU8W-SixGuonhHoyxGkVwkkelHBWgxAcmIHaLHGza_zoGne-MK5dbfaNN85jBqtXg')" }}>
-                        </div>
-                    </div>
-                    <div className="p-sm flex flex-col flex-grow gap-xs">
-                        <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">Túi Chườm Đa Năng
-                            Bụng &amp; Lưng</h3>
-                        <p className="font-price-display text-price-display text-text-main mt-auto">420.000đ</p>
-                        <button
-                            className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">add_shopping_cart</span> Thêm vào giỏ
-                        </button>
-                    </div>
-                </div>
-                {/* Product 4 */}
-                <div
-                    className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow">
-                    <div className="relative aspect-square overflow-hidden bg-surface-container-low">
-                        <span
-                            className="absolute top-sm left-sm z-10 bg-surface text-primary px-xs py-1 rounded-full font-caption text-caption border border-border-warm">Mới</span>
-                        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                            data-alt="An elegant arrangement featuring a set of smaller herbal massage ball compresses. They are arranged on a minimalist ceramic plate alongside a small bottle of massage oil. The scene is lit with a warm, natural light creating an atmosphere of a luxury holistic spa."
-                            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDzCQwZw62I0hglOAs3IAoSmW3kupqhrDkCy-POmeYr7l2nw0YzDDf61GMar_cc4ynai-1Yt59GbzL6LwL-pOdqFzxmJQToKbBOJZP1a2DVmNF5xiz6bThlmXbFPblg_2TSUbMQn4NAXuP-XrJjllZ4y95M2KdVlBSciBebh7bjTn_qi8Ox5vqUjgYhviRF_Xw7V3fdUpR06DozgCYWFf6PbpuUElMUH3pX_cPNMP4z2lNegeXQ_3CTB472QRnEdaHhb0MGdJt3sAw')" }}>
-                        </div>
-                    </div>
-                    <div className="p-sm flex flex-col flex-grow gap-xs">
-                        <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">Bộ Bi Chườm Thảo
-                            Dược Massage</h3>
-                        <p className="font-price-display text-price-display text-text-main mt-auto">250.000đ</p>
-                        <button
-                            className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">add_shopping_cart</span> Thêm vào giỏ
-                        </button>
-                    </div>
-                </div>
-            </div>
+            )}
             <div className="flex justify-center mt-lg">
                 <button
                     className="bg-surface border-2 border-primary text-primary rounded-full px-lg py-sm font-label-md text-label-md hover:bg-primary-fixed hover:border-transparent transition-colors">

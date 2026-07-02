@@ -1,9 +1,14 @@
 import fs from 'fs';
 import path from 'path';
+import type { NextConfig } from "next";
 
-// Load variables from .env.frontend into process.env dynamically
-const envPath = path.join(process.cwd(), '.env.frontend');
-if (fs.existsSync(envPath)) {
+const envCandidates = [
+  path.resolve(process.cwd(), ".env.frontend"),
+  path.resolve(process.cwd(), "..", ".env.frontend"),
+];
+
+const envPath = envCandidates.find((candidate) => fs.existsSync(candidate));
+if (envPath) {
   const envContent = fs.readFileSync(envPath, 'utf8');
   envContent.split(/\r?\n/).forEach((line) => {
     const trimmed = line.trim();
@@ -20,8 +25,6 @@ if (fs.existsSync(envPath)) {
     }
   });
 }
-
-import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // devIndicators: false,

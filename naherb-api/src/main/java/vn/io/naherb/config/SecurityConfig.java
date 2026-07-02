@@ -23,8 +23,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
@@ -54,10 +54,6 @@ public class SecurityConfig {
 
     private final SecurityProperties properties;
 
-    /**
-     * Public chatbot APIs — no JWT filter, guests can chat without login.
-     * Must be {@link Order}(1) so it takes precedence over the main chain.
-     */
     @Bean
     @Order(1)
     SecurityFilterChain chatbotSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -110,7 +106,8 @@ public class SecurityConfig {
                                 "/api/auth/google",
                                 "/api/auth/refresh",
                                 "/api/admin/**",
-                                "/api/account/**"))
+                                "/api/account/**",
+                                "/api/v1/admin/media/**"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(cache -> cache.disable())
                 .formLogin(form -> form.disable())
@@ -136,6 +133,13 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html")
+                        .permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/products",
+                                "/api/products/**",
+                                "/api/product-categories",
+                                "/api/product-categories/**")
                         .permitAll()
                         .requestMatchers("/api/admin/auth/**")
                         .permitAll()

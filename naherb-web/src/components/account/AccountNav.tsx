@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const links = [
   { href: "/account/profile", label: "Hồ sơ cá nhân", icon: "person" },
   { href: "/account/addresses", label: "Địa chỉ giao hàng", icon: "location_on" },
+  { href: "/account/orders", label: "Đơn hàng của tôi", icon: "receipt_long" },
 ] as const;
 
 export default function AccountNav() {
@@ -14,7 +15,7 @@ export default function AccountNav() {
   return (
     <nav className="flex flex-col gap-xs">
       {links.map((link) => {
-        const active = pathname === link.href;
+        const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
         return (
           <Link
             key={link.href}
