@@ -13,10 +13,52 @@ const merriweather = Merriweather({
   subsets: ["latin", "vietnamese"],
 });
 
-export const metadata: Metadata = {
-  title: "NaHerbs",
-  description: "Wellness Management Platform",
-};
+// Fetch site info từ backend (server-side, không cần auth)
+async function fetchSiteInfo(): Promise<Record<string, string>> {
+  try {
+    const apiBase =
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+    const res = await fetch(`${apiBase}/v1/settings/site-info`, {
+      // Revalidate mỗi 1 giờ — thay đổi settings sẽ phản ánh sau tối đa 1h
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return {};
+    const json = await res.json();
+    return json?.data || json || {};
+  } catch {
+    return {};
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const info = await fetchSiteInfo();
+
+  const title = info.store_seo_title || info.store_name || "NaHerbs";
+  const description =
+    info.store_seo_description ||
+    info.store_tagline ||
+    "Thảo dược thiên nhiên cho sức khỏe của bạn";
+
+  return {
+    title: {
+      default: title,
+      // Trang con sẽ render dạng: "Tên trang | NaHerbs"
+      template: `%s | ${info.store_name || "NaHerbs"}`,
+    },
+    description,
+    openGraph: {
+      title,
+      description,
+      siteName: info.store_name || "NaHerbs",
+      locale: "vi_VN",
+      type: "website",
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import ChatbotShell from "@/components/chatbot/ChatbotShell";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRequireAuth } from "@/components/account/useRequireAuth";
-import { useCart } from "@/components/cart/CartContext";
+
 import { extractApiErrorMessage } from "@/lib/api-error";
 import { formatMoney, paymentMethodLabels } from "@/lib/order-format";
 import {
@@ -49,7 +49,7 @@ export default function CheckoutPage() {
 
 function CheckoutContent() {
   const queryClient = useQueryClient();
-  const { open: openCart } = useCart();
+
   const { isLoading: authLoading, isAuthenticated } = useRequireAuth();
   const [addressMode, setAddressMode] = useState<"saved" | "inline">("saved");
   const [selectedAddressId, setSelectedAddressId] = useState("");
@@ -90,6 +90,10 @@ function CheckoutContent() {
     if (!selectedItemIds) return allItems;
     return allItems.filter((item) => item.id && selectedItemIds.has(item.id));
   }, [allItems, selectedItemIds]);
+  const selectedSubtotal = useMemo(
+    () => items.reduce((acc, item) => acc + (item.lineTotal ?? 0), 0),
+    [items],
+  );
   const addresses = useMemo(
     () => (addressesResponse as { data?: AccountAddress[] } | undefined)?.data ?? [],
     [addressesResponse],
@@ -187,13 +191,12 @@ function CheckoutContent() {
           <Link href="/" className="font-display-lg text-display-lg text-primary">
             NaHerbs
           </Link>
-          <button
-            type="button"
-            onClick={openCart}
+          <Link
+            href="/cart"
             className="text-label-md font-label-md text-secondary hover:text-primary"
           >
             Quay lại giỏ hàng
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -434,7 +437,7 @@ function CheckoutContent() {
           </div>
           <div className="mt-md flex justify-between text-body-md font-semibold text-primary">
             <span>Tổng cộng</span>
-            <span>{formatMoney(cart?.subtotal)}</span>
+            <span>{formatMoney(selectedSubtotal)}</span>
           </div>
         </aside>
       </section>

@@ -3,7 +3,6 @@ package vn.io.naherb.setting;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +12,7 @@ import vn.io.naherb.common.entity.BaseEntity;
 @Table(name = "site_settings")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class SiteSetting extends BaseEntity {
 
     @Column(name = "setting_key", nullable = false, unique = true, length = 100)
