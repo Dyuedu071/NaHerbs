@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import vn.io.naherb.common.enums.StockStatus;
-import vn.io.naherb.product.entity.ProductSku;
 
 @Repository
 public interface ProductSkuRepository extends JpaRepository<ProductSku, UUID> {

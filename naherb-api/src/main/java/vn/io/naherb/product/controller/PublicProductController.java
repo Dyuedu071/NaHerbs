@@ -1,6 +1,4 @@
 package vn.io.naherb.product.controller;
-import vn.io.naherb.product.service.ProductService;
-import vn.io.naherb.product.entity.*;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
