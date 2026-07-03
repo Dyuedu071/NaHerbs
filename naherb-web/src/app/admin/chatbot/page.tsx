@@ -1,5 +1,6 @@
 "use client";
 
+import type { AdminChatbotConfigUpdate } from "@/lib/admin-faq";
 import AdminKnowledgePanel from "@/components/admin/AdminKnowledgePanel";
 import {
   getGetAdminChatbotConfigQueryKey,
@@ -8,10 +9,11 @@ import {
 } from "@/services/generated/admin-chatbot/admin-chatbot";
 import type { UpdateChatbotConfigRequest } from "@/services/generated/model/updateChatbotConfigRequest";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { getCsrfToken } from "@/services/csrf";
 
-interface ChatbotConfigForm extends UpdateChatbotConfigRequest {
+interface ChatbotConfigForm extends AdminChatbotConfigUpdate {
   suggestedQuestionsText: string;
 }
 
@@ -22,6 +24,7 @@ const defaultForm: ChatbotConfigForm = {
   fallbackMessage: "",
   suggestedQuestions: [],
   suggestedQuestionsText: "",
+  maxProductsPerAnswer: 3,
 };
 
 function parseSuggestedQuestions(text: string): string[] {
@@ -34,6 +37,7 @@ function parseSuggestedQuestions(text: string): string[] {
 export default function AdminChatbotConfigPage() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<ChatbotConfigForm>(defaultForm);
+  const [faqCount, setFaqCount] = useState(0);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -69,7 +73,9 @@ export default function AdminChatbotConfigPage() {
   });
 
   useEffect(() => {
-    const config = configResponse?.data as UpdateChatbotConfigRequest | undefined;
+    const config = configResponse?.data as AdminChatbotConfigUpdate & {
+      faqEntries?: unknown[];
+    };
     if (!config) {
       return;
     }
@@ -80,7 +86,9 @@ export default function AdminChatbotConfigPage() {
       fallbackMessage: config.fallbackMessage ?? "",
       suggestedQuestions: config.suggestedQuestions ?? [],
       suggestedQuestionsText: (config.suggestedQuestions ?? []).join("\n"),
+      maxProductsPerAnswer: config.maxProductsPerAnswer ?? 3,
     });
+    setFaqCount(config.faqEntries?.length ?? 0);
   }, [configResponse]);
 
   const handleSubmit = (event: FormEvent) => {
@@ -88,20 +96,21 @@ export default function AdminChatbotConfigPage() {
     setSaveMessage(null);
     setSaveError(null);
 
-    const payload: UpdateChatbotConfigRequest = {
+    const payload: AdminChatbotConfigUpdate = {
       enabled: form.enabled,
       welcomeMessage: form.welcomeMessage?.trim(),
       disclaimer: form.disclaimer?.trim(),
       fallbackMessage: form.fallbackMessage?.trim(),
       suggestedQuestions: parseSuggestedQuestions(form.suggestedQuestionsText),
+      maxProductsPerAnswer: form.maxProductsPerAnswer,
     };
 
-    saveConfig({ data: payload });
+    saveConfig({ data: payload as UpdateChatbotConfigRequest });
   };
 
   if (isLoading) {
     return (
-      <main className="mx-auto flex w-full max-w-container-max flex-1 flex-col gap-md p-gutter">
+      <main className="mx-auto flex w-full max-w-none flex-1 flex-col gap-md p-gutter">
         <p className="text-body-md text-text-muted">Đang tải cấu hình chatbot...</p>
       </main>
     );
@@ -109,7 +118,7 @@ export default function AdminChatbotConfigPage() {
 
   if (isError) {
     return (
-      <main className="mx-auto flex w-full max-w-container-max flex-1 flex-col gap-md p-gutter">
+      <main className="mx-auto flex w-full max-w-none flex-1 flex-col gap-md p-gutter">
         <p className="text-body-md text-error">
           Không thể tải cấu hình. Hãy đăng nhập bằng tài khoản admin.
         </p>
@@ -127,6 +136,24 @@ export default function AdminChatbotConfigPage() {
           Quản lý tin nhắn chào mừng, disclaimer và câu hỏi gợi ý trên widget tư vấn.
         </p>
       </div>
+
+      <Link
+        href="/admin/chatbot/faq"
+        className="flex items-center justify-between gap-md rounded-[24px] border border-herbal-beige bg-surface-container-lowest p-md shadow-ambient-sm transition-colors hover:border-primary/40 hover:bg-primary-container/10"
+      >
+        <div className="flex items-center gap-sm">
+          <span className="material-symbols-outlined text-2xl text-primary">quiz</span>
+          <div>
+            <p className="font-label-md text-label-md text-text-main">FAQ Chatbot</p>
+            <p className="font-caption text-caption text-text-muted">
+              {faqCount > 0
+                ? `Đang có ${faqCount} câu hỏi thường gặp`
+                : "Chưa có FAQ — thêm câu hỏi trả lời nhanh không qua AI"}
+            </p>
+          </div>
+        </div>
+        <span className="material-symbols-outlined text-text-muted">chevron_right</span>
+      </Link>
 
       <form
         onSubmit={handleSubmit}
@@ -198,6 +225,29 @@ export default function AdminChatbotConfigPage() {
               setForm((prev) => ({ ...prev, fallbackMessage: event.target.value }))
             }
             className="rounded-xl border border-border-warm bg-surface px-sm py-2 font-body-md text-body-md outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          />
+        </div>
+
+        <div className="flex flex-col gap-xs">
+          <label
+            htmlFor="maxProductsPerAnswer"
+            className="font-label-md text-label-md text-text-main"
+          >
+            Số sản phẩm gợi ý tối đa mỗi câu trả lời (1–5)
+          </label>
+          <input
+            id="maxProductsPerAnswer"
+            type="number"
+            min={1}
+            max={5}
+            value={form.maxProductsPerAnswer ?? 3}
+            onChange={(event) =>
+              setForm((prev) => ({
+                ...prev,
+                maxProductsPerAnswer: Number(event.target.value),
+              }))
+            }
+            className="w-32 rounded-xl border border-border-warm bg-surface px-sm py-2 font-body-md text-body-md outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           />
         </div>
 

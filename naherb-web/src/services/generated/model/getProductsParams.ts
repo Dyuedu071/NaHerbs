@@ -9,8 +9,9 @@ import type { GetProductsSort } from './getProductsSort';
 
 export type GetProductsParams = {
 keyword?: string;
-categorySlug?: string;
-need?: string;
+categorySlugs?: string[];
+minPrice?: number;
+maxPrice?: number;
 inStockOnly?: boolean;
 sort?: GetProductsSort;
 page?: number;

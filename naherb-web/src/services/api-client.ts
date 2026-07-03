@@ -1,14 +1,14 @@
-import axios, { AxiosRequestConfig } from 'axios';
-import { clearCsrfToken, getCsrfToken } from './csrf';
+import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
+import { clearCsrfToken, getCsrfToken } from "./csrf";
 
 export const AXIOS_INSTANCE = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api',
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api",
   withCredentials: true,
 });
 
 AXIOS_INSTANCE.interceptors.request.use(async (config) => {
   const method = config.method?.toLowerCase();
-  if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
+  if (method && ["post", "put", "patch", "delete"].includes(method)) {
     const csrfToken = await getCsrfToken();
     if (csrfToken) {
       config.headers = config.headers ?? {};
@@ -24,6 +24,11 @@ let failedQueue: Array<{
   reject: (reason: unknown) => void;
 }> = [];
 
+type RetriableRequestConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean;
+  _csrfRetry?: boolean;
+};
+
 const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -35,31 +40,45 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Response Interceptor tự động Refresh Token khi gặp lỗi 401 (Access Token hết hạn)
 AXIOS_INSTANCE.interceptors.response.use(
   (response) => {
     const method = response.config.method?.toLowerCase();
-    if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
+    if (method && ["post", "put", "patch", "delete"].includes(method)) {
       clearCsrfToken();
     }
     return response;
   },
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config as RetriableRequestConfig | undefined;
+    const method = originalRequest?.method?.toLowerCase();
+    const isMutation = !!method && ["post", "put", "patch", "delete"].includes(method);
 
-    // Chỉ thực hiện refresh khi trả về lỗi 401 và request chưa được thử lại lần nào (_retry)
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      // Tránh lặp vô hạn nếu các API auth trả về 401
+    if (
+      error.response?.status === 403 &&
+      originalRequest &&
+      isMutation &&
+      !originalRequest._csrfRetry
+    ) {
+      originalRequest._csrfRetry = true;
+      clearCsrfToken();
+      const csrfToken = await getCsrfToken();
+      if (csrfToken) {
+        originalRequest.headers = originalRequest.headers ?? {};
+        originalRequest.headers["X-XSRF-TOKEN"] = csrfToken;
+        return AXIOS_INSTANCE(originalRequest);
+      }
+    }
+
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       if (
-        originalRequest.url?.includes('/auth/refresh') ||
-        originalRequest.url?.includes('/auth/login') ||
-        originalRequest.url?.includes('/auth/google') ||
-        originalRequest.url?.includes('/auth/register')
+        originalRequest.url?.includes("/auth/refresh") ||
+        originalRequest.url?.includes("/auth/login") ||
+        originalRequest.url?.includes("/auth/google") ||
+        originalRequest.url?.includes("/auth/register")
       ) {
         return Promise.reject(error);
       }
 
-      // Nếu đang có một tiến trình refresh token đang chạy, xếp hàng các request sau vào hàng đợi
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -76,23 +95,20 @@ AXIOS_INSTANCE.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Gọi API làm mới token (Backend tự động ghi đè Cookie mới)
-        await AXIOS_INSTANCE.post('/auth/refresh');
+        await AXIOS_INSTANCE.post("/auth/refresh");
         isRefreshing = false;
         processQueue(null);
-
-        // Thực hiện lại request gốc ban đầu với Cookie mới
         return AXIOS_INSTANCE(originalRequest);
       } catch (refreshError) {
         isRefreshing = false;
         processQueue(refreshError, null);
 
-        // Nếu refresh thất bại, chỉ tự động chuyển hướng nếu đang ở các trang bảo mật (như /tai-khoan hoặc /admin)
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           const currentPath = window.location.pathname;
-          const isProtectedRoute = currentPath.startsWith('/tai-khoan') || currentPath.startsWith('/admin');
-          if (isProtectedRoute) {
-            window.location.href = '/dang-nhap';
+          const protectedPrefixes = ["/tai-khoan", "/checkout", "/account", "/admin"];
+          const isProtected = protectedPrefixes.some((prefix) => currentPath.startsWith(prefix));
+          if (isProtected) {
+            window.location.href = "/dang-nhap";
           }
         }
         return Promise.reject(refreshError);
@@ -100,10 +116,9 @@ AXIOS_INSTANCE.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
-// Custom instance cho Orval
 export const customInstance = <T>(
   config: AxiosRequestConfig,
   options?: AxiosRequestConfig,
@@ -118,7 +133,7 @@ export const customInstance = <T>(
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   promise.cancel = () => {
-    source.cancel('Query was cancelled');
+    source.cancel("Query was cancelled");
   };
 
   return promise;

@@ -16,7 +16,21 @@ export async function generateMetadata(
   const resolvedParams = await params;
   try {
     const rawData = await getProductsSlug(resolvedParams.slug);
-    const product = rawData as unknown as ProductDetail;
+    let product: ProductDetail | undefined = undefined;
+    if (rawData) {
+      if ('id' in rawData) {
+        product = rawData as unknown as ProductDetail;
+      } else if (typeof rawData === 'object' && 'data' in rawData && rawData.data) {
+        product = rawData.data as ProductDetail;
+      }
+    }
+
+    if (!product) {
+      return {
+        title: 'Sản phẩm không tồn tại | NaHerbs',
+      };
+    }
+
     return {
       title: product.seoTitle || `${product.name} | NaHerbs`,
       description: product.seoDescription || product.shortDescription,
@@ -31,11 +45,21 @@ export async function generateMetadata(
 export default async function ProductDetailPage({ params }: Props) {
   const resolvedParams = await params;
   
-  let product: ProductDetail;
+  let product: ProductDetail | undefined = undefined;
   try {
     const rawData = await getProductsSlug(resolvedParams.slug);
-    product = rawData as unknown as ProductDetail;
+    if (rawData) {
+      if ('id' in rawData) {
+        product = rawData as unknown as ProductDetail;
+      } else if (typeof rawData === 'object' && 'data' in rawData && rawData.data) {
+        product = rawData.data as ProductDetail;
+      }
+    }
   } catch (error) {
+    notFound();
+  }
+
+  if (!product) {
     notFound();
   }
 
@@ -60,7 +84,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Gallery Column */}
-          <div className="lg:sticky lg:top-8 h-fit">
+          <div className="lg:sticky lg:top-28 h-fit">
             <ProductGallery images={product.images || []} />
           </div>
 
@@ -74,14 +98,14 @@ export default async function ProductDetailPage({ params }: Props) {
             </p>
 
             <ProductSelection versions={product.versions || []} />
+
+            <ProductTabs 
+              detailDescription={product.detailDescription ?? undefined}
+              usageInstruction={product.usageInstruction ?? undefined}
+              safetyNote={product.safetyNote ?? undefined}
+            />
           </div>
         </div>
-
-        <ProductTabs 
-          detailDescription={product.detailDescription ?? undefined}
-          usageInstruction={product.usageInstruction ?? undefined}
-          safetyNote={product.safetyNote ?? undefined}
-        />
       </div>
     </div>
   );

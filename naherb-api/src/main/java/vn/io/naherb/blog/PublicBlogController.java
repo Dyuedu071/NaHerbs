@@ -34,4 +34,9 @@ public class PublicBlogController {
         BlogPostResponse post = blogService.getPostBySlug(slug);
         return ResponseEntity.ok(post);
     }
+
+    @GetMapping("/categories")
+    public ResponseEntity<java.util.List<vn.io.naherb.blog.dto.BlogCategoryDto>> getCategories() {
+        return ResponseEntity.ok(blogService.getAllCategories());
+    }
 }

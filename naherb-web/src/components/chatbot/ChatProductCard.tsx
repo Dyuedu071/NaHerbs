@@ -30,16 +30,13 @@ function stockLabel(status?: RecommendedProduct["stockStatus"]): string | null {
 }
 
 export default function ChatProductCard({ product }: ChatProductCardProps) {
-  const href = product.slug ? `/products/${product.slug}` : "#";
+  const href = product.slug ? `/san-pham/${product.slug}` : "#";
   const stock = stockLabel(product.stockStatus);
-  const displayName = product.skuName
-    ? `${product.name} — ${product.skuName}`
-    : product.name;
 
   return (
     <Link
       href={href}
-      className="flex gap-sm rounded-xl border border-border-warm bg-surface p-xs transition-colors hover:border-primary hover:bg-success-bg/40"
+      className="flex w-full min-w-0 max-w-full gap-sm overflow-hidden rounded-xl border border-border-warm bg-surface p-xs transition-colors hover:border-primary hover:bg-success-bg/40"
     >
       <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-border-warm bg-herbal-beige">
         {product.thumbnailUrl ? (
@@ -55,10 +52,15 @@ export default function ChatProductCard({ product }: ChatProductCardProps) {
         )}
       </div>
 
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 overflow-hidden">
         <p className="truncate font-label-md text-label-md text-text-main">
-          {displayName}
+          {product.name}
         </p>
+        {product.skuName?.trim() && product.skuName !== product.name && (
+          <p className="truncate font-caption text-caption text-text-muted">
+            {product.skuName}
+          </p>
+        )}
         {product.reason?.trim() && (
           <p className="mt-0.5 line-clamp-2 font-caption text-caption text-text-muted">
             {product.reason}

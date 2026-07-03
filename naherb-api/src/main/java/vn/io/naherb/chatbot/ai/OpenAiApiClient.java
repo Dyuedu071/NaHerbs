@@ -2,12 +2,17 @@ package vn.io.naherb.chatbot.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.MediaType;
@@ -115,6 +120,76 @@ public class OpenAiApiClient implements OpenAiClient {
             log.warn("Không thể gọi OpenAI chat completions: {}", exception.getMessage());
             throw new AiUnavailableException(
                     "Không thể gọi OpenAI chat completions: " + exception.getMessage(), exception);
+        }
+    }
+
+    @Override
+    public void chatStream(List<ChatMessage> messages, Consumer<String> onToken) {
+        ensureConfigured();
+        HttpURLConnection connection = null;
+        try {
+            List<Map<String, String>> payloadMessages = new ArrayList<>();
+            for (ChatMessage message : messages) {
+                payloadMessages.add(Map.of("role", message.role(), "content", message.content()));
+            }
+
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("model", aiProperties.getModel());
+            body.put("messages", payloadMessages);
+            body.put("temperature", 0.3);
+            body.put("stream", true);
+
+            connection = (HttpURLConnection)
+                    URI.create(aiProperties.getBaseUrl() + "/chat/completions").toURL().openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setConnectTimeout(15_000);
+            connection.setReadTimeout(90_000);
+            connection.setRequestProperty("Authorization", "Bearer " + aiProperties.getApiKey());
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "text/event-stream");
+
+            byte[] payload = objectMapper.writeValueAsBytes(body);
+            connection.getOutputStream().write(payload);
+
+            int status = connection.getResponseCode();
+            if (status >= 400) {
+                String errorBody = StreamUtils.copyToString(connection.getErrorStream(), StandardCharsets.UTF_8);
+                throw new AiUnavailableException(summarizeOpenAiError(status, errorBody));
+            }
+
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (!line.startsWith("data:")) {
+                        continue;
+                    }
+                    String data = line.substring(5).trim();
+                    if ("[DONE]".equals(data)) {
+                        break;
+                    }
+                    JsonNode content = objectMapper
+                            .readTree(data)
+                            .path("choices")
+                            .path(0)
+                            .path("delta")
+                            .path("content");
+                    if (content.isTextual()) {
+                        onToken.accept(content.asText());
+                    }
+                }
+            }
+        } catch (AiUnavailableException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            log.warn("Không thể stream OpenAI chat completions: {}", exception.getMessage());
+            throw new AiUnavailableException(
+                    "Không thể stream OpenAI chat completions: " + exception.getMessage(), exception);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 

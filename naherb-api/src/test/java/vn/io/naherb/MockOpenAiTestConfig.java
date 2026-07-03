@@ -1,6 +1,7 @@
 package vn.io.naherb;
 
 import java.util.List;
+import java.util.function.Consumer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -25,6 +26,18 @@ public class MockOpenAiTestConfig {
 
             @Override
             public String chat(List<ChatMessage> messages) {
+                return buildAnswer(messages);
+            }
+
+            @Override
+            public void chatStream(List<ChatMessage> messages, Consumer<String> onToken) {
+                String answer = buildAnswer(messages);
+                for (String chunk : answer.split("(?<=\\s)")) {
+                    onToken.accept(chunk);
+                }
+            }
+
+            private String buildAnswer(List<ChatMessage> messages) {
                 String joined = messages.stream()
                         .map(ChatMessage::content)
                         .reduce("", (left, right) -> left + " " + right)

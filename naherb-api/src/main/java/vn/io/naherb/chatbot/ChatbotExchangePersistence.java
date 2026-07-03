@@ -13,6 +13,7 @@ import vn.io.naherb.account.Account;
 import vn.io.naherb.account.AccountRepository;
 import vn.io.naherb.chatbot.dto.ChatbotMessageRequest;
 import vn.io.naherb.chatbot.dto.ChatbotMessageResponse;
+import vn.io.naherb.chatbot.dto.RecommendedProductResponse;
 import vn.io.naherb.chatbot.repository.ChatbotConversationRepository;
 import vn.io.naherb.chatbot.repository.ChatbotMessageRepository;
 import vn.io.naherb.common.enums.ChatSenderType;
@@ -37,6 +38,15 @@ class ChatbotExchangePersistence {
     @Transactional
     public ChatbotMessageResponse appendExchange(
             UUID conversationId, ChatbotMessageRequest request, String answer) {
+        return appendExchange(conversationId, request, answer, List.of());
+    }
+
+    @Transactional
+    public ChatbotMessageResponse appendExchange(
+            UUID conversationId,
+            ChatbotMessageRequest request,
+            String answer,
+            List<RecommendedProductResponse> recommendedProducts) {
         ChatbotConversation conversation = conversationRepository
                 .findById(conversationId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy hội thoại"));
@@ -44,12 +54,13 @@ class ChatbotExchangePersistence {
         String metadata = writeMetadata(request.sourcePage());
         saveMessage(conversation, ChatSenderType.USER, request.message().trim(), null);
         saveMessage(conversation, ChatSenderType.ASSISTANT, answer, metadata);
+        conversationRepository.save(conversation);
 
         return new ChatbotMessageResponse(
                 conversation.getId(),
                 answer,
                 chatbotConfigService.getDisclaimer(),
-                List.of(),
+                recommendedProducts != null ? recommendedProducts : List.of(),
                 List.of());
     }
 

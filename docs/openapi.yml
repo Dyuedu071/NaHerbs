@@ -92,13 +92,20 @@ paths:
         schema:
           type: string
       - in: query
-        name: categorySlug
+        name: categorySlugs
         schema:
-          type: string
+          type: array
+          items:
+            type: string
+        explode: true
       - in: query
-        name: need
+        name: minPrice
         schema:
-          type: string
+          type: number
+      - in: query
+        name: maxPrice
+        schema:
+          type: number
       - in: query
         name: inStockOnly
         schema:
@@ -548,6 +555,25 @@ paths:
                   properties:
                     data:
                       $ref: '#/components/schemas/ChatbotMessageResponse'
+  /chatbot/messages/stream:
+    post:
+      tags:
+      - Chatbot
+      security: []
+      summary: Stream chatbot message (SSE)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatbotMessageRequest'
+      responses:
+        '200':
+          description: Server-sent events (meta, token, done, error)
+          content:
+            text/event-stream:
+              schema:
+                type: string
   /admin/auth/login:
     post:
       tags:
@@ -1654,6 +1680,13 @@ components:
       required:
       - paymentMethod
       properties:
+        cartItemIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          nullable: true
+          description: Optional list of cart item IDs to checkout. If not provided, checks out the whole cart.
         shippingAddressId:
           type: string
           format: uuid
@@ -2183,6 +2216,25 @@ components:
             type: string
         fallbackMessage:
           type: string
+        faqEntries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatbotFaqEntry'
+        maxProductsPerAnswer:
+          type: integer
+          minimum: 1
+          maximum: 5
+    ChatbotFaqEntry:
+      type: object
+      properties:
+        question:
+          type: string
+        answer:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
     KnowledgeDocumentSummary:
       type: object
       properties:

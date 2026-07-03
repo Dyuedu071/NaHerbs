@@ -35,4 +35,17 @@ public class OrderItem extends BaseEntity {
 
     @Column(name = "line_total", nullable = false)
     private BigDecimal totalPrice;
+
+    @Column(name = "sku_name", nullable = false)
+    private String legacySkuName;
+
+    @Column(name = "total_price", nullable = false)
+    private BigDecimal legacyTotalPrice;
+
+    @PrePersist
+    @PreUpdate
+    private void syncLegacyColumns() {
+        legacySkuName = skuName;
+        legacyTotalPrice = totalPrice;
+    }
 }

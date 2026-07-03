@@ -7,6 +7,8 @@ public final class ChatbotConfigKeys {
     public static final String DISCLAIMER = "disclaimer";
     public static final String SUGGESTED_QUESTIONS = "suggestedQuestions";
     public static final String FALLBACK_MESSAGE = "fallbackMessage";
+    public static final String FAQ_ENTRIES = "faqEntries";
+    public static final String MAX_PRODUCTS_PER_ANSWER = "maxProductsPerAnswer";
 
     private ChatbotConfigKeys() {}
 }

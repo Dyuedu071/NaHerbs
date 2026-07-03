@@ -134,7 +134,7 @@ export default function AdminProducts() {
 
   return (
     <main className="flex-1 overflow-y-auto p-gutter bg-background">
-      <div className="max-w-container-max mx-auto space-y-md">
+      <div className="space-y-md">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-sm">
           <div>

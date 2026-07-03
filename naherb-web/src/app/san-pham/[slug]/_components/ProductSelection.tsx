@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ProductVersion, ProductSku } from '@/services/generated/model';
+import { useToast } from '@/contexts/ToastContext';
 
 interface ProductSelectionProps {
   versions: ProductVersion[];
@@ -12,6 +13,7 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
   const [selectedSku, setSelectedSku] = useState<ProductSku | undefined>(selectedVersion?.skus?.[0]);
   const [quantity, setQuantity] = useState(1);
 
+  const { showToast } = useToast();
   const handleVersionChange = (version: ProductVersion) => {
     setSelectedVersion(version);
     setSelectedSku(version.skus?.[0]);
@@ -22,14 +24,14 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;
-    alert(`Đã thêm ${quantity} x ${selectedSku?.name} vào giỏ hàng!`);
+    showToast(`Đã thêm ${quantity} x ${selectedSku?.name} vào giỏ hàng!`, "success");
     // TODO: Connect with postCartItems API hook here
   };
 
   if (!versions || versions.length === 0) return null;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
       <div>
         <h2 className="text-3xl font-bold text-gray-900 mb-2">
           {selectedSku?.salePrice?.toLocaleString('vi-VN')} ₫

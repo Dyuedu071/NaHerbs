@@ -1,20 +1,101 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
+import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
+
+import { extractApiErrorMessage } from '@/lib/api-error';
+import { useToast } from '@/contexts/ToastContext';
+import { formatMoney } from '@/lib/order-format';
+import { getGetCartQueryKey, usePostCartItems } from '@/services/generated/cart/cart';
+import { getProductsSlug, useGetProducts } from '@/services/generated/public-products/public-products';
+import type { ProductDetail } from '@/services/generated/model/productDetail';
+import type { ProductPage } from '@/services/generated/model/productPage';
+import type { ProductSku } from '@/services/generated/model/productSku';
+import type { ProductSummary } from '@/services/generated/model/productSummary';
+import { useQueryClient } from '@tanstack/react-query';
 import PublicHeader from '@/components/common/PublicHeader';
+import PublicFooter from '@/components/common/PublicFooter';
+
+const fallbackProductImages = [
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuCCHIGHpyiH_H6cd9_8Zslswa-mB_l-tp5H_0vn7u3WIMjMMnJY7Gl2AHTm2ZHsVUifzbG8EqLQm_Ixt9t8Vx6pOFbt6Dnyqw-ws8jjMUOL7dT-eoB0UiNVffG1mx5yV0Yt6PFc0k4DxdRLRW6XiG26G9nE62FJONsIsnH_ZG0o9R4e_TLJnVtJuj_Dbfde9XuaRyy8WboVSQRO9eDqyiGWc5DhIFUN4pvK2VY2a0BssBOHGBU4TU07jylZpmTjT4fMQUZiW3y9O4g",
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuBQvwT_9-iT2SOajLu-FldGTE-JS02fCYW4Vn3r6HDGFmBcZAE6J1z4YGOPZz5TFuYXNl6TxtI7FYYw8e-p0kSgd8TCry0ZfSEEWdlJTKExoQpQJEC_IskQDCVFWnzJfUEarDOkZcPk2qhcENY_ci_MusEhUOPLOsg7LMNYnCSAKGGfYs0A86_rAalkCY3Jwg7C1Xmt2xtKOj16IyETjLs3IvU1Ef23zXjwmR4eRtyupcA3jLaZEMx4bZeghMprhbXBI0wdkUio9nY",
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuClRWBEUV4yi6_EIQr2oLX9IdPyqCpOZoTrmR7LsFQrQQgeS9fZB-qUANmy34zDMA4-7OJt7DTem0YGYmdsdKu5K077DJya5XIQ-Bjq70AzAp9cHyvOkwYA_7SdNDtaY-AjVSwUwVVT1ELVY7sS9iQJFijRu3yI8tzU9pGRDTqoIqVcJGu0eroB2H34q-jjESBDoWzt_xM8gxHU8W-SixGuonhHoyxGkVwkkelHBWgxAcmIHaLHGza_zoGne-MK5dbfaNN85jBqtXg",
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuDzCQwZw62I0hglOAs3IAoSmW3kupqhrDkCy-POmeYr7l2nw0YzDDf61GMar_cc4ynai-1Yt59GbzL6LwL-pOdqFzxmJQToKbBOJZP1a2DVmNF5xiz6bThlmXbFPblg_2TSUbMQn4NAXuP-XrJjllZ4y95M2KdVlBSciBebh7bjTn_qi8Ox5vqUjgYhviRF_Xw7V3fdUpR06DozgCYWFf6PbpuUElMUH3pX_cPNMP4z2lNegeXQ_3CTB472QRnEdaHhb0MGdJt3sAw",
+];
+
+function findPurchasableSku(product?: ProductDetail): ProductSku | undefined {
+  return product?.versions
+    ?.flatMap((version) => version.skus ?? [])
+    .find(
+      (sku) =>
+        sku.id &&
+        sku.status === "ACTIVE" &&
+        sku.stockStatus !== "OUT_OF_STOCK" &&
+        (sku.stockQuantity ?? 0) > 0,
+    );
+}
+
+function formatProductPrice(product: ProductSummary): string {
+  if (product.minSalePrice == null && product.maxSalePrice == null) {
+    return "Liên hệ";
+  }
+  if (product.minSalePrice === product.maxSalePrice || product.maxSalePrice == null) {
+    return formatMoney(product.minSalePrice);
+  }
+  return `${formatMoney(product.minSalePrice)} - ${formatMoney(product.maxSalePrice)}`;
+}
 
 export default function Home() {
+  const queryClient = useQueryClient();
   const { open: openChatbot } = useChatbot();
+
+  const [addingProductSlug, setAddingProductSlug] = useState<string | null>(null);
+  const { data: productsResponse, isLoading: productsLoading } = useGetProducts(
+    { size: 4, inStockOnly: true, sort: "latest" },
+    { query: { retry: false } },
+  );
+  const { mutateAsync: addCartItem } = usePostCartItems();
+
+  const { showToast } = useToast();
+
+  const featuredProducts =
+    (productsResponse as { data?: ProductPage } | undefined)?.data?.items ?? [];
+
+  const handleAddProduct = async (product: ProductSummary) => {
+    if (!product.slug) {
+      showToast("Sản phẩm chưa có dữ liệu để thêm vào giỏ.", "error");
+      return;
+    }
+
+    setAddingProductSlug(product.slug);
+    try {
+      const detailResponse = await getProductsSlug(product.slug);
+      const detail = (detailResponse as { data?: ProductDetail }).data;
+      const sku = findPurchasableSku(detail);
+
+      if (!sku?.id) {
+        showToast("Sản phẩm hiện chưa có SKU còn hàng.", "error");
+        return;
+      }
+
+      await addCartItem({ data: { skuId: sku.id, quantity: 1 } });
+      await queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
+      showToast("Thêm sản phẩm vào giỏ hàng thành công!", "success");
+    } catch (addError) {
+      showToast(extractApiErrorMessage(addError), "error");
+    } finally {
+      setAddingProductSlug(null);
+    }
+  };
 
   return (
     <>
-
-    {/* TopNavBar */}
     <PublicHeader />
     <main className="flex-grow pt-24 pb-xl">
         {/* Hero Section */}
-        <section className="px-gutter max-w-container-max mx-auto py-xl">
+        <section id="about" className="px-gutter max-w-container-max mx-auto py-xl">
             <div
                 className="grid grid-cols-1 md:grid-cols-2 gap-lg items-center bg-surface-container-low rounded-[2rem] overflow-hidden border border-border-warm shadow-ambient-1">
                 <div className="p-lg md:p-xl flex flex-col items-start gap-md">
@@ -29,14 +110,14 @@ export default function Home() {
                         tại nhà với các liệu pháp chườm nóng truyền thống kết hợp hiện đại.
                     </p>
                     <div className="flex gap-sm mt-sm">
-                        <button
+                        <Link href="/san-pham"
                             className="bg-primary text-on-primary rounded-full px-md py-sm font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-all shadow-ambient-2 hover:-translate-y-0.5">
                             Khám Phá Sản Phẩm
-                        </button>
-                        <button
+                        </Link>
+                        <Link href="/#about"
                             className="border border-primary text-primary rounded-full px-md py-sm font-label-md text-label-md hover:bg-success-bg transition-colors">
                             Tìm Hiểu Thêm
-                        </button>
+                        </Link>
                     </div>
                 </div>
                 <div className="h-full min-h-[400px] w-full relative">
@@ -48,7 +129,7 @@ export default function Home() {
             </div>
         </section>
         {/* Benefit Strip */}
-        <section id="about" className="px-gutter max-w-container-max mx-auto pb-xl">
+        <section className="px-gutter max-w-container-max mx-auto pb-xl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
                 <div
                     className="bg-surface rounded-xl p-md flex items-center gap-sm border border-border-warm shadow-ambient-1">
@@ -94,10 +175,10 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
                 {/* Category 1 */}
-                <a className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
-                    href="#">
+                <Link className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
+                    href="/san-pham?need=co-vai-gay">
                     <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                        data-alt="A stylized, softly lit close-up of a person's neck and shoulders draped with a warm, natural linen herbal compress pad. The lighting is warm and comforting, suggesting a relaxing evening atmosphere. The background is a soft gradient of creamy beige and muted sage green. The overall aesthetic is modern, clean, and organic, emphasizing health and wellness."
+                        data-alt="A stylized, softly lit close-up of a person's neck and shoulders draped with a warm, natural linen herbal compress pad."
                         style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8u-Pb9_W9jEDxC9-Wh8JBusTNpvaxS_X45dZ4hPbNIdwFkW2CxiDVHGIt5I0XRglSGyfzsm-Fb0W6Hmf-cZ8QCSRJvI18aTA86ozSEYDFGAunhiyrJiJQXJpoyRUn-D9oUBgvMZ2v7alitiKvNmjD_nPOwWrfrxCpHEdlRYCQMqO70oan7jVafF0d8LiIr7RYFP0yK4tPPX6BZfnO00vvhZtnyASBGi65hfMbD3NyBQLgt0t75Ep6UpBChHony6rZxHkt2MkJols')" }}>
                     </div>
                     <div
@@ -109,12 +190,12 @@ export default function Home() {
                             Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
                         </p>
                     </div>
-                </a>
+                </Link>
                 {/* Category 2 */}
-                <a className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
-                    href="#">
+                <Link className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
+                    href="/san-pham?need=chuom-nong">
                     <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                        data-alt="A minimal, aesthetically pleasing flat lay composition featuring a rectangular herbal heating pad placed on a pristine bamboo tray. Surrounding the pad are sprigs of dried lavender, chamomile flowers, and a small ceramic bowl holding loose organic herbs. The surface is a textured warm cream linen. Lighting is bright, diffused, and natural, evoking a premium spa environment."
+                        data-alt="A minimal flat lay composition featuring a rectangular herbal heating pad on a bamboo tray."
                         style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDU7Hg-nRJRypliTAzxSs5krgiNSxMW3rKV9hWJ8vet76xLN48JzIa7vDioWHnv8HqPXkdp9G8hKpgmTglsn-P1fdgoA3CGU03pnAJ8Ujwso2DyVPuvK8VvxqhP-Fv0YDE-_8efnv3dQhvgy-kAytVJvrMnSyMksS39ZbntQm6vAbQQ59nOy6ossHCXBozSNAgw9plzyGPSTBEwb0B1aikKUUDX_lLwWNod9sFc6Z1qzlkCIGqFQiAqaiG5Hb68UqwTmdqSukSm9eU')" }}>
                     </div>
                     <div
@@ -126,12 +207,12 @@ export default function Home() {
                             Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
                         </p>
                     </div>
-                </a>
+                </Link>
                 {/* Category 3 */}
-                <a className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
-                    href="#">
+                <Link className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
+                    href="/san-pham?need=thu-gian-mat">
                     <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                        data-alt="A peaceful image showing a person lying back with their eyes closed, wearing a soft, padded herbal eye mask. The setting is deeply relaxing, with soft ambient lighting filtering through linen curtains. The color palette focuses on soft greens, warm whites, and hints of natural wood. The mood is tranquil, meditative, and organic."
+                        data-alt="A peaceful image showing a person wearing a soft herbal eye mask."
                         style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuABJZSNEW3ls3UPS_Nfv-b4r4hlwn2FmDH4ySn_3fDBPvDHygptxHFlqDpkcbFI8Obmnuk5v-35LypmsaBYp1TR8yzf8ALWhPQEdHb5bSaziowppeSB9s2Tal1v4U8bUDkhpzi9Tc4gI41cz70fQ0CiELkMq2wgbNbODO4LG-_GVxc3ibWoZmPhFJBIl-Ju5Kb2-c3koCiR4fAcUD4mZTjK4c66isWpoibanQ2bLNQhwbqIvfOcHY94rX0C2F-1Q91QGv_vbCdTIVo')" }}>
                     </div>
                     <div
@@ -143,105 +224,71 @@ export default function Home() {
                             Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
                         </p>
                     </div>
-                </a>
+                </Link>
             </div>
         </section>
         {/* Featured Products */}
         <section className="px-gutter max-w-container-max mx-auto py-xl">
             <h2 className="font-headline-lg text-headline-lg text-primary text-center mb-xl">Sản Phẩm Nổi Bật</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
-                {/* Product 1 */}
-                <div
-                    className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow">
-                    <div className="relative aspect-square overflow-hidden bg-surface-container-low">
-                        <span
-                            className="absolute top-sm left-sm z-10 bg-success-bg text-primary px-xs py-1 rounded-full font-caption text-caption border border-primary/20">Bán
-                            chạy</span>
-                        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                            data-alt="A product shot of a premium herbal neck wrap, neatly rolled and tied with a natural twine string. It rests on a clean, light beige surface with a subtle soft shadow. Minimalist aesthetic, bright studio lighting, emphasizing the natural texture of the fabric."
-                            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCCHIGHpyiH_H6cd9_8Zslswa-mB_l-tp5H_0vn7u3WIMjMMnJY7Gl2AHTm2ZHsVUifzbG8EqLQm_Ixt9t8Vx6pOFbt6Dnyqw-ws8jjMUOL7dT-eoB0UiNVffG1mx5yV0Yt6PFc0k4DxdRLRW6XiG26G9nE62FJONsIsnH_ZG0o9R4e_TLJnVtJuj_Dbfde9XuaRyy8WboVSQRO9eDqyiGWc5DhIFUN4pvK2VY2a0BssBOHGBU4TU07jylZpmTjT4fMQUZiW3y9O4g')" }}>
-                        </div>
-                    </div>
-                    <div className="p-sm flex flex-col flex-grow gap-xs">
-                        <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">Đai Chườm Nóng Cổ
-                            Vai Gáy Thảo Dược</h3>
-                        <p className="font-price-display text-price-display text-text-main mt-auto">350.000đ</p>
-                        <button
-                            className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">add_shopping_cart</span> Thêm vào giỏ
-                        </button>
-                    </div>
+
+            {productsLoading ? (
+                <p className="text-center text-body-md text-text-muted">Đang tải sản phẩm...</p>
+            ) : featuredProducts.length === 0 ? (
+                <p className="text-center text-body-md text-text-muted">Chưa có sản phẩm còn hàng để hiển thị.</p>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+                    {featuredProducts.map((product, index) => {
+                        const imageUrl = product.thumbnailUrl ?? fallbackProductImages[index % fallbackProductImages.length];
+                        const isAdding = addingProductSlug === product.slug;
+                        const isOutOfStock = product.stockStatus === "OUT_OF_STOCK";
+
+                        return (
+                            <article
+                                key={product.id ?? product.slug ?? product.name}
+                                className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow"
+                            >
+                                <div className="relative aspect-square overflow-hidden bg-surface-container-low">
+                                    {index === 0 && (
+                                        <span className="absolute top-sm left-sm z-10 bg-success-bg text-primary px-xs py-1 rounded-full font-caption text-caption border border-primary/20">
+                                            Bán chạy
+                                        </span>
+                                    )}
+                                    <div
+                                        className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
+                                        style={{ backgroundImage: `url('${imageUrl}')` }}
+                                    />
+                                </div>
+                                <div className="p-sm flex flex-col flex-grow gap-xs">
+                                    <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">
+                                        {product.name ?? "Sản phẩm NaHerbs"}
+                                    </h3>
+                                    <p className="font-price-display text-price-display text-text-main mt-auto">
+                                        {formatProductPrice(product)}
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => void handleAddProduct(product)}
+                                        disabled={isAdding || isOutOfStock}
+                                        className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs disabled:cursor-not-allowed disabled:border-outline disabled:text-text-muted disabled:hover:bg-transparent"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
+                                        {isAdding ? "Đang thêm..." : "Thêm vào giỏ"}
+                                    </button>
+                                </div>
+                            </article>
+                        );
+                    })}
                 </div>
-                {/* Product 2 */}
-                <div
-                    className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow">
-                    <div className="relative aspect-square overflow-hidden bg-surface-container-low">
-                        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                            data-alt="A close-up studio shot of a soft herbal eye mask with a delicate floral pattern. The mask is laid flat on a smooth warm cream background, accompanied by a single sprig of dried lavender. The lighting is soft and shadowless, highlighting the premium quality and calming nature of the product."
-                            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBQvwT_9-iT2SOajLu-FldGTE-JS02fCYW4Vn3r6HDGFmBcZAE6J1z4YGOPZz5TFuYXNl6TxtI7FYYw8e-p0kSgd8TCry0ZfSEEWdlJTKExoQpQJEC_IskQDCVFWnzJfUEarDOkZcPk2qhcENY_ci_MusEhUOPLOsg7LMNYnCSAKGGfYs0A86_rAalkCY3Jwg7C1Xmt2xtKOj16IyETjLs3IvU1Ef23zXjwmR4eRtyupcA3jLaZEMx4bZeghMprhbXBI0wdkUio9nY')" }}>
-                        </div>
-                    </div>
-                    <div className="p-sm flex flex-col flex-grow gap-xs">
-                        <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">Túi Chườm Mắt Hương
-                            Lavender &amp; Thảo Quyết Minh</h3>
-                        <p className="font-price-display text-price-display text-text-main mt-auto">180.000đ</p>
-                        <button
-                            className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">add_shopping_cart</span> Thêm vào giỏ
-                        </button>
-                    </div>
-                </div>
-                {/* Product 3 */}
-                <div
-                    className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow">
-                    <div className="relative aspect-square overflow-hidden bg-surface-container-low">
-                        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                            data-alt="A high-quality image of a large, rectangular multi-purpose herbal heating pad. It has a natural, unbleached cotton cover. The pad is presented folded in half on a wooden surface with a soft, out-of-focus background of greenery. Earthy, organic, and comforting visual tone."
-                            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuClRWBEUV4yi6_EIQr2oLX9IdPyqCpOZoTrmR7LsFQrQQgeS9fZB-qUANmy34zDMA4-7OJt7DTem0YGYmdsdKu5K077DJya5XIQ-Bjq70AzAp9cHyvOkwYA_7SdNDtaY-AjVSwUwVVT1ELVY7sS9iQJFijRu3yI8tzU9pGRDTqoIqVcJGu0eroB2H34q-jjESBDoWzt_xM8gxHU8W-SixGuonhHoyxGkVwkkelHBWgxAcmIHaLHGza_zoGne-MK5dbfaNN85jBqtXg')" }}>
-                        </div>
-                    </div>
-                    <div className="p-sm flex flex-col flex-grow gap-xs">
-                        <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">Túi Chườm Đa Năng
-                            Bụng &amp; Lưng</h3>
-                        <p className="font-price-display text-price-display text-text-main mt-auto">420.000đ</p>
-                        <button
-                            className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">add_shopping_cart</span> Thêm vào giỏ
-                        </button>
-                    </div>
-                </div>
-                {/* Product 4 */}
-                <div
-                    className="bg-surface rounded-xl border border-herbal-beige overflow-hidden shadow-ambient-1 group flex flex-col hover:shadow-ambient-2 transition-shadow">
-                    <div className="relative aspect-square overflow-hidden bg-surface-container-low">
-                        <span
-                            className="absolute top-sm left-sm z-10 bg-surface text-primary px-xs py-1 rounded-full font-caption text-caption border border-border-warm">Mới</span>
-                        <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                            data-alt="An elegant arrangement featuring a set of smaller herbal massage ball compresses. They are arranged on a minimalist ceramic plate alongside a small bottle of massage oil. The scene is lit with a warm, natural light creating an atmosphere of a luxury holistic spa."
-                            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDzCQwZw62I0hglOAs3IAoSmW3kupqhrDkCy-POmeYr7l2nw0YzDDf61GMar_cc4ynai-1Yt59GbzL6LwL-pOdqFzxmJQToKbBOJZP1a2DVmNF5xiz6bThlmXbFPblg_2TSUbMQn4NAXuP-XrJjllZ4y95M2KdVlBSciBebh7bjTn_qi8Ox5vqUjgYhviRF_Xw7V3fdUpR06DozgCYWFf6PbpuUElMUH3pX_cPNMP4z2lNegeXQ_3CTB472QRnEdaHhb0MGdJt3sAw')" }}>
-                        </div>
-                    </div>
-                    <div className="p-sm flex flex-col flex-grow gap-xs">
-                        <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">Bộ Bi Chườm Thảo
-                            Dược Massage</h3>
-                        <p className="font-price-display text-price-display text-text-main mt-auto">250.000đ</p>
-                        <button
-                            className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs">
-                            <span className="material-symbols-outlined text-sm">add_shopping_cart</span> Thêm vào giỏ
-                        </button>
-                    </div>
-                </div>
-            </div>
+            )}
             <div className="flex justify-center mt-lg">
-                <Link
-                    href="/san-pham"
+                <Link href="/san-pham"
                     className="bg-surface border-2 border-primary text-primary rounded-full px-lg py-sm font-label-md text-label-md hover:bg-primary-fixed hover:border-transparent transition-colors">
                     Xem Tất Cả Sản Phẩm
                 </Link>
             </div>
         </section>
         {/* AI Advisor Section */}
-        <section id="contact" className="bg-surface-container my-xl">
+        <section className="bg-surface-container my-xl">
             <div
                 className="px-gutter max-w-container-max mx-auto py-xl flex flex-col md:flex-row items-center gap-xl relative">
                 <div className="w-full md:w-1/2 relative">
@@ -281,67 +328,7 @@ export default function Home() {
             </div>
         </section>
     </main>
-    {/* Footer */}
-    <footer className="w-full pt-xl pb-md bg-primary dark:bg-on-primary-fixed-variant">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto">
-            {/* Brand Column */}
-            <div className="flex flex-col gap-sm">
-                <a className="font-display-lg text-display-lg text-on-primary" href="#">NaHerbs</a>
-                <p className="font-body-md text-body-md text-on-primary/80 mt-xs">
-                    Giải pháp thư giãn và phục hồi năng lượng từ thảo dược thiên nhiên, mang spa về ngôi nhà của bạn.
-                </p>
-            </div>
-            {/* Links Column 1 */}
-            <div className="flex flex-col gap-sm">
-                <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Product Categories</h4>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Cổ Vai Gáy</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Chườm Lưng Bụng</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Thư Giãn Mắt</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Phụ Kiện Thảo Dược</a>
-            </div>
-            {/* Links Column 2 */}
-            <div className="flex flex-col gap-sm">
-                <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Support Links</h4>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Hướng dẫn sử dụng</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Chính sách đổi trả</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">Chính sách bảo mật</a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed w-fit"
-                    href="#">FAQ</a>
-            </div>
-            {/* Contact Column */}
-            <div className="flex flex-col gap-sm">
-                <h4 className="font-headline-md text-headline-md text-on-primary mb-xs text-xl">Liên Hệ</h4>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed flex items-center gap-xs"
-                    href="#">
-                    <span className="material-symbols-outlined text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>phone</span> Hotline: 1900 xxxx
-                </a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed flex items-center gap-xs"
-                    href="#">
-                    <span className="material-symbols-outlined text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>forum</span> Zalo: NaHerbs Official
-                </a>
-                <a className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors focus:outline-none focus:ring-2 focus:ring-tertiary-fixed flex items-center gap-xs"
-                    href="#">
-                    <span className="material-symbols-outlined text-sm"
-                        style={{ fontVariationSettings: "'FILL' 1" }}>mail</span> Email: care@naherbs.vn
-                </a>
-            </div>
-        </div>
-        <div
-            className="px-gutter max-w-container-max mx-auto mt-xl pt-md border-t border-on-primary/20 flex flex-col md:flex-row justify-between items-center">
-            <p className="font-caption text-caption text-on-primary/60">
-                © 2024 NaHerbs. All rights reserved.
-            </p>
-        </div>
-    </footer>
+    <PublicFooter />
     </>
   );
 }

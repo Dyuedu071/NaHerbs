@@ -154,11 +154,12 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public SessionResult login(LoginRequest request, String existingRefreshToken) {
-        String email = normalizeEmail(request.email());
+        String login = request.login().trim();
         authenticationManager.authenticate(
-                UsernamePasswordAuthenticationToken.unauthenticated(email, request.password()));
+                UsernamePasswordAuthenticationToken.unauthenticated(login, request.password()));
 
-        Account account = findByEmail(email);
+        Account account = accountRepository.findByEmailOrPhone(login)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy tài khoản"));
         refreshTokenService.revoke(existingRefreshToken);
         return createSession(account, refreshTokenService.issue(account.getEmail()));
     }

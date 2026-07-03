@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useToast } from '@/contexts/ToastContext';
 import { AXIOS_INSTANCE } from '@/services/api-client';
 
 const RichTextEditor = dynamic(() => import('@/components/common/RichTextEditor'), {
@@ -12,8 +13,11 @@ const RichTextEditor = dynamic(() => import('@/components/common/RichTextEditor'
 });
 
 
-export default function CreatePost() {
+function CreatePostContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get('draftId') || searchParams.get('id');
+
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [content, setContent] = useState('');
@@ -38,11 +42,7 @@ export default function CreatePost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Custom Notifications & Modals
-  const [toast, setToast] = useState<{message: string, type: 'success'|'error'} | null>(null);
-  const showToast = (message: string, type: 'success' | 'error' = 'error') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  const { showToast } = useToast();
 
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [draftData, setDraftData] = useState<any>(null);
@@ -73,14 +73,16 @@ export default function CreatePost() {
 
   useEffect(() => {
     // Check for draft
-    const savedDraft = localStorage.getItem('naherb_draft_post');
-    if (savedDraft) {
-      try {
-        const parsed = JSON.parse(savedDraft);
-        setDraftData(parsed);
-        setShowDraftModal(true);
-      } catch (e) {
-        localStorage.removeItem('naherb_draft_post');
+    if (!editId) {
+      const savedDraft = localStorage.getItem('naherb_draft_post');
+      if (savedDraft) {
+        try {
+          const parsed = JSON.parse(savedDraft);
+          setDraftData(parsed);
+          setShowDraftModal(true);
+        } catch (e) {
+          localStorage.removeItem('naherb_draft_post');
+        }
       }
     }
 
@@ -102,10 +104,42 @@ export default function CreatePost() {
       }
     };
     fetchData();
-  }, []);
+  }, [editId]);
+
+  // Fetch existing post data for editing
+  useEffect(() => {
+    if (!editId) return;
+
+    const fetchPost = async () => {
+      try {
+        const res = await AXIOS_INSTANCE.get(`/v1/admin/blog/${editId}`);
+        const post = res.data?.data || res.data;
+        if (post) {
+          setTitle(post.title || '');
+          setSlug(post.slug || '');
+          setContent(post.content || '');
+          setSeoTitle(post.seoTitle || '');
+          setSeoDescription(post.seoDescription || '');
+          setCategoryId(post.category?.id || '');
+          setThumbnailMediaId(post.thumbnailMediaId || null);
+          setThumbnailUrl(post.thumbnailUrl || '');
+          if (post.products) {
+            setProductIds(post.products.map((p: any) => p.id));
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching post:', err);
+        showToast('Không thể tải thông tin bài viết để chỉnh sửa.', 'error');
+      }
+    };
+
+    fetchPost();
+  }, [editId]);
 
   // Auto-save effect
   useEffect(() => {
+    if (editId) return; // Do not auto-save draft when editing database posts
+
     // Prevent saving empty draft immediately on mount if it's a new post
     if (!title && !content && !categoryId && productIds.length === 0 && !thumbnailMediaId) {
       return;
@@ -119,7 +153,7 @@ export default function CreatePost() {
     }, 1000); // 1-second debounce
 
     return () => clearTimeout(timer);
-  }, [title, slug, content, seoTitle, seoDescription, categoryId, productIds, thumbnailMediaId, thumbnailUrl]);
+  }, [title, slug, content, seoTitle, seoDescription, categoryId, productIds, thumbnailMediaId, thumbnailUrl, editId]);
 
   // Derived state for filtered lists
   const filteredCategories = categories.filter(c => c.name.toLowerCase().includes(categorySearch.toLowerCase()));
@@ -212,7 +246,7 @@ export default function CreatePost() {
 
     setIsSubmitting(true);
     try {
-      await AXIOS_INSTANCE.post('/v1/admin/blog', {
+      const payload = {
         title,
         slug,
         content,
@@ -223,12 +257,19 @@ export default function CreatePost() {
         thumbnailMediaId,
         categoryId: categoryId ? categoryId : null,
         productIds
-      });
+      };
+
+      if (editId) {
+        await AXIOS_INSTANCE.put(`/v1/admin/blog/${editId}`, payload);
+        showToast(status === 'DRAFT' ? "Đã cập nhật bản nháp thành công!" : "Đã cập nhật và xuất bản bài viết!", "success");
+      } else {
+        await AXIOS_INSTANCE.post('/v1/admin/blog', payload);
+        showToast(status === 'DRAFT' ? "Đã lưu nháp thành công!" : "Đã xuất bản bài viết!", "success");
+      }
       localStorage.removeItem('naherb_draft_post');
-      showToast(status === 'DRAFT' ? "Đã lưu nháp thành công!" : "Đã xuất bản bài viết!", "success");
       setTimeout(() => router.push('/admin/posts'), 1000);
     } catch (error: any) {
-      console.error("Error creating post:", error);
+      console.error("Error submitting post:", error);
       if (error.response?.status === 409) {
         showToast("Lỗi: Đường dẫn tĩnh (Slug) đã tồn tại. Vui lòng đổi slug khác.", "error");
       } else if (error.response?.data?.message) {
@@ -245,13 +286,7 @@ export default function CreatePost() {
   const handlePublish = async () => submitPost('PUBLISHED');
 
   return (
-    <main className="flex-1 p-gutter max-w-container-max mx-auto w-full flex flex-col gap-md pb-xl relative">
-      {/* Toast Notification */}
-      {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-ambient-lg text-label-md font-label-md text-white transition-all transform duration-300 ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
-          {toast.message}
-        </div>
-      )}
+    <main className="flex-1 p-gutter w-full flex gap-xl relative">
 
       {/* Draft Restore Modal */}
       {showDraftModal && (
@@ -282,7 +317,9 @@ export default function CreatePost() {
           <Link href="/admin/posts" className="w-10 h-10 flex items-center justify-center rounded-full text-text-muted hover:bg-surface-variant transition-colors">
             <span className="material-symbols-outlined">arrow_back</span>
           </Link>
-          <h1 className="text-headline-md font-headline-md text-primary">Tạo bài viết mới</h1>
+          <h1 className="text-headline-md font-headline-md text-primary">
+            {editId ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}
+          </h1>
         </div>
         <div className="flex gap-sm">
           <button 
@@ -481,5 +518,13 @@ export default function CreatePost() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CreatePost() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center text-text-muted">Đang tải...</div>}>
+      <CreatePostContent />
+    </Suspense>
   );
 }

@@ -70,8 +70,8 @@
   --spacing-base: 4px;
   --spacing-md: 24px;
   --spacing-lg: 48px;
-  --spacing-gutter: 32px;
-  --spacing-container-max: 1240px;
+  --spacing-gutter: 40px;
+  --spacing-container-max: 1536px;
   --spacing-xl: 80px;
 
   --font-body-lg: var(--font-inter), sans-serif;

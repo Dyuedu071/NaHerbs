@@ -57,7 +57,7 @@ public class BlogServiceTest {
         });
 
         // Act
-        BlogPost result = blogService.createPost(validRequest);
+        vn.io.naherb.blog.dto.BlogPostResponse result = blogService.createPost(validRequest);
 
         // Assert
         assertNotNull(result);
@@ -78,7 +78,7 @@ public class BlogServiceTest {
         });
 
         // Act
-        BlogPost result = blogService.createPost(validRequest);
+        vn.io.naherb.blog.dto.BlogPostResponse result = blogService.createPost(validRequest);
 
         // Assert
         assertEquals("bai-viet-test-2", result.getSlug());
