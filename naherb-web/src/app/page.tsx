@@ -25,18 +25,6 @@ const fallbackProductImages = [
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDzCQwZw62I0hglOAs3IAoSmW3kupqhrDkCy-POmeYr7l2nw0YzDDf61GMar_cc4ynai-1Yt59GbzL6LwL-pOdqFzxmJQToKbBOJZP1a2DVmNF5xiz6bThlmXbFPblg_2TSUbMQn4NAXuP-XrJjllZ4y95M2KdVlBSciBebh7bjTn_qi8Ox5vqUjgYhviRF_Xw7V3fdUpR06DozgCYWFf6PbpuUElMUH3pX_cPNMP4z2lNegeXQ_3CTB472QRnEdaHhb0MGdJt3sAw",
 ];
 
-function findPurchasableSku(product?: ProductDetail): ProductSku | undefined {
-  return product?.versions
-    ?.flatMap((version) => version.skus ?? [])
-    .find(
-      (sku) =>
-        sku.id &&
-        sku.status === "ACTIVE" &&
-        sku.stockStatus !== "OUT_OF_STOCK" &&
-        (sku.stockQuantity ?? 0) > 0,
-    );
-}
-
 function formatProductPrice(product: ProductSummary): string {
   if (product.minSalePrice == null) {
     return "Liên hệ";
@@ -48,43 +36,14 @@ export default function Home() {
   const queryClient = useQueryClient();
   const { open: openChatbot } = useChatbot();
 
-  const [addingProductSlug, setAddingProductSlug] = useState<string | null>(null);
   const { data: productsResponse, isLoading: productsLoading } = useGetProducts(
     { size: 4, inStockOnly: true, sort: "latest" },
     { query: { retry: false } },
   );
-  const { mutateAsync: addCartItem } = usePostCartItems();
-
-  const { showToast } = useToast();
 
   const featuredProducts = (productsResponse as any)?.items ?? [];
 
-  const handleAddProduct = async (product: ProductSummary) => {
-    if (!product.slug) {
-      showToast("Sản phẩm chưa có dữ liệu để thêm vào giỏ.", "error");
-      return;
-    }
 
-    setAddingProductSlug(product.slug);
-    try {
-      const detailResponse = await getProductsSlug(product.slug);
-      const detail = detailResponse as unknown as ProductDetail;
-      const sku = findPurchasableSku(detail);
-
-      if (!sku?.id) {
-        showToast("Sản phẩm hiện chưa có SKU còn hàng.", "error");
-        return;
-      }
-
-      await addCartItem({ data: { skuId: sku.id, quantity: 1 } });
-      await queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
-      showToast("Thêm sản phẩm vào giỏ hàng thành công!", "success");
-    } catch (addError) {
-      showToast(extractApiErrorMessage(addError), "error");
-    } finally {
-      setAddingProductSlug(null);
-    }
-  };
 
   return (
     <>
@@ -235,8 +194,6 @@ export default function Home() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
                     {featuredProducts.map((product: ProductSummary, index: number) => {
                         const imageUrl = product.thumbnailUrl ?? fallbackProductImages[index % fallbackProductImages.length];
-                        const isAdding = addingProductSlug === product.slug;
-                        const isOutOfStock = product.stockStatus === "OUT_OF_STOCK";
 
                         return (
                             <article
@@ -258,18 +215,37 @@ export default function Home() {
                                     <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">
                                         {product.name ?? "Sản phẩm NaHerbs"}
                                     </h3>
-                                    <p className="font-price-display text-price-display text-text-main mt-auto">
-                                        {formatProductPrice(product)}
-                                    </p>
-                                    <button
-                                        type="button"
-                                        onClick={() => void handleAddProduct(product)}
-                                        disabled={isAdding || isOutOfStock}
-                                        className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs disabled:cursor-not-allowed disabled:border-outline disabled:text-text-muted disabled:hover:bg-transparent"
+                                    <div className="mt-auto">
+                                        {(product.maxSalePrice && product.minSalePrice && product.maxSalePrice > product.minSalePrice) ? (
+                                            <div className="flex items-center gap-1 mb-0.5">
+                                                <span className="text-caption text-text-muted line-through">
+                                                    {formatMoney(product.maxSalePrice)}
+                                                </span>
+                                                <span className="text-[10px] font-bold text-error bg-error-container px-1.5 py-0.5 rounded">
+                                                    -{Math.round((1 - product.minSalePrice / product.maxSalePrice) * 100)}%
+                                                </span>
+                                            </div>
+                                        ) : (product.originalPrice && product.minSalePrice && product.originalPrice > product.minSalePrice) ? (
+                                            <div className="flex items-center gap-1 mb-0.5">
+                                                <span className="text-caption text-text-muted line-through">
+                                                    {formatMoney(product.originalPrice)}
+                                                </span>
+                                                <span className="text-[10px] font-bold text-error bg-error-container px-1.5 py-0.5 rounded">
+                                                    -{Math.round((1 - product.minSalePrice / product.originalPrice) * 100)}%
+                                                </span>
+                                            </div>
+                                        ) : null}
+                                        <p className="font-price-display text-price-display text-text-main">
+                                            {formatProductPrice(product)}
+                                        </p>
+                                    </div>
+                                    <Link
+                                        href={`/san-pham/${product.slug}`}
+                                        className="mt-xs w-full py-2 rounded-full font-label-md text-label-md border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors flex justify-center items-center gap-xs"
                                     >
-                                        <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
-                                        {isAdding ? "Đang thêm..." : "Thêm vào giỏ"}
-                                    </button>
+                                        <span className="material-symbols-outlined text-sm">visibility</span>
+                                        Xem chi tiết
+                                    </Link>
                                 </div>
                             </article>
                         );
