@@ -17,6 +17,7 @@ export default function ProductGallery({ images, activeSkuUrl }: ProductGalleryP
   // Sync active image when activeSkuUrl changes
   useEffect(() => {
     if (activeSkuUrl) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveImage(activeSkuUrl);
     }
   }, [activeSkuUrl]);

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Về NaHerbs - Tinh hoa thảo dược thiên nhiên</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&amp;family=Inter:wght@400;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#45664f",
+                        "on-tertiary-fixed": "#341100",
+                        "primary-fixed-dim": "#acd0ad",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f9f3e7",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#abcfb4",
+                        "on-surface": "#1d1c14",
+                        "background": "#fff9ed",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e8e2d6",
+                        "tertiary-fixed-dim": "#ffb692",
+                        "text-main": "#2B2B2B",
+                        "primary-container": "#4f6f52",
+                        "surface-dim": "#dfd9ce",
+                        "surface-container-high": "#ede8dc",
+                        "inverse-primary": "#acd0ad",
+                        "on-surface-variant": "#424841",
+                        "error-bg": "#FBEAE5",
+                        "secondary-container": "#c7eccf",
+                        "outline-variant": "#c2c8bf",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#c7eccf",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#333028",
+                        "herbal-beige": "#E8D8BD",
+                        "surface": "#fff9ed",
+                        "surface-bright": "#fff9ed",
+                        "success-bg": "#E7F0E4",
+                        "soft-sage": "#A8BFA3",
+                        "border-warm": "#DDD0BC",
+                        "tertiary-container": "#9c542d",
+                        "outline": "#737971",
+                        "on-primary-container": "#ccf0cc",
+                        "text-muted": "#6F6A61",
+                        "primary-fixed": "#c8ecc8",
+                        "on-tertiary-container": "#ffe1d3",
+                        "on-background": "#1d1c14",
+                        "tertiary-fixed": "#ffdbcb",
+                        "primary": "#37563b",
+                        "on-primary-fixed": "#03210b",
+                        "error-text": "#B94A3A",
+                        "on-secondary-fixed-variant": "#2e4d39",
+                        "on-secondary-fixed": "#012110",
+                        "tertiary": "#7e3d18",
+                        "surface-tint": "#466649",
+                        "surface-variant": "#e8e2d6",
+                        "on-secondary-container": "#4b6c55",
+                        "on-primary-fixed-variant": "#2f4e33",
+                        "inverse-on-surface": "#f6f0e4",
+                        "error": "#ba1a1a",
+                        "earth-brown": "#8A6A4F",
+                        "surface-container": "#f3ede1",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#733510",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "24px", // Customizing based on brand anchor
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "lg": "48px",
+                        "container-max": "1240px",
+                        "base": "4px",
+                        "xl": "80px",
+                        "xs": "8px",
+                        "sm": "16px",
+                        "gutter": "32px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Merriweather"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Merriweather"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["56px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-md": ["15px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["40px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "1.35", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            background-color: #fff9ed;
+            /* warm cream */
+            color: #1d1c14;
+        }
+
+        .organic-blur {
+            background: radial-gradient(circle at 50% 50%, rgba(172, 208, 173, 0.2) 0%, transparent 70%);
+        }
+
+        .tonal-shadow {
+            box-shadow: 0 10px 30px -10px rgba(69, 102, 79, 0.15);
+        }
+    </style>
+</head>
+
+<body class="font-body-md bg-background overflow-x-hidden">
+    <!-- TopNavBar -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/88 backdrop-blur-md shadow-sm">
+        <div class="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
+            <!-- Brand Logo -->
+            <div class="font-display-lg text-display-lg text-primary flex items-center gap-2">
+                NaHerbs
+            </div>
+            <!-- Navigation Links -->
+            <div class="hidden md:flex gap-lg items-center">
+                <a class="font-label-md text-label-md text-secondary hover:text-primary transition-all duration-200"
+                    href="#">Home</a>
+                <a class="font-label-md text-label-md text-secondary hover:text-primary transition-all duration-200"
+                    href="#">Products</a>
+                <a class="font-label-md text-label-md text-secondary hover:text-primary transition-all duration-200"
+                    href="#">Blog</a>
+                <a class="font-label-md text-label-md text-primary font-bold relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-soft-sage after:rounded-full"
+                    href="#">About</a>
+                <a class="font-label-md text-label-md text-secondary hover:text-primary transition-all duration-200"
+                    href="#">Contact</a>
+            </div>
+            <!-- Trailing Actions -->
+            <div class="flex items-center gap-md">
+                <div class="hidden md:flex items-center bg-surface-container rounded-full px-sm py-xs">
+                    <span class="material-symbols-outlined text-secondary text-[20px]">search</span>
+                    <span class="ml-2 text-text-muted text-caption">Tìm kiếm...</span>
+                </div>
+                <button
+                    class="material-symbols-outlined text-primary p-2 hover:bg-primary-fixed rounded-full transition-colors">shopping_cart</button>
+                <button
+                    class="material-symbols-outlined text-primary p-2 hover:bg-primary-fixed rounded-full transition-colors">account_circle</button>
+                <button
+                    class="hidden lg:block bg-primary text-on-primary font-label-md text-label-md px-md py-xs rounded-full hover:scale-105 transition-transform duration-200 active:scale-95">
+                    Tư vấn ngay
+                </button>
+            </div>
+        </div>
+    </nav>
+    <main class="mt-20">
+        <!-- Hero Section -->
+        <section class="relative min-h-[716px] flex items-center overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent z-10">
+                </div>
+                <div class="w-full h-full bg-cover bg-center opacity-40"
+                    data-alt="A lush, serene medicinal herb garden at sunrise, with soft golden light filtering through sage green leaves and delicate white blossoms. The style is professional architectural photography with a focus on macro botanical details and a minimalist, clean aesthetic that feels organic and spa-like."
+                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBBhOtjBYaaMC3LTXP8UABhgHPLmet9ZhG8C1r04hIlukYA1aPvaRhsXzIXQmX4V-XGPKEZgjOeMp_eG7OKhp4UlGeF1sLWTz9hnpR1B8npPOOdjEjHrvBqGRDv-1JmTIcLfSbNd6pvgcRslpjAuyyK12xh_5FJbNTprMb6nky_nJsg425ZmHY75uGeizMKbKIGSRI-Y9R1VOrrQiFj_WKUQKRA3yrb810Ee8N7gjadqvKXSOBol1_hMID-Gmls9PHjLDBQzdPv0jQ')">
+                </div>
+            </div>
+            <div class="max-w-container-max mx-auto px-gutter relative z-20">
+                <div class="max-w-2xl">
+                    <h1 class="font-display-lg text-display-lg text-primary mb-sm">Về NaHerbs</h1>
+                    <p class="font-headline-lg text-secondary opacity-90 leading-tight">
+                        Tinh hoa thảo dược, chăm sóc sức khỏe từ thiên nhiên
+                    </p>
+                    <div class="mt-lg flex gap-md">
+                        <div class="w-12 h-[2px] bg-soft-sage self-center"></div>
+                        <p class="font-body-lg text-on-surface-variant max-w-md italic">
+                            Chúng tôi tin rằng mẹ thiên nhiên luôn nắm giữ những bí mật tuyệt vời nhất để duy trì vẻ đẹp
+                            và sức khỏe bền vững.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Brand Story Section -->
+        <section class="py-xl max-w-container-max mx-auto px-gutter">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
+                <div class="relative">
+                    <div class="rounded-xl overflow-hidden tonal-shadow border border-herbal-beige/30">
+                        <img class="w-full aspect-[4/5] object-cover"
+                            data-alt="A close-up artistic shot of a traditional herbalist's workspace, featuring aged wooden textures, bundles of dried lavender and rosemary, and a ceramic mortar and pestle. The lighting is soft and warm, highlighting the tactile nature of the ingredients and creating a sense of heritage and artisanal craftsmanship."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwE9_UxJnKtVCN7DhEkUPPA-zJ2nALbTnyP74xPQpkES0IdNXoCpFIeACHjBrYf7pMN8sMd-0j5KsecYRPZiKMfdcXeq0aq_pkRMEml3L4i-wJnDbP3aOfwjjPiZsBYBHqGORA0kZ4YVDJWM4_S8tRwAAp5h1Fda19wk-jbVoYL03TbHfxk-W84OXeqIxr1RZWKHkGEhZk_lYqy3UVTixZpDHBO_wlJR1Y50hP72hZe7tfnlh0QcCcaK__WVlQjsEwA1mk5i94qps" />
+                    </div>
+                    <div
+                        class="absolute -bottom-md -right-md bg-primary-container p-md rounded-xl text-on-primary-container shadow-lg hidden md:block">
+                        <span class="font-display-lg text-display-lg block">10+</span>
+                        <span class="font-label-md">Năm kinh nghiệm</span>
+                    </div>
+                </div>
+                <div class="space-y-md">
+                    <span class="font-label-md text-primary uppercase tracking-widest">Câu chuyện thương hiệu</span>
+                    <h2 class="font-headline-lg text-primary">Về NaHerbs</h2>
+                    <p class="font-body-lg text-on-surface-variant">
+                        NaHerbs là thương hiệu chăm sóc sức khỏe cá nhân và gia đình, mang đến những giá trị tuyệt vời
+                        từ thảo dược tự nhiên. Chúng tôi tận tâm phát triển các sản phẩm an toàn, hiệu quả, đáp ứng nhu
+                        cầu chăm sóc sức khỏe toàn diện trong cuộc sống hiện đại.
+                    </p>
+                    <div class="pt-md">
+                        <button
+                            class="border border-primary text-primary font-label-md px-md py-xs rounded-full hover:bg-primary hover:text-on-primary transition-all duration-300">
+                            Khám phá quy trình
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Mission & Vision Section -->
+        <section class="py-xl bg-surface-container/50">
+            <div class="max-w-container-max mx-auto px-gutter">
+                <div class="text-center mb-xl max-w-2xl mx-auto">
+                    <h2 class="font-headline-lg text-primary mb-md">Tầm nhìn &amp; Sứ mệnh</h2>
+                    <p class="font-body-md text-on-surface-variant">Định hướng phát triển bền vững vì sức khỏe cộng đồng
+                        và sự cân bằng của hệ sinh thái.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+                    <!-- Vision Card -->
+                    <div
+                        class="bg-white p-lg rounded-xl tonal-shadow border border-herbal-beige/20 group hover:-translate-y-2 transition-transform duration-300">
+                        <div
+                            class="w-16 h-16 bg-success-bg rounded-full flex items-center justify-center mb-md group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-primary text-[32px]">visibility</span>
+                        </div>
+                        <h3 class="font-headline-md text-primary mb-sm">Tầm nhìn</h3>
+                        <p class="font-body-lg text-on-surface-variant">
+                            Đến năm 2029, NaHerbs hướng tới trở thành thương hiệu Việt Nam hàng đầu trong lĩnh vực chăm
+                            sóc sức khỏe tự nhiên, vươn tầm quốc tế với những sản phẩm chất lượng và uy tín.
+                        </p>
+                    </div>
+                    <!-- Mission Card -->
+                    <div
+                        class="bg-white p-lg rounded-xl tonal-shadow border border-herbal-beige/20 group hover:-translate-y-2 transition-transform duration-300">
+                        <div
+                            class="w-16 h-16 bg-secondary-container/30 rounded-full flex items-center justify-center mb-md group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-primary text-[32px]">eco</span>
+                        </div>
+                        <h3 class="font-headline-md text-primary mb-sm">Sứ mệnh</h3>
+                        <p class="font-body-lg text-on-surface-variant">
+                            Sứ mệnh của NaHerbs là mang đến những giải pháp chăm sóc sức khỏe từ thảo dược an toàn, hiệu
+                            quả, góp phần nâng cao chất lượng cuộc sống và bảo vệ sức khỏe cho mọi gia đình.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 4R Core Values Section -->
+        <section class="py-xl max-w-container-max mx-auto px-gutter">
+            <div class="text-center mb-xl">
+                <h2 class="font-headline-lg text-primary">Giá trị cốt lõi 4R</h2>
+                <div class="w-20 h-1 bg-soft-sage mx-auto mt-sm"></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+                <!-- Responsibility -->
+                <div class="text-center group">
+                    <div
+                        class="w-20 h-20 mx-auto bg-primary rounded-2xl flex items-center justify-center text-on-primary mb-md rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                        <span class="material-symbols-outlined text-[36px]">shield_with_heart</span>
+                    </div>
+                    <h4 class="font-label-md text-headline-md text-primary mb-xs">Responsibility</h4>
+                    <p class="font-body-md text-on-surface-variant">Cam kết sản phẩm an toàn, lối sống lành mạnh.</p>
+                </div>
+                <!-- Respectability -->
+                <div class="text-center group">
+                    <div
+                        class="w-20 h-20 mx-auto bg-primary rounded-2xl flex items-center justify-center text-on-primary mb-md -rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                        <span class="material-symbols-outlined text-[36px]">verified</span>
+                    </div>
+                    <h4 class="font-label-md text-headline-md text-primary mb-xs">Respectability</h4>
+                    <p class="font-body-md text-on-surface-variant">Trân trọng thảo dược Việt, nguyên liệu chất lượng.
+                    </p>
+                </div>
+                <!-- Renovation -->
+                <div class="text-center group">
+                    <div
+                        class="w-20 h-20 mx-auto bg-primary rounded-2xl flex items-center justify-center text-on-primary mb-md rotate-6 group-hover:rotate-0 transition-transform duration-300">
+                        <span class="material-symbols-outlined text-[36px]">lightbulb</span>
+                    </div>
+                    <h4 class="font-label-md text-headline-md text-primary mb-xs">Renovation</h4>
+                    <p class="font-body-md text-on-surface-variant">Nghiên cứu cải tiến, kết hợp thảo dược và thiết kế
+                        hiện đại.</p>
+                </div>
+                <!-- Reliability -->
+                <div class="text-center group">
+                    <div
+                        class="w-20 h-20 mx-auto bg-primary rounded-2xl flex items-center justify-center text-on-primary mb-md -rotate-6 group-hover:rotate-0 transition-transform duration-300">
+                        <span class="material-symbols-outlined text-[36px]">handshake</span>
+                    </div>
+                    <h4 class="font-label-md text-headline-md text-primary mb-xs">Reliability</h4>
+                    <p class="font-body-md text-on-surface-variant">Xây dựng niềm tin qua chất lượng và dịch vụ tận tâm.
+                    </p>
+                </div>
+            </div>
+        </section>
+        <!-- Product Philosophy Section -->
+        <section class="py-xl mb-xl">
+            <div class="max-w-container-max mx-auto px-gutter">
+                <div class="bg-primary rounded-xl p-lg md:p-xl relative overflow-hidden">
+                    <!-- Subtle background decoration -->
+                    <div class="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
+                        <span class="material-symbols-outlined text-[400px] absolute -top-20 -right-20">spa</span>
+                    </div>
+                    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-5 gap-lg items-center">
+                        <div class="lg:col-span-3">
+                            <span class="font-label-md text-primary-fixed uppercase tracking-widest mb-xs block">Triết
+                                lý sản phẩm</span>
+                            <h2 class="font-display-lg text-on-primary mb-md text-[42px]">100% Thuần khiết &amp; Thủ
+                                công</h2>
+                            <p class="font-body-lg text-on-primary/80 mb-lg">
+                                Chúng tôi từ chối các thành phần hóa học độc hại. Mỗi sản phẩm của NaHerbs là sự kết hợp
+                                hoàn hảo giữa phương pháp thủ công tỉ mỉ và tiêu chuẩn vệ sinh hiện đại, đảm bảo giữ
+                                trọn vẹn hoạt tính sinh học của dược liệu.
+                            </p>
+                            <div class="grid grid-cols-2 gap-md">
+                                <div class="flex items-center gap-xs text-on-primary">
+                                    <span class="material-symbols-outlined text-soft-sage"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    <span class="font-label-md">Không paraben</span>
+                                </div>
+                                <div class="flex items-center gap-xs text-on-primary">
+                                    <span class="material-symbols-outlined text-soft-sage"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    <span class="font-label-md">Không hương liệu tổng hợp</span>
+                                </div>
+                                <div class="flex items-center gap-xs text-on-primary">
+                                    <span class="material-symbols-outlined text-soft-sage"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    <span class="font-label-md">Nguyên liệu canh tác hữu cơ</span>
+                                </div>
+                                <div class="flex items-center gap-xs text-on-primary">
+                                    <span class="material-symbols-outlined text-soft-sage"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    <span class="font-label-md">Quy trình khép kín</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2">
+                            <div class="aspect-square rounded-xl overflow-hidden border-4 border-white/20 tonal-shadow">
+                                <img class="w-full h-full object-cover"
+                                    data-alt="A cinematic close-up of clear glass dropper bottles containing golden herbal oil, placed on a light wood surface alongside fresh mint leaves and dried botanical elements. The composition is clean and premium, emphasizing the product's purity and the handcrafted quality of the brand."
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkzyx12B4fNeHc_Xa5LNAKoPQAJv3qoQfqFnr2HkPiE8vLjbeS5JDtAV7M2fImvg2vXVYcE2zwgpwjDXGkmBxqpHja2A9_z_ur2GRStWpfBj4zTpe6XvrExKI_SFtR9-XONCgluGaIZlHSAk4NXpp6iy_wZgE7Xs96O5duX5QU5ZIQmDsMammm5x-lkQNYyQ2ifKKaYtDhSqBszo0d-fONnvtZfHllyYGcTPmRhyqdq0bJ_LfzhNwRVvjmycqZ8PmEWQ6EBaLdoms" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-primary dark:bg-on-primary-fixed-variant w-full pt-xl pb-md">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter max-w-container-max mx-auto text-on-primary">
+            <!-- Brand Column -->
+            <div class="space-y-md">
+                <div class="font-display-lg text-display-lg text-on-primary">NaHerbs</div>
+                <p class="font-body-md text-on-primary/80">Mang tinh hoa thảo dược Việt vào đời sống hiện đại. Chăm sóc
+                    sức khỏe và vẻ đẹp bền vững từ gốc.</p>
+            </div>
+            <!-- Links Column 1 -->
+            <div>
+                <h5 class="font-headline-md text-on-primary mb-md text-lg">Danh mục sản phẩm</h5>
+                <ul class="space-y-xs">
+                    <li><a class="font-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Trà thảo mộc</a></li>
+                    <li><a class="font-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Tinh dầu nguyên chất</a></li>
+                    <li><a class="font-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Mỹ phẩm thiên nhiên</a></li>
+                    <li><a class="font-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Thực phẩm bảo vệ sức khỏe</a></li>
+                </ul>
+            </div>
+            <!-- Links Column 2 -->
+            <div>
+                <h5 class="font-headline-md text-on-primary mb-md text-lg">Hỗ trợ khách hàng</h5>
+                <ul class="space-y-xs">
+                    <li><a class="font-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Chính sách vận chuyển</a></li>
+                    <li><a class="font-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Chính sách đổi trả</a></li>
+                    <li><a class="font-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Hướng dẫn mua hàng</a></li>
+                    <li><a class="font-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors"
+                            href="#">Câu hỏi thường gặp</a></li>
+                </ul>
+            </div>
+            <!-- Contact Column -->
+            <div>
+                <h5 class="font-headline-md text-on-primary mb-md text-lg">Liên hệ</h5>
+                <ul class="space-y-xs font-body-md">
+                    <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">call</span>
+                        Hotline: 1900 1234</li>
+                    <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">chat</span>
+                        Zalo: NaHerbs Official</li>
+                    <li class="flex items-center gap-xs"><span class="material-symbols-outlined text-sm">mail</span>
+                        Email: contact@naherbs.com</li>
+                    <li class="mt-md flex gap-sm">
+                        <a class="w-10 h-10 bg-on-primary/10 rounded-full flex items-center justify-center hover:bg-on-primary/20 transition-colors"
+                            href="#">
+                            <span class="material-symbols-outlined">public</span>
+                        </a>
+                        <a class="w-10 h-10 bg-on-primary/10 rounded-full flex items-center justify-center hover:bg-on-primary/20 transition-colors"
+                            href="#">
+                            <span class="material-symbols-outlined">alternate_email</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-container-max mx-auto px-gutter mt-xl pt-md border-t border-on-primary/10">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-md">
+                <p class="font-label-md text-on-primary/60">© 2024 NaHerbs. All rights reserved.</p>
+                <div class="flex gap-md">
+                    <a class="font-label-md text-on-primary/60 hover:text-on-primary" href="#">Privacy Policy</a>
+                    <a class="font-label-md text-on-primary/60 hover:text-on-primary" href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- AI Advisor Floating Button -->
+    <div class="fixed bottom-gutter right-gutter z-50">
+        <button
+            class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform active:scale-95 group relative">
+            <span class="material-symbols-outlined text-[32px]">psychology</span>
+            <div
+                class="absolute right-full mr-md bg-white text-primary px-sm py-xs rounded-lg tonal-shadow font-label-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-herbal-beige/30">
+                Tư vấn sức khỏe AI
+            </div>
+        </button>
+    </div>
+    <script>
+        // Micro-interactions and scroll effects
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-md');
+                nav.classList.remove('shadow-sm');
+            } else {
+                nav.classList.add('shadow-sm');
+                nav.classList.remove('shadow-md');
+            }
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section > div').forEach(el => {
+            el.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>

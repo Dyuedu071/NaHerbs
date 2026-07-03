@@ -29,7 +29,7 @@ export default function PublicFooter() {
                 <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors w-fit"
                     href="/tin-tuc">Tin tức & Blog</Link>
                 <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors w-fit"
-                    href="/#about">Giới thiệu NaHerbs</Link>
+                    href="/gioi-thieu">Giới thiệu NaHerbs</Link>
                 <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors w-fit"
                     href="/#contact">Liên hệ</Link>
                 <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors w-fit"

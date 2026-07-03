@@ -11,7 +11,11 @@ export default function ProductSortBar() {
     const params = new URLSearchParams(searchParams.toString());
     params.set('sort', e.target.value);
     params.set('page', '0');
-    router.push(`/san-pham?${params.toString()}`);
+    
+    const newQueryString = params.toString();
+    if (newQueryString !== searchParams.toString()) {
+      router.push(`/san-pham?${newQueryString}`, { scroll: false });
+    }
   };
 
   return (

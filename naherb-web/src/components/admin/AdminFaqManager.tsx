@@ -37,6 +37,7 @@ function FaqFormModal({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft(modal.entry);
     setError(null);
   }, [modal]);
@@ -175,6 +176,7 @@ export default function AdminFaqManager() {
     if (!config) {
       return;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEntries(faqEntriesToForm(config.faqEntries ?? []));
     setIsDirty(false);
   }, [configResponse]);
