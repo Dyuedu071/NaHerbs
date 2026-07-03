@@ -31,7 +31,7 @@ export default function PublicFooter() {
                 <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors w-fit"
                     href="/gioi-thieu">Giới thiệu NaHerbs</Link>
                 <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors w-fit"
-                    href="/#contact">Liên hệ</Link>
+                    href="/lien-he">Liên hệ</Link>
                 <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors w-fit"
                     href="/dang-nhap">Đăng nhập / Đăng ký</Link>
             </div>
