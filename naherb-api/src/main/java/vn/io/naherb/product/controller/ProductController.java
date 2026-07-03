@@ -75,6 +75,12 @@ public class ProductController {
         return ApiResponse.ok(null);
     }
 
+    @org.springframework.web.bind.annotation.PatchMapping("/{productId}/restore")
+    public ApiResponse<Object> restoreProduct(@PathVariable UUID productId) {
+        productService.restoreProduct(productId);
+        return ApiResponse.ok(null);
+    }
+
     // ─── Version endpoints ────────────────────────────────────────
 
     @GetMapping("/{productId}/versions")
@@ -95,6 +101,14 @@ public class ProductController {
             @PathVariable UUID productId,
             @PathVariable UUID versionId) {
         productService.deleteVersion(versionId);
+        return ApiResponse.ok(null);
+    }
+
+    @org.springframework.web.bind.annotation.PatchMapping("/{productId}/versions/{versionId}/restore")
+    public ApiResponse<Object> restoreVersion(
+            @PathVariable UUID productId,
+            @PathVariable UUID versionId) {
+        productService.restoreVersion(versionId);
         return ApiResponse.ok(null);
     }
 

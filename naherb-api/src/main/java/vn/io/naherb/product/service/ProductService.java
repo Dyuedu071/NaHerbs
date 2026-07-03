@@ -246,6 +246,21 @@ public class ProductService {
     public Product updateProduct(UUID productId, UpsertProductRequest request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
+        
+        if (request.getStatus() == ContentStatus.PUBLISHED) {
+            List<ProductVersion> versions = versionRepository.findByProductIdOrderByDisplayOrderAsc(productId);
+            List<ProductSku> skus = skuRepository.findByProductId(productId);
+            
+            boolean hasActive = skus.stream().anyMatch(sku -> 
+                sku.getStatus() == SkuStatus.ACTIVE && 
+                versions.stream().anyMatch(v -> v.getId().equals(sku.getVersion().getId()) && v.getStatus() == ContentStatus.PUBLISHED)
+            );
+            
+            if (!hasActive) {
+                throw new vn.io.naherb.exception.BadRequestException("Không thể chuyển sang trạng thái Đang bán vì không có Phiên bản hoặc SKU nào đang hoạt động.");
+            }
+        }
+        
         mapRequestToProduct(request, product);
         product = productRepository.save(product);
         handleProductImages(product, request.getImages());
@@ -256,6 +271,14 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
         product.setStatus(ContentStatus.ARCHIVED);
+        productRepository.save(product);
+    }
+
+    @Transactional
+    public void restoreProduct(UUID productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
+        product.setStatus(ContentStatus.DRAFT);
         productRepository.save(product);
     }
 
@@ -389,11 +412,32 @@ public class ProductService {
     public void deleteVersion(UUID versionId) {
         ProductVersion version = versionRepository.findById(versionId)
                 .orElseThrow(() -> new NotFoundException("Phiên bản không tồn tại"));
-        
+
+        // Soft-delete: archive the version and deactivate all its child SKUs
+        version.setStatus(ContentStatus.ARCHIVED);
+        versionRepository.save(version);
+
         List<ProductSku> skus = skuRepository.findByVersionId(versionId);
-        skuRepository.deleteAll(skus);
-        
-        versionRepository.delete(version);
+        skus.forEach(s -> s.setStatus(SkuStatus.INACTIVE));
+        skuRepository.saveAll(skus);
+    }
+
+    @Transactional
+    public void restoreVersion(UUID versionId) {
+        ProductVersion version = versionRepository.findById(versionId)
+                .orElseThrow(() -> new NotFoundException("Phiên bản không tồn tại"));
+
+        version.setStatus(ContentStatus.PUBLISHED);
+        versionRepository.save(version);
+
+        // Reactivate child SKUs that were deactivated by the archive
+        List<ProductSku> skus = skuRepository.findByVersionId(versionId);
+        skus.forEach(s -> {
+            if (s.getStatus() == SkuStatus.INACTIVE) {
+                s.setStatus(SkuStatus.ACTIVE);
+            }
+        });
+        skuRepository.saveAll(skus);
     }
 
     // ─── SKU management ──────────────────────────────────────────────────────
@@ -444,7 +488,17 @@ public class ProductService {
     public void deleteSku(UUID skuId) {
         ProductSku sku = skuRepository.findById(skuId)
                 .orElseThrow(() -> new NotFoundException("SKU không tồn tại"));
-        skuRepository.delete(sku);
+        // Soft-delete: mark as INACTIVE instead of removing from DB
+        sku.setStatus(SkuStatus.INACTIVE);
+        skuRepository.save(sku);
+    }
+
+    @Transactional
+    public void restoreSku(UUID skuId) {
+        ProductSku sku = skuRepository.findById(skuId)
+                .orElseThrow(() -> new NotFoundException("SKU không tồn tại"));
+        sku.setStatus(SkuStatus.ACTIVE);
+        skuRepository.save(sku);
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────────

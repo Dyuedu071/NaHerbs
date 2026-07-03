@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { ProductPage, ProductCategorySummary } from '@/services/generated/model';
 import { getProducts, getProductCategories } from '@/services/generated/public-products/public-products';
 import ProductCard from '@/components/ProductCard';
@@ -111,28 +112,30 @@ export default async function ProductsPage({
                 <div className="text-center py-24 bg-surface-container-lowest rounded-2xl shadow-[0_4px_20px_-2px_rgba(46,77,57,0.12)] border border-border-warm flex flex-col items-center justify-center">
                   <span className="material-symbols-outlined text-[64px] text-text-muted opacity-40 mb-sm">inventory_2</span>
                   <p className="text-on-surface-variant font-label-md text-label-md">Không tìm thấy sản phẩm nào phù hợp với bộ lọc hiện tại.</p>
-                  <a href="/san-pham" className="mt-md text-primary hover:underline font-label-md transition-colors">
+                  <Link href="/san-pham" scroll={false} className="mt-md text-primary hover:underline font-label-md transition-colors">
                     Xóa bộ lọc
-                  </a>
+                  </Link>
                 </div>
               )}
 
               {/* Pagination */}
-              {totalPages > 1 && (
+              {totalPages > 0 && (
                 <div className="mt-xl flex justify-center items-center gap-2">
-                  <a 
+                  <Link 
                     href={currentPage > 0 ? generatePaginationUrl(currentPage - 1) : '#'} 
-                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${currentPage > 0 ? 'text-text-main hover:bg-surface-variant hover:text-primary' : 'text-text-muted cursor-not-allowed'}`}
+                    scroll={false}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${currentPage > 0 ? 'text-text-main hover:bg-surface-variant hover:text-primary' : 'text-text-muted opacity-50 cursor-default pointer-events-none'}`}
                     aria-label="Trang trước"
                     aria-disabled={currentPage === 0}
                   >
                     <span className="material-symbols-outlined text-[20px]">chevron_left</span>
-                  </a>
+                  </Link>
 
                   {Array.from({ length: totalPages }).map((_, i) => (
-                    <a
+                    <Link
                       key={i}
                       href={generatePaginationUrl(i)}
+                      scroll={false}
                       className={`w-10 h-10 flex items-center justify-center rounded-full font-label-md transition-colors ${
                         i === currentPage
                           ? 'bg-primary text-white shadow-md'
@@ -140,17 +143,18 @@ export default async function ProductsPage({
                       }`}
                     >
                       {i + 1}
-                    </a>
+                    </Link>
                   ))}
 
-                  <a 
+                  <Link 
                     href={currentPage < totalPages - 1 ? generatePaginationUrl(currentPage + 1) : '#'} 
-                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${currentPage < totalPages - 1 ? 'text-text-main hover:bg-surface-variant hover:text-primary' : 'text-text-muted cursor-not-allowed'}`}
+                    scroll={false}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${currentPage < totalPages - 1 ? 'text-text-main hover:bg-surface-variant hover:text-primary' : 'text-text-muted opacity-50 cursor-default pointer-events-none'}`}
                     aria-label="Trang sau"
                     aria-disabled={currentPage === totalPages - 1}
                   >
                     <span className="material-symbols-outlined text-[20px]">chevron_right</span>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

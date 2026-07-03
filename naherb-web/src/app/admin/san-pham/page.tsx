@@ -2,8 +2,11 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useMutation } from '@tanstack/react-query';
 import { useGetAdminProducts, useDeleteAdminProductsProductId } from '@/services/generated/admin-products/admin-products';
 import { useGetProductCategories } from '@/services/generated/public-products/public-products';
+import { customInstance } from '@/services/api-client';
+import toast from 'react-hot-toast';
 
 // Define structure for display products
 interface ProductItem {
@@ -27,21 +30,56 @@ export default function AdminProducts() {
   const { data: backendData, isLoading, refetch } = useGetAdminProducts();
   const { data: categoriesData } = useGetProductCategories();
   const deleteMutation = useDeleteAdminProductsProductId();
+  const restoreMutation = useMutation({
+    mutationFn: (productId: string) =>
+      customInstance({ url: `/v1/admin/products/${productId}/restore`, method: 'PATCH' }),
+    onSuccess: () => { toast.success('Khôi phục sản phẩm thành công'); refetch(); },
+    onError: () => toast.error('Lỗi khi khôi phục sản phẩm'),
+  });
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa (lưu trữ) sản phẩm này?')) {
-      try {
-        await deleteMutation.mutateAsync({ productId: id });
-        refetch();
-      } catch (e) {
-        console.error(e);
-        alert('Có lỗi xảy ra khi xóa sản phẩm');
-      }
-    }
+  // Confirmation modal state
+  const [confirmModal, setConfirmModal] = useState<{
+    title: string;
+    message: string;
+    productName?: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const handleDelete = (id: string, name: string) => {
+    setConfirmModal({
+      title: 'Lưu trữ sản phẩm',
+      message: 'Sản phẩm sẽ được chuyển sang trạng thái “Lưu trữ” và không hiển thị trên gian hàng. Bạn có thể khôi phục sau.',
+      productName: name,
+      onConfirm: async () => {
+        try {
+          await deleteMutation.mutateAsync({ productId: id });
+          refetch();
+        } catch (e) {
+          console.error(e);
+        }
+      },
+    });
   };
+
+  const handleRestore = (id: string, name: string) => {
+    setConfirmModal({
+      title: 'Khôi phục sản phẩm',
+      message: 'Sản phẩm sẽ được chuyển về trạng thái “Nháp” và có thể xuất bản lại bình thường.',
+      productName: name,
+      onConfirm: () => restoreMutation.mutate(id),
+    });
+  };
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'active' | 'lowstock' | 'hidden'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'active' | 'lowstock' | 'hidden' | 'archived'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
+
+  // Reset page whenever filters change
+  const handleTabChange = (tab: typeof activeTab) => { setActiveTab(tab); setCurrentPage(1); };
+  const handleSearchChange = (q: string) => { setSearchQuery(q); setCurrentPage(1); };
+  const handleCategoryChange = (cat: string) => { setSelectedCategory(cat); setCurrentPage(1); };
 
   const rawData = (backendData as any)?.data || backendData;
   const apiProducts = Array.isArray(rawData) ? rawData : (rawData?.items || []);
@@ -66,7 +104,8 @@ export default function AdminProducts() {
       stockStatus = 'lowstock';
     }
 
-    const isHidden = p.status === 'DRAFT' || p.status === 'ARCHIVED' || p.status === 'HIDDEN';
+    const isHidden = p.status === 'DRAFT' || p.status === 'HIDDEN';
+    const isArchived = p.status === 'ARCHIVED';
     
     return {
       id: p.id || `api-prod-${idx}`,
@@ -80,8 +119,8 @@ export default function AdminProducts() {
       stock: p.totalStockQuantity ?? (isOutOfStock ? 0 : 50),
       stockText,
       stockStatus,
-      status: isHidden ? "hidden" : "active",
-      statusText: isHidden ? "Đã ẩn" : "Đang bán",
+      status: isArchived ? 'archived' : (isHidden ? 'hidden' : 'active'),
+      statusText: isArchived ? 'Lưu trữ' : (isHidden ? 'Đã ẩn' : 'Đang bán'),
       imageUrl: p.thumbnailUrl || ""
     };
   });
@@ -127,13 +166,99 @@ export default function AdminProducts() {
       matchesTab = product.stockStatus === 'lowstock' || product.stockStatus === 'outofstock';
     } else if (activeTab === 'hidden') {
       matchesTab = product.status === 'hidden';
+    } else if (activeTab === 'archived') {
+      matchesTab = (product.status as any) === 'archived';
     }
+    // 'all' tab shows every status
 
     return matchesSearch && matchesTab;
   });
 
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedProducts = filteredProducts.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  // Build page number list with smart ellipsis
+  const buildPageNumbers = (total: number, current: number): (number | '...')[] => {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const pages: (number | '...')[] = [1];
+    if (current > 3) pages.push('...');
+    for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) pages.push(p);
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+    return pages;
+  };
+
   return (
     <main className="flex-1 overflow-y-auto p-gutter bg-background">
+
+      {/* ── Confirmation Modal ──────────────────────────────────────────── */}
+      {confirmModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-delete-title"
+        >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-200"
+            onClick={() => setConfirmModal(null)}
+          />
+
+          {/* Card */}
+          <div className="relative z-10 bg-surface-container-lowest rounded-2xl border border-border-warm shadow-ambient-lg w-full max-w-md p-6 animate-in zoom-in-95 fade-in duration-200">
+            {/* Icon */}
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 mx-auto mb-4">
+              <span className="material-symbols-outlined text-2xl text-amber-600">archive</span>
+            </div>
+
+            {/* Title */}
+            <h2
+              id="confirm-delete-title"
+              className="text-title-md font-title-md text-on-surface text-center mb-1"
+            >
+              {confirmModal.title}
+            </h2>
+
+            {/* Product name highlight */}
+            {confirmModal.productName && (
+              <p className="text-label-md font-label-md text-primary text-center mb-3 truncate px-4">
+                &ldquo;{confirmModal.productName}&rdquo;
+              </p>
+            )}
+
+            {/* Message */}
+            <p className="text-body-sm text-text-muted text-center leading-relaxed mb-6">
+              {confirmModal.message}
+            </p>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmModal(null)}
+                className="flex-1 px-4 py-2.5 rounded-full border border-border-warm text-text-main hover:bg-surface-container transition-colors text-label-md font-label-md"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                disabled={deleteMutation.isPending}
+                onClick={() => {
+                  confirmModal.onConfirm();
+                  setConfirmModal(null);
+                }}
+                className="flex-1 px-4 py-2.5 rounded-full bg-amber-600 text-white hover:bg-amber-700 active:scale-[0.98] transition-all text-label-md font-label-md flex items-center justify-center gap-1.5 shadow-ambient-md disabled:opacity-60"
+              >
+                <span className="material-symbols-outlined text-[16px]">archive</span>
+                Lưu trữ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-md">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-sm">
@@ -166,14 +291,14 @@ export default function AdminProducts() {
                 placeholder="Tìm kiếm tên sản phẩm, SKU..."
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
               />
             </div>
             <div className="relative">
               <select
                 className="appearance-none h-[42px] pl-4 pr-10 py-2 bg-background border border-border-warm rounded-lg focus:outline-none focus:border-primary text-body-md text-text-main cursor-pointer"
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e) => handleCategoryChange(e.target.value)}
               >
                 <option value="">Tất cả danh mục</option>
                 {categoryOptions.map((cat) => (
@@ -189,7 +314,7 @@ export default function AdminProducts() {
           </div>
           <div className="flex gap-2 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 hide-scrollbar">
             <button
-              onClick={() => setActiveTab('all')}
+              onClick={() => handleTabChange('all')}
               className={`px-4 py-1.5 rounded-full text-label-md font-label-md whitespace-nowrap transition-colors ${
                 activeTab === 'all'
                   ? 'bg-secondary-container/30 text-primary border border-primary/20'
@@ -199,7 +324,7 @@ export default function AdminProducts() {
               Tất cả ({categoryFilteredProducts.length})
             </button>
             <button
-              onClick={() => setActiveTab('active')}
+              onClick={() => handleTabChange('active')}
               className={`px-4 py-1.5 rounded-full text-label-md font-label-md whitespace-nowrap transition-colors ${
                 activeTab === 'active'
                   ? 'bg-secondary-container/30 text-primary border border-primary/20'
@@ -209,7 +334,7 @@ export default function AdminProducts() {
               Đang bán ({categoryFilteredProducts.filter(p => p.status === 'active' && p.stockStatus !== 'outofstock').length})
             </button>
             <button
-              onClick={() => setActiveTab('lowstock')}
+              onClick={() => handleTabChange('lowstock')}
               className={`px-4 py-1.5 rounded-full text-label-md font-label-md whitespace-nowrap transition-colors ${
                 activeTab === 'lowstock'
                   ? 'bg-secondary-container/30 text-primary border border-primary/20'
@@ -219,7 +344,7 @@ export default function AdminProducts() {
               Hết hàng/Sắp hết ({categoryFilteredProducts.filter(p => p.stockStatus === 'lowstock' || p.stockStatus === 'outofstock').length})
             </button>
             <button
-              onClick={() => setActiveTab('hidden')}
+              onClick={() => handleTabChange('hidden')}
               className={`px-4 py-1.5 rounded-full text-label-md font-label-md whitespace-nowrap transition-colors ${
                 activeTab === 'hidden'
                   ? 'bg-secondary-container/30 text-primary border border-primary/20'
@@ -227,6 +352,16 @@ export default function AdminProducts() {
               }`}
             >
               Nháp/Đã ẩn ({categoryFilteredProducts.filter(p => p.status === 'hidden').length})
+            </button>
+            <button
+              onClick={() => handleTabChange('archived')}
+              className={`px-4 py-1.5 rounded-full text-label-md font-label-md whitespace-nowrap transition-colors ${
+                activeTab === 'archived'
+                  ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                  : 'bg-transparent text-text-muted border border-transparent hover:bg-surface-container'
+              }`}
+            >
+              Đã lưu trữ ({categoryFilteredProducts.filter(p => (p.status as any) === 'archived').length})
             </button>
           </div>
         </div>
@@ -268,7 +403,7 @@ export default function AdminProducts() {
                     </td>
                   </tr>
                 ) : (
-                  filteredProducts.map((product) => (
+                  paginatedProducts.map((product) => (
                     <tr key={product.id} className="hover:bg-surface/50 transition-colors group">
                       <td className="py-3 px-4">
                         <input
@@ -341,7 +476,7 @@ export default function AdminProducts() {
                       </td>
                       <td className="py-3 px-4">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-caption border ${
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-caption border whitespace-nowrap ${
                             product.status === 'active'
                               ? 'bg-success-bg text-primary border-primary/10'
                               : 'bg-surface-variant text-text-muted border-border-warm'
@@ -367,11 +502,21 @@ export default function AdminProducts() {
                             <span className="material-symbols-outlined text-[20px]">edit</span>
                           </Link>
                           <button
-                            onClick={() => handleDelete(product.id)}
+                            onClick={() => handleDelete(product.id, product.name)}
+                            title="Lưu trữ sản phẩm"
                             className="p-1.5 text-text-muted hover:text-error rounded-lg hover:bg-error-bg transition-colors"
                           >
-                            <span className="material-symbols-outlined text-[20px]">delete</span>
+                            <span className="material-symbols-outlined text-[20px]">archive</span>
                           </button>
+                          {(product.status as any) === 'archived' && (
+                            <button
+                              onClick={() => handleRestore(product.id, product.name)}
+                              title="Khôi phục sản phẩm"
+                              className="p-1.5 text-text-muted hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-[20px]">restore</span>
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -380,40 +525,62 @@ export default function AdminProducts() {
               </tbody>
             </table>
           </div>
-          {/* Pagination */}
-          <div
-            className="p-4 border-t border-border-warm flex items-center justify-between text-caption text-text-muted"
-          >
-            <div>
-              Hiển thị 1-{filteredProducts.length} trong số {filteredProducts.length} sản phẩm
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                className="p-1 rounded hover:bg-surface-container transition-colors disabled:opacity-50"
-                disabled
-              >
-                <span className="material-symbols-outlined text-[20px]">chevron_left</span>
-              </button>
-              <button
-                className="w-6 h-6 rounded flex items-center justify-center bg-primary text-on-primary font-semibold"
-              >
-                1
-              </button>
-              <button
-                className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container transition-colors"
-              >
-                2
-              </button>
-              <button
-                className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container transition-colors"
-              >
-                3
-              </button>
-              <span>...</span>
-              <button className="p-1 rounded hover:bg-surface-container transition-colors">
-                <span className="material-symbols-outlined text-[20px]">chevron_right</span>
-              </button>
-            </div>
+          {/* Pagination Footer */}
+          <div className="p-4 border-t border-border-warm flex items-center justify-between gap-4 flex-wrap">
+            {/* Range info */}
+            <p className="text-caption text-text-muted whitespace-nowrap">
+              Hiển thị{' '}
+              <span className="font-semibold text-on-surface">
+                {filteredProducts.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, filteredProducts.length)}
+              </span>{' '}
+              trong số{' '}
+              <span className="font-semibold text-on-surface">{filteredProducts.length}</span>{' '}
+              sản phẩm
+            </p>
+
+            {/* Page controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                {/* Prev */}
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={safePage === 1}
+                  className="p-1.5 rounded-lg hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-text-muted"
+                  title="Trang trước"
+                >
+                  <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                </button>
+
+                {/* Page numbers */}
+                {buildPageNumbers(totalPages, safePage).map((pg, idx) =>
+                  pg === '...' ? (
+                    <span key={`ellipsis-${idx}`} className="w-8 text-center text-text-muted text-caption select-none">…</span>
+                  ) : (
+                    <button
+                      key={pg}
+                      onClick={() => setCurrentPage(pg as number)}
+                      className={`w-8 h-8 rounded-lg text-label-md font-label-md transition-colors ${
+                        pg === safePage
+                          ? 'bg-primary text-on-primary font-semibold shadow-ambient-low'
+                          : 'hover:bg-surface-container text-text-muted'
+                      }`}
+                    >
+                      {pg}
+                    </button>
+                  )
+                )}
+
+                {/* Next */}
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={safePage === totalPages}
+                  className="p-1.5 rounded-lg hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-text-muted"
+                  title="Trang sau"
+                >
+                  <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

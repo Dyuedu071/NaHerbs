@@ -37,6 +37,7 @@ export default function AccountProfilePage() {
     if (!profile) {
       return;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm({
       fullName: profile.fullName ?? "",
       phone: profile.phone ?? "",

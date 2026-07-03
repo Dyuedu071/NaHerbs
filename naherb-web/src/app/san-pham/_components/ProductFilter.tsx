@@ -39,7 +39,11 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
       }
       
       params.set('page', '0'); // reset page on filter
-      router.push(`/san-pham?${params.toString()}`);
+      
+      const newQueryString = params.toString();
+      if (newQueryString !== searchParams.toString()) {
+        router.push(`/san-pham?${newQueryString}`, { scroll: false });
+      }
     },
     [router, searchParams]
   );
@@ -68,7 +72,11 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
     else params.delete('maxPrice');
     
     params.set('page', '0');
-    router.push(`/san-pham?${params.toString()}`);
+    
+    const newQueryString = params.toString();
+    if (newQueryString !== searchParams.toString()) {
+      router.push(`/san-pham?${newQueryString}`, { scroll: false });
+    }
   };
 
   return (

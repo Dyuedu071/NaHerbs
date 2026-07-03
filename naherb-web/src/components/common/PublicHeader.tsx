@@ -61,8 +61,8 @@ export default function PublicHeader() {
           <Link className={getLinkClass('/', true)} href="/">Trang chủ</Link>
           <Link className={getLinkClass('/san-pham')} href="/san-pham">Sản phẩm</Link>
           <Link className={getLinkClass('/tin-tuc')} href="/tin-tuc">Tin tức</Link>
-          <Link className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200" href="/#about">Giới thiệu</Link>
-          <Link className="text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200" href="/#contact">Liên hệ</Link>
+          <Link className={getLinkClass('/gioi-thieu')} href="/gioi-thieu">Giới thiệu</Link>
+          <Link className={getLinkClass('/lien-he')} href="/lien-he">Liên hệ</Link>
         </nav>
 
         {/* Trailing Actions */}
