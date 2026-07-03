@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import vn.io.naherb.common.entity.BaseEntity;
-import vn.io.naherb.product.ProductSku;
+import vn.io.naherb.product.entity.ProductSku;
 
 @Entity
 @Table(name = "order_items")

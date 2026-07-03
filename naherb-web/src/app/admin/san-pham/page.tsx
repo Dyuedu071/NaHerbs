@@ -2,13 +2,14 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useGetAdminProducts } from '@/services/generated/admin-products/admin-products';
+import { useGetAdminProducts, useDeleteAdminProductsProductId } from '@/services/generated/admin-products/admin-products';
 import { useGetProductCategories } from '@/services/generated/public-products/public-products';
 
 // Define structure for display products
 interface ProductItem {
   id: string;
   name: string;
+  slug: string;
   sku: string;
   category: string;
   categorySlug: string;
@@ -23,8 +24,21 @@ interface ProductItem {
 }
 
 export default function AdminProducts() {
-  const { data: backendData, isLoading } = useGetAdminProducts();
+  const { data: backendData, isLoading, refetch } = useGetAdminProducts();
   const { data: categoriesData } = useGetProductCategories();
+  const deleteMutation = useDeleteAdminProductsProductId();
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa (lưu trữ) sản phẩm này?')) {
+      try {
+        await deleteMutation.mutateAsync({ productId: id });
+        refetch();
+      } catch (e) {
+        console.error(e);
+        alert('Có lỗi xảy ra khi xóa sản phẩm');
+      }
+    }
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'lowstock' | 'hidden'>('all');
@@ -57,6 +71,7 @@ export default function AdminProducts() {
     return {
       id: p.id || `api-prod-${idx}`,
       name: p.name || "Sản phẩm không tên",
+      slug: p.slug || "",
       sku: p.skuCode ? p.skuCode.toUpperCase() : (p.slug ? p.slug.toUpperCase() : `SKU-${idx}`),
       category: p.categoryName || "Thảo dược",
       categorySlug: p.categorySlug || p.categoryName || "",
@@ -128,12 +143,13 @@ export default function AdminProducts() {
               Manage your herbal product catalog, inventory, and pricing.
             </p>
           </div>
-          <button
+          <Link
+            href="/admin/san-pham/them"
             className="flex items-center gap-xs bg-primary text-on-primary px-sm py-2 rounded-full hover:bg-primary-container transition-all shadow-ambient-md hover:shadow-ambient-low hover:translate-y-px"
           >
             <span className="material-symbols-outlined text-[20px]">add</span>
             <span className="text-label-md font-label-md">Thêm sản phẩm mới</span>
-          </button>
+          </Link>
         </div>
 
         {/* Filters & Controls Card */}
@@ -338,17 +354,20 @@ export default function AdminProducts() {
                         <div
                           className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <button
+                          <Link
+                            href={`/san-pham/${product.slug}`} target="_blank"
                             className="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"
                           >
                             <span className="material-symbols-outlined text-[20px]">visibility</span>
-                          </button>
-                          <button
+                          </Link>
+                          <Link
+                            href={`/admin/san-pham/${product.id}`}
                             className="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"
                           >
                             <span className="material-symbols-outlined text-[20px]">edit</span>
-                          </button>
+                          </Link>
                           <button
+                            onClick={() => handleDelete(product.id)}
                             className="p-1.5 text-text-muted hover:text-error rounded-lg hover:bg-error-bg transition-colors"
                           >
                             <span className="material-symbols-outlined text-[20px]">delete</span>

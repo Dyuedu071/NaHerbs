@@ -1,4 +1,4 @@
-package vn.io.naherb.product;
+package vn.io.naherb.product.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,7 +9,7 @@ import vn.io.naherb.common.enums.ContentStatus;
 @Table(name = "product_versions")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ProductVersion extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

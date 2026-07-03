@@ -3,7 +3,7 @@ package vn.io.naherb.blog;
 import jakarta.persistence.*;
 import lombok.*;
 import vn.io.naherb.common.entity.BaseEntity;
-import vn.io.naherb.product.Product;
+import vn.io.naherb.product.entity.Product;
 
 @Entity
 @Table(name = "blog_post_products")
@@ -13,7 +13,7 @@ import vn.io.naherb.product.Product;
 public class BlogPostProduct extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id")
     private BlogPost post;
 
     @ManyToOne(fetch = FetchType.LAZY)

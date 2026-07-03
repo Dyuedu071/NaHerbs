@@ -631,6 +631,29 @@ paths:
                     data:
                       $ref: '#/components/schemas/ProductDetail'
   /admin/products/{productId}:
+    get:
+      tags:
+      - Admin Products
+      summary: Get product details
+      parameters:
+      - in: path
+        name: productId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Product details retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiResponse'
+                - type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/ProductDetail'
     put:
       tags:
       - Admin Products
@@ -1407,6 +1430,20 @@ components:
         seoDescription:
           type: string
           nullable: true
+        benefits:
+          type: string
+          nullable: true
+        preservationInstruction:
+          type: string
+          nullable: true
+        primaryKeyword:
+          type: string
+          nullable: true
+        isFeatured:
+          type: boolean
+        displayOrder:
+          type: integer
+          format: int32
         versions:
           type: array
           items:
@@ -1985,6 +2022,43 @@ components:
           nullable: true
         status:
           $ref: '#/components/schemas/ProductStatus'
+        benefits:
+          type: string
+          nullable: true
+        preservationInstruction:
+          type: string
+          nullable: true
+        primaryKeyword:
+          type: string
+          nullable: true
+        isFeatured:
+          type: boolean
+        displayOrder:
+          type: integer
+          format: int32
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpsertProductImageRequest'
+          nullable: true
+    UpsertProductImageRequest:
+      type: object
+      properties:
+        mediaId:
+          type: string
+          format: uuid
+          nullable: true
+        url:
+          type: string
+        altText:
+          type: string
+          nullable: true
+        isThumbnail:
+          type: boolean
+        displayOrder:
+          type: integer
+          format: int32
+          nullable: true
     UpsertProductVersionRequest:
       type: object
       required:

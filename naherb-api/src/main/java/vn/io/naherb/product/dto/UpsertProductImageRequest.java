@@ -1,15 +1,15 @@
 package vn.io.naherb.product.dto;
 
-import java.util.UUID;
-import lombok.Builder;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.UUID;
 
 @Data
-@Builder
-public class ProductImageResponse {
-    private UUID id;
+public class UpsertProductImageRequest {
+    private UUID mediaId;
     private String url;
     private String altText;
+    @JsonProperty("isThumbnail")
     private boolean isThumbnail;
     private Integer displayOrder;
 }

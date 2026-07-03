@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.io.naherb.blog.dto.BlogPostRequest;
 import vn.io.naherb.blog.dto.BlogPostResponse;
 import vn.io.naherb.product.repository.ProductRepository;
-import vn.io.naherb.product.Product;
+import vn.io.naherb.product.entity.Product;
 import vn.io.naherb.exception.NotFoundException;
 import vn.io.naherb.common.enums.ContentStatus;
 import vn.io.naherb.config.RedisCacheConfig;
