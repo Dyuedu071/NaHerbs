@@ -39,8 +39,8 @@ import vn.io.naherb.common.enums.StockStatus;
 import vn.io.naherb.order.OrderItemRepository;
 import vn.io.naherb.order.OrderRepository;
 import vn.io.naherb.order.PaymentRepository;
-import vn.io.naherb.product.Product;
-import vn.io.naherb.product.ProductSku;
+import vn.io.naherb.product.entity.Product;
+import vn.io.naherb.product.entity.ProductSku;
 import vn.io.naherb.product.repository.ProductSkuRepository;
 
 @SpringBootTest

@@ -6,6 +6,7 @@
  * OpenAPI spec version: 2.2.0
  */
 import type { ProductStatus } from './productStatus';
+import type { UpsertProductImageRequest } from './upsertProductImageRequest';
 
 export interface UpsertProductRequest {
   /** @nullable */
@@ -25,4 +26,14 @@ export interface UpsertProductRequest {
   /** @nullable */
   seoDescription?: string | null;
   status: ProductStatus;
+  /** @nullable */
+  benefits?: string | null;
+  /** @nullable */
+  preservationInstruction?: string | null;
+  /** @nullable */
+  primaryKeyword?: string | null;
+  isFeatured?: boolean;
+  displayOrder?: number;
+  /** @nullable */
+  images?: UpsertProductImageRequest[] | null;
 }

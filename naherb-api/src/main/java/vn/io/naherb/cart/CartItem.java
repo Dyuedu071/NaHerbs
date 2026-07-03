@@ -3,7 +3,7 @@ package vn.io.naherb.cart;
 import jakarta.persistence.*;
 import lombok.*;
 import vn.io.naherb.common.entity.BaseEntity;
-import vn.io.naherb.product.ProductSku;
+import vn.io.naherb.product.entity.ProductSku;
 
 @Entity
 @Table(name = "cart_items")

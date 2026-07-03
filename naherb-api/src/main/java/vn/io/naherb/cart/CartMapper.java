@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import vn.io.naherb.cart.dto.CartItemResponse;
 import vn.io.naherb.cart.dto.CartResponse;
-import vn.io.naherb.product.ProductSku;
+import vn.io.naherb.product.entity.ProductSku;
 
 final class CartMapper {
 

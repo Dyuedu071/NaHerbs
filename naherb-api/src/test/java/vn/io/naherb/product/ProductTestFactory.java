@@ -1,4 +1,5 @@
 package vn.io.naherb.product;
+import vn.io.naherb.product.entity.*;
 
 import vn.io.naherb.common.enums.ContentStatus;
 

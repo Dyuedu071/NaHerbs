@@ -1,4 +1,5 @@
 package vn.io.naherb.product.service;
+import vn.io.naherb.product.entity.*;
 
 import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
@@ -19,11 +20,11 @@ import vn.io.naherb.common.enums.ContentStatus;
 import vn.io.naherb.common.enums.StockStatus;
 import vn.io.naherb.common.response.PageResponse;
 import vn.io.naherb.exception.NotFoundException;
-import vn.io.naherb.product.Product;
-import vn.io.naherb.product.ProductCategory;
-import vn.io.naherb.product.ProductImage;
-import vn.io.naherb.product.ProductSku;
-import vn.io.naherb.product.ProductVersion;
+import vn.io.naherb.product.entity.Product;
+import vn.io.naherb.product.entity.ProductCategory;
+import vn.io.naherb.product.entity.ProductImage;
+import vn.io.naherb.product.entity.ProductSku;
+import vn.io.naherb.product.entity.ProductVersion;
 import vn.io.naherb.product.dto.ProductCategoryResponse;
 import vn.io.naherb.product.dto.ProductDetailResponse;
 import vn.io.naherb.product.dto.ProductImageResponse;
@@ -97,6 +98,8 @@ public class PublicProductServiceImpl implements PublicProductService {
         
         Map<UUID, List<ProductSku>> skusByProduct = skuRepository.findAll().stream()
                 .filter(sku -> sku.getProduct() != null && productIds.contains(sku.getProduct().getId()))
+                .filter(sku -> sku.getStatus() == vn.io.naherb.common.enums.SkuStatus.ACTIVE)
+                .filter(sku -> sku.getVersion() == null || sku.getVersion().getStatus() == ContentStatus.PUBLISHED)
                 .collect(Collectors.groupingBy(sku -> sku.getProduct().getId()));
                 
         Map<UUID, List<ProductImage>> imagesByProduct = imageRepository.findByProductIdIn(productIds).stream()
@@ -144,8 +147,10 @@ public class PublicProductServiceImpl implements PublicProductService {
         Product product = productRepository.findBySlugAndStatus(slug, ContentStatus.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
                 
-        List<ProductVersion> versions = versionRepository.findByProductIdOrderByDisplayOrderAsc(product.getId());
-        List<ProductSku> skus = skuRepository.findByProductId(product.getId());
+        List<ProductVersion> versions = versionRepository.findByProductIdOrderByDisplayOrderAsc(product.getId())
+                .stream().filter(v -> v.getStatus() == ContentStatus.PUBLISHED).toList();
+        List<ProductSku> skus = skuRepository.findByProductId(product.getId())
+                .stream().filter(s -> s.getStatus() == vn.io.naherb.common.enums.SkuStatus.ACTIVE).toList();
         List<ProductImage> images = imageRepository.findByProductId(product.getId());
         
         List<ProductVersionResponse> versionResponses = versions.stream().map(v -> {

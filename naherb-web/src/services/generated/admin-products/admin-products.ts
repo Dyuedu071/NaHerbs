@@ -27,6 +27,7 @@ import type {
 import type {
   GetAdminProducts200,
   GetAdminProductsParams,
+  GetAdminProductsProductId200,
   OkResponse,
   PostAdminProducts201,
   UpdateStockRequest,
@@ -199,6 +200,97 @@ export const usePostAdminProducts = <TError = unknown,
       return useMutation(mutationOptions, queryClient);
     }
     /**
+ * @summary Get product details
+ */
+export const getAdminProductsProductId = (
+    productId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<GetAdminProductsProductId200>(
+      {url: `/admin/products/${productId}`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getGetAdminProductsProductIdQueryKey = (productId?: string,) => {
+    return [
+    `/admin/products/${productId}`
+    ] as const;
+    }
+
+    
+export const getGetAdminProductsProductIdQueryOptions = <TData = Awaited<ReturnType<typeof getAdminProductsProductId>>, TError = unknown>(productId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminProductsProductId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminProductsProductIdQueryKey(productId);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminProductsProductId>>> = ({ signal }) => getAdminProductsProductId(productId, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(productId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminProductsProductId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdminProductsProductIdQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminProductsProductId>>>
+export type GetAdminProductsProductIdQueryError = unknown
+
+
+export function useGetAdminProductsProductId<TData = Awaited<ReturnType<typeof getAdminProductsProductId>>, TError = unknown>(
+ productId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminProductsProductId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminProductsProductId>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminProductsProductId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminProductsProductId<TData = Awaited<ReturnType<typeof getAdminProductsProductId>>, TError = unknown>(
+ productId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminProductsProductId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminProductsProductId>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminProductsProductId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminProductsProductId<TData = Awaited<ReturnType<typeof getAdminProductsProductId>>, TError = unknown>(
+ productId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminProductsProductId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get product details
+ */
+
+export function useGetAdminProductsProductId<TData = Awaited<ReturnType<typeof getAdminProductsProductId>>, TError = unknown>(
+ productId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminProductsProductId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdminProductsProductIdQueryOptions(productId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+/**
  * @summary Update product
  */
 export const putAdminProductsProductId = (

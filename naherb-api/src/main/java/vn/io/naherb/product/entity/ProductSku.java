@@ -1,4 +1,4 @@
-package vn.io.naherb.product;
+package vn.io.naherb.product.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +12,7 @@ import vn.io.naherb.media.MediaAsset;
 @Table(name = "product_skus")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ProductSku extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
