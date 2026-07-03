@@ -22,16 +22,7 @@ export default function AdminHeader() {
   return (
     <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-border-warm bg-surface/88 px-md shadow-sm backdrop-blur-md">
       <div className="flex items-center gap-md">
-        <div className="relative">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
-            search
-          </span>
-          <input
-            className="w-64 rounded-full border-none bg-surface-container py-2 pl-10 pr-4 text-body-md font-body-md outline-none transition-all focus:ring-2 focus:ring-primary"
-            placeholder="Search..."
-            type="text"
-          />
-        </div>
+        {/* Placeholder for future left-side items */}
       </div>
       <div className="flex items-center gap-lg">
         <span className="text-label-md font-label-md font-semibold text-primary">
@@ -40,9 +31,6 @@ export default function AdminHeader() {
         <div className="flex items-center gap-sm">
           <button className="flex h-10 w-10 items-center justify-center rounded-full text-text-muted transition-all hover:bg-surface-container hover:text-primary">
             <span className="material-symbols-outlined">notifications</span>
-          </button>
-          <button className="flex h-10 w-10 items-center justify-center rounded-full text-text-muted transition-all hover:bg-surface-container hover:text-primary">
-            <span className="material-symbols-outlined">apps</span>
           </button>
           <div className="ml-sm h-8 w-8 overflow-hidden rounded-full border border-border-warm shadow-sm">
             <img

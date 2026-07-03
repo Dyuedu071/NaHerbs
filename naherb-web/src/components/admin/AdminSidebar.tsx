@@ -74,20 +74,7 @@ export default function AdminSidebar() {
       </nav>
 
       <div className="flex flex-col gap-base border-t border-border-warm p-md">
-        <a
-          className="flex items-center gap-sm rounded-lg px-sm py-sm text-text-muted transition-all duration-200 hover:bg-surface-container-high hover:text-primary"
-          href="#"
-        >
-          <span className="material-symbols-outlined">settings</span>
-          <span className="text-label-md font-label-md">Settings</span>
-        </a>
-        <a
-          className="flex items-center gap-sm rounded-lg px-sm py-sm text-text-muted transition-all duration-200 hover:bg-surface-container-high hover:text-primary"
-          href="#"
-        >
-          <span className="material-symbols-outlined">help_outline</span>
-          <span className="text-label-md font-label-md">Support</span>
-        </a>
+
         <Link
           href="/"
           className="mt-sm w-full rounded-full bg-primary py-sm text-center text-label-md font-label-md text-on-primary transition-colors hover:bg-secondary"
