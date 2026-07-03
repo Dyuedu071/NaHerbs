@@ -20,7 +20,7 @@ export default function AdminSidebar() {
     { name: "Dashboard", href: "/admin/dashboard", icon: "dashboard" },
     { name: "Sản phẩm", href: "/admin/san-pham", icon: "inventory_2" },
     { name: "Đơn hàng", href: "/admin/orders", icon: "shopping_cart" },
-    { name: "QR Payments", href: "/admin/qr-payments", icon: "qr_code_2" },
+    { name: "Thanh toán QR", href: "/admin/thanh-toan-qr", icon: "qr_code_2" },
     { name: "Blog", href: "/admin/posts", icon: "edit_note" },
     { name: "Chatbot AI", href: "/admin/chatbot", icon: "psychiatry" },
     { name: "Cài đặt", href: "/admin/settings", icon: "settings" },

@@ -14,7 +14,7 @@ export const orderStatusLabels: Record<OrderStatus, string> = {
 export const paymentStatusLabels: Record<PaymentStatus, string> = {
   UNPAID: "Chưa thanh toán",
   COD_PENDING: "COD chờ thu",
-  WAITING_BANK_TRANSFER: "Chờ chuyển khoản",
+  WAITING_BANK_TRANSFER: "Chờ xác nhận chuyển khoản",
   PAID: "Đã thanh toán",
   FAILED: "Thanh toán lỗi",
   REFUNDED: "Đã hoàn tiền",

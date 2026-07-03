@@ -12,6 +12,7 @@ import { usePostCheckout } from "@/services/generated/checkout/checkout";
 import { useGetAccountAddresses } from "@/services/generated/customer-addresses/customer-addresses";
 import type { AccountAddress } from "@/services/generated/model/accountAddress";
 import type { Cart } from "@/services/generated/model/cart";
+import type { CartItem } from "@/services/generated/model/cartItem";
 import type { CheckoutResponse } from "@/services/generated/model/checkoutResponse";
 import { PaymentMethod } from "@/services/generated/model/paymentMethod";
 import type { PaymentMethod as PaymentMethodType } from "@/services/generated/model/paymentMethod";
@@ -59,6 +60,8 @@ function CheckoutContent() {
   const [note, setNote] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [createdOrder, setCreatedOrder] = useState<CheckoutResponse | null>(null);
+  const [copiedTransferContent, setCopiedTransferContent] = useState(false);
+  const [checkoutItemsSnapshot, setCheckoutItemsSnapshot] = useState<CartItem[] | null>(null);
 
   const { data: cartResponse, isLoading: cartLoading } = useGetCart({
     query: {
@@ -112,6 +115,7 @@ function CheckoutContent() {
       onSuccess: (response) => {
         const order = (response as { data?: CheckoutResponse }).data ?? null;
         setFormError(null);
+        setCopiedTransferContent(false);
         setCreatedOrder(order);
         void queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
         void queryClient.invalidateQueries({ queryKey: ["/orders/my"] });
@@ -127,11 +131,14 @@ function CheckoutContent() {
     event.preventDefault();
     setFormError(null);
     setCreatedOrder(null);
+    setCheckoutItemsSnapshot(null);
 
     if (items.length === 0) {
       setFormError("Giỏ hàng đang trống.");
       return;
     }
+
+    setCheckoutItemsSnapshot(items);
 
     if (effectiveAddressMode === "saved") {
       if (!effectiveSelectedAddressId) {
@@ -180,9 +187,25 @@ function CheckoutContent() {
     });
   };
 
+  const handleCopyTransferContent = async (value?: string | null) => {
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedTransferContent(true);
+      window.setTimeout(() => setCopiedTransferContent(false), 2000);
+    } catch {
+      setFormError("Không thể copy nội dung chuyển khoản. Vui lòng copy thủ công.");
+    }
+  };
+
   if (authLoading || !isAuthenticated || cartLoading || addressesLoading) {
     return <CheckoutShell>Đang tải thông tin thanh toán...</CheckoutShell>;
   }
+
+  const displayItems = checkoutItemsSnapshot ?? items;
+  const displaySubtotal =
+    checkoutItemsSnapshot?.reduce((acc, item) => acc + (item.lineTotal ?? 0), 0) ??
+    selectedSubtotal;
 
   return (
     <main className="min-h-screen bg-background">
@@ -212,7 +235,7 @@ function CheckoutContent() {
             </p>
           </div>
 
-          {items.length === 0 && (
+          {!createdOrder && items.length === 0 && (
             <p className="rounded-lg bg-error-container px-sm py-2 text-caption text-error">
               Giỏ hàng đang trống. Vui lòng thêm sản phẩm trước khi thanh toán.
             </p>
@@ -381,20 +404,178 @@ function CheckoutContent() {
 
           {createdOrder && (
             <section className="rounded-xl border border-primary/30 bg-success-bg p-md">
-              <h2 className="text-body-lg font-body-lg font-semibold text-primary">
-                Đã tạo đơn {createdOrder.orderCode}
-              </h2>
-              <p className="mt-xs text-body-md text-text-main">
-                Tổng tiền: {formatMoney(createdOrder.totalAmount)}
-              </p>
-              {createdOrder.qrInstruction && (
-                <div className="mt-sm rounded-lg bg-surface p-sm text-caption text-text-main">
-                  <p>Ngân hàng: {createdOrder.qrInstruction.bankName}</p>
-                  <p>Số tài khoản: {createdOrder.qrInstruction.accountNumber}</p>
-                  <p>Nội dung: {createdOrder.qrInstruction.transferContent}</p>
+              <div className="flex items-start gap-sm">
+                <span
+                  className="material-symbols-outlined mt-1 text-primary"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  check_circle
+                </span>
+                <div>
+                  <h2 className="text-body-lg font-body-lg font-semibold text-primary">
+                    Đã tạo đơn {createdOrder.orderCode}
+                  </h2>
+                  <p className="mt-xs text-body-md text-text-main">
+                    Tổng tiền: {formatMoney(createdOrder.totalAmount)}
+                  </p>
+                </div>
+              </div>
+
+              {createdOrder.paymentMethod === PaymentMethod.BANK_QR && (
+                <div className="mt-md rounded-xl border border-primary/20 bg-surface-container-lowest p-md">
+                  <div className="mb-sm flex items-center gap-xs">
+                    <span className="material-symbols-outlined text-primary">
+                      qr_code_2
+                    </span>
+                    <h3 className="text-body-lg font-body-lg font-bold text-primary">
+                      Quét QR để chuyển khoản
+                    </h3>
+                  </div>
+
+                  {createdOrder.qrInstruction ? (
+                    <div className="grid gap-md md:grid-cols-[220px_1fr]">
+                      <div className="flex flex-col items-center rounded-xl border border-border-warm bg-white p-sm">
+                        {createdOrder.qrInstruction.qrImageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={createdOrder.qrInstruction.qrImageUrl}
+                            alt="QR chuyển khoản NaHerbs"
+                            className="h-52 w-52 object-contain"
+                          />
+                        ) : (
+                          <div className="flex h-52 w-52 flex-col items-center justify-center rounded-lg border border-dashed border-border-warm bg-surface-container-low text-center text-text-muted">
+                            <span className="material-symbols-outlined text-[48px]">
+                              qr_code_2
+                            </span>
+                            <span className="mt-xs text-caption">
+                              Chưa cấu hình ảnh QR
+                            </span>
+                          </div>
+                        )}
+                        <p className="mt-xs text-center text-caption text-text-muted">
+                          QR cố định của tài khoản NaHerbs
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col gap-sm text-body-md text-text-main">
+                        <div className="rounded-xl border border-border-warm bg-surface p-sm">
+                          <div className="mb-sm flex items-center gap-xs">
+                            <span className="material-symbols-outlined text-[18px] text-primary">
+                              account_balance
+                            </span>
+                            <h4 className="font-label-md text-label-md text-primary">
+                              Thông tin ngân hàng
+                            </h4>
+                          </div>
+                          <div className="grid gap-sm sm:grid-cols-2">
+                            <div>
+                              <p className="text-caption font-bold uppercase text-text-muted">
+                                Ngân hàng
+                              </p>
+                              <p className="font-bold text-primary">
+                                {createdOrder.qrInstruction.bankName ||
+                                  "Chưa cấu hình"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-caption font-bold uppercase text-text-muted">
+                                Số tài khoản
+                              </p>
+                              <p className="font-mono text-lg font-black tracking-wider">
+                                {createdOrder.qrInstruction.accountNumber ||
+                                  "Chưa cấu hình"}
+                              </p>
+                            </div>
+                            <div className="sm:col-span-2">
+                              <p className="text-caption font-bold uppercase text-text-muted">
+                                Tên tài khoản
+                              </p>
+                              <p className="font-bold">
+                                {createdOrder.qrInstruction.accountName ||
+                                  "Chưa cấu hình"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="rounded-xl border border-tertiary-fixed-dim/40 bg-tertiary-fixed/20 p-sm">
+                          <p className="text-caption font-bold uppercase text-text-muted">
+                            Số tiền cần chuyển
+                          </p>
+                          <p className="mt-xs text-price-display font-price-display text-tertiary-container">
+                            {formatMoney(createdOrder.totalAmount)}
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-primary/10 bg-success-bg p-sm">
+                          <p className="text-caption font-bold uppercase text-text-muted">
+                            Nội dung chuyển khoản
+                          </p>
+                          <div className="mt-xs flex flex-wrap items-center gap-xs">
+                            <code className="rounded bg-surface-container-high px-2 py-1 font-mono text-body-md font-bold text-earth-brown">
+                              {createdOrder.qrInstruction.transferContent ||
+                                createdOrder.orderCode}
+                            </code>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                void handleCopyTransferContent(
+                                  createdOrder.qrInstruction?.transferContent ||
+                                    createdOrder.orderCode,
+                                )
+                              }
+                              className="inline-flex items-center gap-xs rounded-full border border-primary px-sm py-1 text-caption font-semibold text-primary hover:bg-primary hover:text-on-primary"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">
+                                content_copy
+                              </span>
+                              {copiedTransferContent ? "Đã copy" : "Copy"}
+                            </button>
+                          </div>
+                        </div>
+
+                        <p className="rounded-lg bg-error-bg px-sm py-2 text-caption text-error-text">
+                          Vui lòng chuyển khoản đúng số tiền và đúng nội dung để
+                          admin xác nhận nhanh hơn. Đơn hàng sẽ ở trạng thái
+                          “Chờ xác nhận chuyển khoản” cho tới khi NaHerbs kiểm
+                          tra tài khoản ngân hàng.
+                        </p>
+
+                        <div className="flex flex-wrap gap-xs">
+                          {createdOrder.orderId && (
+                            <Link
+                              href={`/account/orders/${createdOrder.orderId}`}
+                              className="inline-flex items-center gap-xs rounded-full bg-primary px-md py-sm text-label-md font-label-md text-on-primary transition-colors hover:bg-secondary"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">
+                                done_all
+                              </span>
+                              Tôi đã chuyển khoản, theo dõi đơn
+                            </Link>
+                          )}
+                          <Link
+                            href="/"
+                            className="inline-flex items-center gap-xs rounded-full border border-border-warm px-md py-sm text-label-md font-label-md text-primary transition-colors hover:bg-success-bg"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">
+                              storefront
+                            </span>
+                            Tiếp tục mua sắm
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="rounded-lg bg-error-bg px-sm py-2 text-caption text-error-text">
+                      Đơn đã tạo với phương thức chuyển khoản QR, nhưng hệ thống
+                      chưa trả về hướng dẫn chuyển khoản. Vui lòng mở chi tiết
+                      đơn hoặc liên hệ NaHerbs để được hỗ trợ.
+                    </p>
+                  )}
                 </div>
               )}
-              {createdOrder.orderId && (
+
+              {createdOrder.paymentMethod !== PaymentMethod.BANK_QR && createdOrder.orderId && (
                 <Link
                   href={`/account/orders/${createdOrder.orderId}`}
                   className="mt-sm inline-flex items-center gap-xs rounded-full bg-primary px-md py-sm text-label-md font-label-md text-on-primary"
@@ -406,20 +587,22 @@ function CheckoutContent() {
             </section>
           )}
 
-          <button
-            type="submit"
-            disabled={isPending || items.length === 0}
-            className="inline-flex w-full items-center justify-center gap-xs rounded-full bg-primary px-md py-sm text-label-md font-label-md text-on-primary transition-colors hover:bg-secondary disabled:opacity-60"
-          >
-            <span className="material-symbols-outlined text-[18px]">check_circle</span>
-            {isPending ? "Đang tạo đơn..." : "Xác nhận đặt hàng"}
-          </button>
+          {!createdOrder && (
+            <button
+              type="submit"
+              disabled={isPending || items.length === 0}
+              className="inline-flex w-full items-center justify-center gap-xs rounded-full bg-primary px-md py-sm text-label-md font-label-md text-on-primary transition-colors hover:bg-secondary disabled:opacity-60"
+            >
+              <span className="material-symbols-outlined text-[18px]">check_circle</span>
+              {isPending ? "Đang tạo đơn..." : "Xác nhận đặt hàng"}
+            </button>
+          )}
         </form>
 
         <aside className="h-fit rounded-[24px] border border-herbal-beige bg-surface-container-lowest p-md shadow-ambient-sm">
           <h2 className="text-body-lg font-body-lg font-semibold text-primary">Đơn hàng</h2>
           <div className="mt-md flex flex-col gap-sm">
-            {items.map((item) => (
+            {displayItems.map((item) => (
               <div key={item.id} className="flex justify-between gap-sm border-b border-border-warm pb-sm">
                 <div>
                   <p className="text-label-md font-label-md text-text-main">
@@ -437,7 +620,7 @@ function CheckoutContent() {
           </div>
           <div className="mt-md flex justify-between text-body-md font-semibold text-primary">
             <span>Tổng cộng</span>
-            <span>{formatMoney(selectedSubtotal)}</span>
+            <span>{formatMoney(displaySubtotal)}</span>
           </div>
         </aside>
       </section>
