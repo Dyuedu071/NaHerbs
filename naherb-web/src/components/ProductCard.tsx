@@ -62,7 +62,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </span>
               )}
           </span>
-          <AddToCartButton productId={product.id || ''} isOutOfStock={isOutOfStock} />
+          <AddToCartButton productSlug={product.slug || ''} isOutOfStock={isOutOfStock} />
         </div>
       </div>
     </Link>
