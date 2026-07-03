@@ -286,7 +286,7 @@ function CreatePostContent() {
   const handlePublish = async () => submitPost('PUBLISHED');
 
   return (
-    <main className="flex-1 p-gutter w-full flex gap-xl relative">
+    <main className="flex-1 p-gutter w-full flex flex-col gap-md relative">
 
       {/* Draft Restore Modal */}
       {showDraftModal && (

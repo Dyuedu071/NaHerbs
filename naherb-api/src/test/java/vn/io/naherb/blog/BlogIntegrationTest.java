@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import vn.io.naherb.blog.dto.BlogPostRequest;
 import vn.io.naherb.common.enums.ContentStatus;
-import vn.io.naherb.product.Product;
+import vn.io.naherb.product.entity.Product;
 import vn.io.naherb.product.repository.ProductRepository;
 
 import java.util.List;

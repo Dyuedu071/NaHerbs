@@ -21,7 +21,7 @@ import vn.io.naherb.order.dto.DashboardStatsResponse;
 import vn.io.naherb.order.dto.DashboardStatsResponse.LowStockItem;
 import vn.io.naherb.order.dto.DashboardStatsResponse.PendingQrItem;
 import vn.io.naherb.order.dto.DashboardStatsResponse.RecentOrderItem;
-import vn.io.naherb.product.ProductSku;
+import vn.io.naherb.product.entity.ProductSku;
 import vn.io.naherb.product.repository.ProductRepository;
 import vn.io.naherb.product.repository.ProductSkuRepository;
 

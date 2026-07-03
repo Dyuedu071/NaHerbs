@@ -2,8 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductDetail } from '@/services/generated/model';
 import { getProductsSlug } from '@/services/generated/public-products/public-products';
-import ProductGallery from './_components/ProductGallery';
-import ProductSelection from './_components/ProductSelection';
+import ProductInteractive from './_components/ProductInteractive';
 import ProductTabs from './_components/ProductTabs';
 
 interface Props {
@@ -64,8 +63,8 @@ export default async function ProductDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main className="flex-grow pt-24 min-h-screen bg-surface">
+      <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <nav className="flex mb-8 text-sm text-gray-500">
           <a href="/" className="hover:text-green-700">Trang chủ</a>
           <span className="mx-2">/</span>
@@ -82,23 +81,11 @@ export default async function ProductDetailPage({ params }: Props) {
           <span className="text-gray-900 font-medium">{product.name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Gallery Column */}
-          <div className="lg:sticky lg:top-28 h-fit">
-            <ProductGallery images={product.images || []} />
-          </div>
+        <ProductInteractive product={product} />
 
-          {/* Info Column */}
-          <div className="pt-2">
-            <h1 className="text-4xl font-merriweather font-bold text-gray-900 mb-4">
-              {product.name}
-            </h1>
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-              {product.shortDescription}
-            </p>
-
-            <ProductSelection versions={product.versions || []} />
-
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12">
+          {/* Keep an empty div to align tabs properly or just place tabs full width */}
+          <div className="col-span-1 lg:col-span-2">
             <ProductTabs 
               detailDescription={product.detailDescription ?? undefined}
               usageInstruction={product.usageInstruction ?? undefined}
@@ -107,6 +94,6 @@ export default async function ProductDetailPage({ params }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

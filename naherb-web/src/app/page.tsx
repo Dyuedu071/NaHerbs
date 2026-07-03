@@ -38,13 +38,10 @@ function findPurchasableSku(product?: ProductDetail): ProductSku | undefined {
 }
 
 function formatProductPrice(product: ProductSummary): string {
-  if (product.minSalePrice == null && product.maxSalePrice == null) {
+  if (product.minSalePrice == null) {
     return "Liên hệ";
   }
-  if (product.minSalePrice === product.maxSalePrice || product.maxSalePrice == null) {
-    return formatMoney(product.minSalePrice);
-  }
-  return `${formatMoney(product.minSalePrice)} - ${formatMoney(product.maxSalePrice)}`;
+  return `${formatMoney(product.minSalePrice)}`;
 }
 
 export default function Home() {
@@ -60,8 +57,7 @@ export default function Home() {
 
   const { showToast } = useToast();
 
-  const featuredProducts =
-    (productsResponse as { data?: ProductPage } | undefined)?.data?.items ?? [];
+  const featuredProducts = (productsResponse as any)?.items ?? [];
 
   const handleAddProduct = async (product: ProductSummary) => {
     if (!product.slug) {
@@ -72,7 +68,7 @@ export default function Home() {
     setAddingProductSlug(product.slug);
     try {
       const detailResponse = await getProductsSlug(product.slug);
-      const detail = (detailResponse as { data?: ProductDetail }).data;
+      const detail = detailResponse as unknown as ProductDetail;
       const sku = findPurchasableSku(detail);
 
       if (!sku?.id) {
@@ -237,7 +233,7 @@ export default function Home() {
                 <p className="text-center text-body-md text-text-muted">Chưa có sản phẩm còn hàng để hiển thị.</p>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
-                    {featuredProducts.map((product, index) => {
+                    {featuredProducts.map((product: ProductSummary, index: number) => {
                         const imageUrl = product.thumbnailUrl ?? fallbackProductImages[index % fallbackProductImages.length];
                         const isAdding = addingProductSlug === product.slug;
                         const isOutOfStock = product.stockStatus === "OUT_OF_STOCK";

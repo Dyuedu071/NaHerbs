@@ -7,6 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Map;
 
+import vn.io.naherb.common.enums.MediaType;
+
 @RestController
 @RequestMapping("/api/v1/admin/media")
 public class MediaController {
@@ -18,9 +20,11 @@ public class MediaController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "type", defaultValue = "OTHER") MediaType type) {
         try {
-            MediaAsset asset = mediaService.uploadImage(file);
+            MediaAsset asset = mediaService.uploadImage(file, type);
             // TinyMCE expects a JSON response in the format { "location": "folder/sub-folder/new-location.png" }
             return ResponseEntity.ok(Map.of(
                     "location", asset.getUrl(),

@@ -1,4 +1,4 @@
-package vn.io.naherb.product;
+package vn.io.naherb.product.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +10,7 @@ import vn.io.naherb.media.MediaAsset;
 @Table(name = "product_categories")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ProductCategory extends BaseEntity {
 
     @Column(nullable = false)

@@ -3,29 +3,50 @@
 import { useState } from 'react';
 import { ProductVersion, ProductSku } from '@/services/generated/model';
 import { useToast } from '@/contexts/ToastContext';
+import { usePostCartItems, getGetCartQueryKey } from '@/services/generated/cart/cart';
+import { useQueryClient } from '@tanstack/react-query';
+import { extractApiErrorMessage } from '@/lib/api-error';
 
 interface ProductSelectionProps {
   versions: ProductVersion[];
+  onSkuSelect?: (sku: ProductSku) => void;
 }
 
-export default function ProductSelection({ versions }: ProductSelectionProps) {
+export default function ProductSelection({ versions, onSkuSelect }: ProductSelectionProps) {
   const [selectedVersion, setSelectedVersion] = useState<ProductVersion | undefined>(versions[0]);
   const [selectedSku, setSelectedSku] = useState<ProductSku | undefined>(selectedVersion?.skus?.[0]);
   const [quantity, setQuantity] = useState(1);
 
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
+  const { mutateAsync: addCartItem, isPending } = usePostCartItems();
+
   const handleVersionChange = (version: ProductVersion) => {
     setSelectedVersion(version);
     setSelectedSku(version.skus?.[0]);
     setQuantity(1);
+    if (onSkuSelect && version.skus?.[0]) {
+      onSkuSelect(version.skus[0]);
+    }
   };
 
   const isOutOfStock = selectedSku?.stockStatus === 'OUT_OF_STOCK' || (selectedSku?.stockQuantity ?? 0) === 0;
 
-  const handleAddToCart = () => {
-    if (isOutOfStock) return;
-    showToast(`Đã thêm ${quantity} x ${selectedSku?.name} vào giỏ hàng!`, "success");
-    // TODO: Connect with postCartItems API hook here
+  const handleAddToCart = async () => {
+    if (isOutOfStock || isPending) return;
+
+    if (!selectedSku?.id) {
+      showToast('Vui lòng chọn phân loại sản phẩm.', 'error');
+      return;
+    }
+
+    try {
+      await addCartItem({ data: { skuId: selectedSku.id, quantity } });
+      await queryClient.invalidateQueries({ queryKey: getGetCartQueryKey() });
+      showToast(`Đã thêm ${quantity} × ${selectedSku.name || 'sản phẩm'} vào giỏ hàng!`, 'success');
+    } catch (err) {
+      showToast(extractApiErrorMessage(err), 'error');
+    }
   };
 
   if (!versions || versions.length === 0) return null;
@@ -43,7 +64,7 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
         )}
       </div>
 
-      {versions.length > 1 && (
+      {versions.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-gray-900 mb-3">Phiên bản</h3>
           <div className="flex flex-wrap gap-3">
@@ -64,7 +85,7 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
         </div>
       )}
 
-      {selectedVersion && selectedVersion.skus && selectedVersion.skus.length > 1 && (
+      {selectedVersion && selectedVersion.skus && selectedVersion.skus.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-gray-900 mb-3">Tùy chọn (Mùi hương / Phân loại)</h3>
           <div className="flex flex-wrap gap-3">
@@ -74,6 +95,7 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
                 onClick={() => {
                   setSelectedSku(sku);
                   setQuantity(1);
+                  if (onSkuSelect) onSkuSelect(sku);
                 }}
                 className={`px-4 py-2 rounded-xl border text-sm font-medium transition ${
                   selectedSku?.id === sku.id
@@ -120,11 +142,18 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
       </div>
 
       <button
-        onClick={handleAddToCart}
-        disabled={isOutOfStock}
-        className="w-full bg-green-700 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+        onClick={() => void handleAddToCart()}
+        disabled={isOutOfStock || isPending}
+        className="w-full bg-green-700 text-white py-4 rounded-xl font-bold text-lg hover:bg-green-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm hover:shadow-md flex items-center justify-center gap-2"
       >
-        Thêm vào giỏ hàng
+        {isPending ? (
+          <>
+            <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+            Đang thêm...
+          </>
+        ) : (
+          'Thêm vào giỏ hàng'
+        )}
       </button>
     </div>
   );

@@ -25,6 +25,14 @@ export interface ProductDetail {
   seoTitle?: string | null;
   /** @nullable */
   seoDescription?: string | null;
+  /** @nullable */
+  benefits?: string | null;
+  /** @nullable */
+  preservationInstruction?: string | null;
+  /** @nullable */
+  primaryKeyword?: string | null;
+  isFeatured?: boolean;
+  displayOrder?: number;
   versions?: ProductVersion[];
   images?: ProductImage[];
   relatedProducts?: ProductSummary[];

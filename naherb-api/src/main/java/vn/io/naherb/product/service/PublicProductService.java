@@ -1,4 +1,5 @@
 package vn.io.naherb.product.service;
+import vn.io.naherb.product.entity.*;
 
 import java.util.List;
 import vn.io.naherb.common.enums.ContentStatus;
@@ -13,8 +14,10 @@ public interface PublicProductService {
     
     PageResponse<ProductListResponse> searchProducts(
             String keyword, 
-            String categorySlug, 
+            List<String> categorySlugs, 
             String need, 
+            java.math.BigDecimal minPrice,
+            java.math.BigDecimal maxPrice,
             Boolean inStockOnly, 
             String sort, 
             int page, 

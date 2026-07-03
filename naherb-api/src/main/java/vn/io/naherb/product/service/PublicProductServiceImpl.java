@@ -1,4 +1,5 @@
 package vn.io.naherb.product.service;
+import vn.io.naherb.product.entity.*;
 
 import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
@@ -19,11 +20,11 @@ import vn.io.naherb.common.enums.ContentStatus;
 import vn.io.naherb.common.enums.StockStatus;
 import vn.io.naherb.common.response.PageResponse;
 import vn.io.naherb.exception.NotFoundException;
-import vn.io.naherb.product.Product;
-import vn.io.naherb.product.ProductCategory;
-import vn.io.naherb.product.ProductImage;
-import vn.io.naherb.product.ProductSku;
-import vn.io.naherb.product.ProductVersion;
+import vn.io.naherb.product.entity.Product;
+import vn.io.naherb.product.entity.ProductCategory;
+import vn.io.naherb.product.entity.ProductImage;
+import vn.io.naherb.product.entity.ProductSku;
+import vn.io.naherb.product.entity.ProductVersion;
 import vn.io.naherb.product.dto.ProductCategoryResponse;
 import vn.io.naherb.product.dto.ProductDetailResponse;
 import vn.io.naherb.product.dto.ProductImageResponse;
@@ -59,7 +60,7 @@ public class PublicProductServiceImpl implements PublicProductService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ProductListResponse> searchProducts(
-            String keyword, String categorySlug, String need, Boolean inStockOnly, String sortStr, int page, int size) {
+            String keyword, List<String> categorySlugs, String need, java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice, Boolean inStockOnly, String sortStr, int page, int size) {
         
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         if ("price_asc".equals(sortStr)) {
@@ -80,8 +81,8 @@ public class PublicProductServiceImpl implements PublicProductService {
             if (keyword != null && !keyword.isBlank()) {
                 predicates.add(cb.like(cb.lower(root.get("name")), "%" + keyword.toLowerCase() + "%"));
             }
-            if (categorySlug != null && !categorySlug.isBlank()) {
-                predicates.add(cb.equal(root.join("category").get("slug"), categorySlug));
+            if (categorySlugs != null && !categorySlugs.isEmpty()) {
+                predicates.add(root.join("category").get("slug").in(categorySlugs));
             }
             if (need != null && !need.isBlank()) {
                 // Map need to benefits or primaryKeyword using LIKE
@@ -97,6 +98,8 @@ public class PublicProductServiceImpl implements PublicProductService {
         
         Map<UUID, List<ProductSku>> skusByProduct = skuRepository.findAll().stream()
                 .filter(sku -> sku.getProduct() != null && productIds.contains(sku.getProduct().getId()))
+                .filter(sku -> sku.getStatus() == vn.io.naherb.common.enums.SkuStatus.ACTIVE)
+                .filter(sku -> sku.getVersion() == null || sku.getVersion().getStatus() == ContentStatus.PUBLISHED)
                 .collect(Collectors.groupingBy(sku -> sku.getProduct().getId()));
                 
         Map<UUID, List<ProductImage>> imagesByProduct = imageRepository.findByProductIdIn(productIds).stream()
@@ -106,15 +109,26 @@ public class PublicProductServiceImpl implements PublicProductService {
             List<ProductSku> skus = skusByProduct.getOrDefault(product.getId(), List.of());
             List<ProductImage> images = imagesByProduct.getOrDefault(product.getId(), List.of());
             
-            BigDecimal minPrice = skus.stream().map(ProductSku::getSalePrice).min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
-            BigDecimal maxPrice = skus.stream().map(ProductSku::getSalePrice).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+            ProductSku cheapestSku = skus.stream()
+                    .filter(s -> s.getSalePrice() != null)
+                    .min(java.util.Comparator.comparing(ProductSku::getSalePrice))
+                    .orElse(null);
+            BigDecimal minSalePrice = cheapestSku != null ? cheapestSku.getSalePrice() : BigDecimal.ZERO;
+            BigDecimal originalPrice = cheapestSku != null ? cheapestSku.getOriginalPrice() : null;
+            BigDecimal maxSalePrice = skus.stream().map(ProductSku::getSalePrice).filter(java.util.Objects::nonNull).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
             boolean inStock = skus.stream().anyMatch(sku -> sku.getStockStatus() == StockStatus.IN_STOCK);
             
             String thumb = images.stream().filter(ProductImage::isThumbnail).findFirst()
                     .map(ProductImage::getUrl).orElse(null);
                     
             if (inStockOnly != null && inStockOnly && !inStock) {
-                return null; // Should ideally filter in DB, but doing in-memory for this MVP
+                return null;
+            }
+            if (minPrice != null && maxSalePrice.compareTo(minPrice) < 0) {
+                return null;
+            }
+            if (maxPrice != null && minSalePrice.compareTo(maxPrice) > 0) {
+                return null;
             }
             
             return ProductListResponse.builder()
@@ -123,8 +137,9 @@ public class PublicProductServiceImpl implements PublicProductService {
                     .slug(product.getSlug())
                     .shortDescription(product.getShortDescription())
                     .thumbnailUrl(thumb)
-                    .minSalePrice(minPrice)
-                    .maxSalePrice(maxPrice)
+                    .originalPrice(originalPrice)
+                    .minSalePrice(minSalePrice)
+                    .maxSalePrice(maxSalePrice)
                     .stockStatus(inStock ? StockStatus.IN_STOCK : StockStatus.OUT_OF_STOCK)
                     .build();
         }).filter(java.util.Objects::nonNull).toList();
@@ -144,8 +159,10 @@ public class PublicProductServiceImpl implements PublicProductService {
         Product product = productRepository.findBySlugAndStatus(slug, ContentStatus.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
                 
-        List<ProductVersion> versions = versionRepository.findByProductIdOrderByDisplayOrderAsc(product.getId());
-        List<ProductSku> skus = skuRepository.findByProductId(product.getId());
+        List<ProductVersion> versions = versionRepository.findByProductIdOrderByDisplayOrderAsc(product.getId())
+                .stream().filter(v -> v.getStatus() == ContentStatus.PUBLISHED).toList();
+        List<ProductSku> skus = skuRepository.findByProductId(product.getId())
+                .stream().filter(s -> s.getStatus() == vn.io.naherb.common.enums.SkuStatus.ACTIVE).toList();
         List<ProductImage> images = imageRepository.findByProductId(product.getId());
         
         List<ProductVersionResponse> versionResponses = versions.stream().map(v -> {
@@ -207,7 +224,8 @@ public class PublicProductServiceImpl implements PublicProductService {
                 .salePrice(sku.getSalePrice())
                 .stockQuantity(sku.getStockQuantity())
                 .stockStatus(sku.getStockStatus())
-                .thumbnailUrl(null) // Can map if sku has specific image
+                .status(sku.getStatus())
+                .thumbnailUrl(sku.getThumbnailMedia() != null ? sku.getThumbnailMedia().getUrl() : null)
                 .build();
     }
 }

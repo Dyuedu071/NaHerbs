@@ -22,4 +22,6 @@ export interface UpsertProductSkuRequest {
   salePrice: number;
   stockQuantity: number;
   status: SkuStatus;
+  /** @nullable */
+  thumbnailMediaId?: string | null;
 }

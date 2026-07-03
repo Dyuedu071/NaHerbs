@@ -1,17 +1,25 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ProductImage } from '@/services/generated/model';
 
 interface ProductGalleryProps {
   images: ProductImage[];
+  activeSkuUrl?: string;
 }
 
-export default function ProductGallery({ images }: ProductGalleryProps) {
+export default function ProductGallery({ images, activeSkuUrl }: ProductGalleryProps) {
   const [activeImage, setActiveImage] = useState(
     images.find((img) => img.isThumbnail)?.url || images[0]?.url || ''
   );
+
+  // Sync active image when activeSkuUrl changes
+  useEffect(() => {
+    if (activeSkuUrl) {
+      setActiveImage(activeSkuUrl);
+    }
+  }, [activeSkuUrl]);
 
   if (!images || images.length === 0) {
     return (

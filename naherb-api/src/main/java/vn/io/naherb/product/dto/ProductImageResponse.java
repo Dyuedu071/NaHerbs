@@ -11,4 +11,5 @@ public class ProductImageResponse {
     private String url;
     private String altText;
     private boolean isThumbnail;
+    private Integer displayOrder;
 }

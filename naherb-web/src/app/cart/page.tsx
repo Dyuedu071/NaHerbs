@@ -151,7 +151,7 @@ export default function CartPage() {
   return (
     <>
       <PublicHeader />
-      <main className="pt-32 pb-xl px-gutter max-w-[1400px] mx-auto min-h-[819px]">
+      <main className="pt-32 pb-xl px-gutter max-w-container-max mx-auto min-h-[819px]">
         {/* Header */}
         <header className="mb-12">
           <h1 className="font-headline-lg text-headline-lg md:font-headline-lg-mobile md:text-headline-lg-mobile text-primary mb-2">

@@ -20,4 +20,5 @@ public class ProductSkuResponse {
     private Integer stockQuantity;
     private StockStatus stockStatus;
     private String thumbnailUrl;
+    private vn.io.naherb.common.enums.SkuStatus status;
 }

@@ -16,6 +16,7 @@ export interface ProductSummary {
   thumbnailUrl?: string | null;
   /** @nullable */
   shortDescription?: string | null;
+  originalPrice?: number;
   minSalePrice?: number;
   maxSalePrice?: number;
   stockStatus?: StockStatus;
