@@ -1,6 +1,7 @@
 "use client";
 
 import { useRequireAuth } from "@/components/account/useRequireAuth";
+import PublicHeader from "@/components/common/PublicHeader";
 
 import { extractApiErrorMessage } from "@/lib/api-error";
 import { formatMoney, paymentMethodLabels } from "@/lib/order-format";
@@ -185,22 +186,10 @@ function CheckoutContent() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
-      <header className="border-b border-border-warm bg-surface/90 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-container-max items-center justify-between px-gutter">
-          <Link href="/" className="font-display-lg text-display-lg text-primary">
-            NaHerbs
-          </Link>
-          <Link
-            href="/cart"
-            className="text-label-md font-label-md text-secondary hover:text-primary"
-          >
-            Quay lại giỏ hàng
-          </Link>
-        </div>
-      </header>
-
-      <section className="mx-auto grid max-w-container-max gap-md px-gutter py-lg lg:grid-cols-[1fr_360px]">
+    <>
+      <PublicHeader />
+      <main className="min-h-screen bg-background pt-28">
+        <section className="mx-auto grid max-w-container-max gap-md px-gutter pb-lg lg:grid-cols-[1fr_360px]">
         <form
           onSubmit={handleSubmit}
           className="flex flex-col gap-md rounded-[24px] border border-herbal-beige bg-surface-container-lowest p-md shadow-ambient-sm"
@@ -212,7 +201,7 @@ function CheckoutContent() {
             </p>
           </div>
 
-          {items.length === 0 && (
+          {items.length === 0 && !createdOrder && (
             <p className="rounded-lg bg-error-container px-sm py-2 text-caption text-error">
               Giỏ hàng đang trống. Vui lòng thêm sản phẩm trước khi thanh toán.
             </p>
@@ -382,7 +371,7 @@ function CheckoutContent() {
           {createdOrder && (
             <section className="rounded-xl border border-primary/30 bg-success-bg p-md">
               <h2 className="text-body-lg font-body-lg font-semibold text-primary">
-                Đã tạo đơn {createdOrder.orderCode}
+                Đặt hàng thành công
               </h2>
               <p className="mt-xs text-body-md text-text-main">
                 Tổng tiền: {formatMoney(createdOrder.totalAmount)}
@@ -440,8 +429,9 @@ function CheckoutContent() {
             <span>{formatMoney(selectedSubtotal)}</span>
           </div>
         </aside>
-      </section>
-    </main>
+        </section>
+      </main>
+    </>
   );
 }
 
@@ -478,8 +468,11 @@ function CheckoutField({
 
 function CheckoutShell({ children }: { children: string }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-gutter">
-      <p className="text-body-md text-text-muted">{children}</p>
-    </main>
+    <>
+      <PublicHeader />
+      <main className="flex min-h-screen items-center justify-center bg-background px-gutter pt-20">
+        <p className="text-body-md text-text-muted">{children}</p>
+      </main>
+    </>
   );
 }
