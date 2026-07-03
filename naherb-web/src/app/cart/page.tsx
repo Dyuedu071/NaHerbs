@@ -278,7 +278,7 @@ export default function CartPage() {
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
                           <div className="flex justify-between items-start pr-8">
-                            <Link href={`/san-pham/${item.skuId}`} className="font-headline-md text-headline-md text-primary !text-[20px] hover:underline">
+                            <Link href={`/san-pham/${item.productSlug}`} className="font-headline-md text-headline-md text-primary !text-[20px] hover:underline">
                               {item.productName ?? "Sản phẩm"}
                             </Link>
                             <button
