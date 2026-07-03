@@ -64,8 +64,8 @@ export default async function ProductDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <main className="flex-grow pt-24 min-h-screen bg-surface">
+      <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <nav className="flex mb-8 text-sm text-gray-500">
           <a href="/" className="hover:text-green-700">Trang chủ</a>
           <span className="mx-2">/</span>
@@ -107,6 +107,6 @@ export default async function ProductDetailPage({ params }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

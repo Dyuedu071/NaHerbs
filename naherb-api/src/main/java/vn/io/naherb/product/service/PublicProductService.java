@@ -14,8 +14,10 @@ public interface PublicProductService {
     
     PageResponse<ProductListResponse> searchProducts(
             String keyword, 
-            String categorySlug, 
+            List<String> categorySlugs, 
             String need, 
+            java.math.BigDecimal minPrice,
+            java.math.BigDecimal maxPrice,
             Boolean inStockOnly, 
             String sort, 
             int page, 

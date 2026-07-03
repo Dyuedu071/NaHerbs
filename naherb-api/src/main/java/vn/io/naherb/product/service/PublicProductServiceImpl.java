@@ -60,7 +60,7 @@ public class PublicProductServiceImpl implements PublicProductService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ProductListResponse> searchProducts(
-            String keyword, String categorySlug, String need, Boolean inStockOnly, String sortStr, int page, int size) {
+            String keyword, List<String> categorySlugs, String need, java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice, Boolean inStockOnly, String sortStr, int page, int size) {
         
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         if ("price_asc".equals(sortStr)) {
@@ -81,8 +81,8 @@ public class PublicProductServiceImpl implements PublicProductService {
             if (keyword != null && !keyword.isBlank()) {
                 predicates.add(cb.like(cb.lower(root.get("name")), "%" + keyword.toLowerCase() + "%"));
             }
-            if (categorySlug != null && !categorySlug.isBlank()) {
-                predicates.add(cb.equal(root.join("category").get("slug"), categorySlug));
+            if (categorySlugs != null && !categorySlugs.isEmpty()) {
+                predicates.add(root.join("category").get("slug").in(categorySlugs));
             }
             if (need != null && !need.isBlank()) {
                 // Map need to benefits or primaryKeyword using LIKE
@@ -109,15 +109,26 @@ public class PublicProductServiceImpl implements PublicProductService {
             List<ProductSku> skus = skusByProduct.getOrDefault(product.getId(), List.of());
             List<ProductImage> images = imagesByProduct.getOrDefault(product.getId(), List.of());
             
-            BigDecimal minPrice = skus.stream().map(ProductSku::getSalePrice).min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
-            BigDecimal maxPrice = skus.stream().map(ProductSku::getSalePrice).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+            BigDecimal minSalePrice = skus.stream().map(ProductSku::getSalePrice).min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+            BigDecimal maxSalePrice = skus.stream().map(ProductSku::getSalePrice).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
             boolean inStock = skus.stream().anyMatch(sku -> sku.getStockStatus() == StockStatus.IN_STOCK);
             
             String thumb = images.stream().filter(ProductImage::isThumbnail).findFirst()
                     .map(ProductImage::getUrl).orElse(null);
                     
             if (inStockOnly != null && inStockOnly && !inStock) {
-                return null; // Should ideally filter in DB, but doing in-memory for this MVP
+                return null;
+            }
+            if (minPrice != null && maxPrice != null) {
+                if (maxPrice.compareTo(minPrice) < 0) {
+                     if (maxPrice.compareTo(BigDecimal.ZERO) > 0 && minPrice.compareTo(maxPrice) > 0) return null;
+                }
+            }
+            if (minPrice != null && maxPrice.compareTo(minPrice) < 0) {
+                return null;
+            }
+            if (maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+                return null;
             }
             
             return ProductListResponse.builder()
@@ -212,7 +223,8 @@ public class PublicProductServiceImpl implements PublicProductService {
                 .salePrice(sku.getSalePrice())
                 .stockQuantity(sku.getStockQuantity())
                 .stockStatus(sku.getStockStatus())
-                .thumbnailUrl(null) // Can map if sku has specific image
+                .status(sku.getStatus())
+                .thumbnailUrl(sku.getThumbnailMedia() != null ? sku.getThumbnailMedia().getUrl() : null)
                 .build();
     }
 }

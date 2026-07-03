@@ -35,14 +35,16 @@ public class PublicProductController {
     @GetMapping("/products")
     public ResponseEntity<PageResponse<ProductListResponse>> getProducts(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String categorySlug,
+            @RequestParam(required = false) List<String> categorySlugs,
             @RequestParam(required = false) String need,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice,
             @RequestParam(required = false) Boolean inStockOnly,
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
         return ResponseEntity.ok(publicProductService.searchProducts(
-                keyword, categorySlug, need, inStockOnly, sort, page, size));
+                keyword, categorySlugs, need, minPrice, maxPrice, inStockOnly, sort, page, size));
     }
 
     @GetMapping("/products/{slug}")

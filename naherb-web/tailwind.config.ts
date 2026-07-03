@@ -79,7 +79,7 @@ const config: Config = {
         "md": "24px",
         "lg": "48px",
         "gutter": "40px",
-        "container-max": "1536px",
+        "container-max": "1920px",
         "xl": "80px",
       },
       maxWidth: {
@@ -88,7 +88,7 @@ const config: Config = {
         "md": "28rem",
         "lg": "32rem",
         "xl": "36rem",
-        "container-max": "1536px",
+        "container-max": "1920px",
       },
       fontFamily: {
         "body-lg": ["var(--font-inter)", "sans-serif"],
