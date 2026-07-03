@@ -84,6 +84,7 @@ export default function RootLayout({
     <html
       lang="vi"
       className={`${inter.variable} ${merriweather.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <link
@@ -102,7 +103,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col" suppressHydrationWarning>
         <GoogleOAuthProvider
           clientId={
             process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
