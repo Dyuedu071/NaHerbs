@@ -27,14 +27,22 @@ public class MediaService {
             throw new IllegalArgumentException("File size exceeds 10MB limit");
         }
 
-        // Validate content type
+        // Resolve content type: prefer the multipart header, fall back to filename extension.
+        // Browsers can send null content-type for subsequent multipart parts in some environments.
         String contentType = file.getContentType();
-        if (contentType == null || (!contentType.equals("image/jpeg") 
-                && !contentType.equals("image/jpg") 
-                && !contentType.equals("image/png") 
-                && !contentType.equals("image/webp")
-                && !contentType.equals("image/gif"))) {
-            throw new IllegalArgumentException("Invalid file format: " + contentType + ". Only JPG, PNG, WEBP, GIF are allowed.");
+        if (contentType == null || contentType.isBlank()) {
+            contentType = resolveContentTypeFromFilename(file.getOriginalFilename());
+        }
+
+        // Validate content type
+        if (contentType == null
+                || (!contentType.equals("image/jpeg")
+                        && !contentType.equals("image/jpg")
+                        && !contentType.equals("image/png")
+                        && !contentType.equals("image/webp")
+                        && !contentType.equals("image/gif"))) {
+            throw new IllegalArgumentException(
+                    "Invalid file format: " + contentType + ". Only JPG, PNG, WEBP, GIF are allowed.");
         }
 
         MediaType actualType = type != null ? type : MediaType.OTHER;
@@ -72,5 +80,22 @@ public class MediaService {
         }
         
         mediaAssetRepository.delete(asset);
+    }
+
+    /**
+     * Resolves MIME type from the file's extension as a fallback when the browser
+     * does not include a Content-Type header for multipart file parts.
+     */
+    private String resolveContentTypeFromFilename(String filename) {
+        if (filename == null) return null;
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex < 0) return null;
+        return switch (filename.substring(dotIndex + 1).toLowerCase()) {
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "png" -> "image/png";
+            case "webp" -> "image/webp";
+            case "gif" -> "image/gif";
+            default -> null;
+        };
     }
 }
