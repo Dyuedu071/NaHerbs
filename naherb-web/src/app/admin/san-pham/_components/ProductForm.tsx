@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { UpsertProductRequest, ProductStatus } from '@/services/generated/model';
 import { useGetProductCategories } from '@/services/generated/public-products/public-products';
@@ -44,14 +44,62 @@ const STEPS = [
   { id: 5, label: 'Tổng quan', icon: 'check_circle' },
 ];
 
+/**
+ * Wraps a File as a Blob with an explicit MIME type.
+ * Some browsers omit the Content-Type part-header in multipart uploads for
+ * non-first files, causing Spring's MultipartFile.getContentType() to return
+ * null and the backend to reject the request with 400.
+ * Using new Blob([file], { type }) forces the browser to always include it.
+ */
+const EXT_MIME: Record<string, string> = {
+  jpg: 'image/jpeg', jpeg: 'image/jpeg',
+  png: 'image/png', webp: 'image/webp', gif: 'image/gif',
+};
+function toTypedBlob(file: File): Blob {
+  const mimeType = file.type ||
+    EXT_MIME[file.name.split('.').pop()?.toLowerCase() ?? ''] ||
+    'application/octet-stream';
+  return new Blob([file], { type: mimeType });
+}
+
 export default function ProductForm({ initialData, onSubmit, isLoading, title, embedded }: ProductFormProps) {
   const router = useRouter();
   const { data: categoriesData } = useGetProductCategories();
   const categories = Array.isArray(categoriesData) ? categoriesData : ((categoriesData as any)?.data || []);
   
   const [uploading, setUploading] = useState(false);
+  const [skuUploading, setSkuUploading] = useState<Set<string>>(new Set());
   const [currentStep, setCurrentStep] = useState(1);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // ─── TOAST NOTIFICATION ───────────────────────────────────────────────
+  type ToastType = 'error' | 'success' | 'warning';
+  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+  const toastTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = useCallback((message: string, type: ToastType = 'error') => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ message, type });
+    toastTimer.current = setTimeout(() => setToast(null), 4000);
+  }, []);
+
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
+
+  // ─── IMAGE FORMAT VALIDATION ──────────────────────────────────────────
+  const ALLOWED_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif']);
+  const ALLOWED_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']);
+
+  /** Returns list of invalid file names, or empty array if all are valid */
+  const findInvalidImages = (files: FileList | File[]): string[] => {
+    const invalid: string[] = [];
+    Array.from(files).forEach(file => {
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+      const validExt = ALLOWED_EXTENSIONS.has(ext);
+      const validMime = !file.type || ALLOWED_MIME.has(file.type);
+      if (!validExt || !validMime) invalid.push(file.name);
+    });
+    return invalid;
+  };
   
   const isEditMode = !!initialData?.id;
 
@@ -79,13 +127,27 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
+
+    // ── Client-side format check ──
+    const invalid = findInvalidImages(e.target.files);
+    if (invalid.length > 0) {
+      showToast(
+        `Ảnh không đúng định dạng: ${invalid.join(', ')}. Chỉ chấp nhận JPG, PNG, WEBP, GIF.`,
+        'error'
+      );
+      e.target.value = '';
+      return;
+    }
+
     setUploading(true);
     try {
       const newImages = [...(formData.images || [])];
       for (let i = 0; i < e.target.files.length; i++) {
         const file = e.target.files[i];
         const payload = new FormData();
-        payload.append('file', file);
+        // toTypedBlob ensures Content-Type is always present in the multipart
+        // part header (some browsers omit it for non-first file fields).
+        payload.append('file', toTypedBlob(file), file.name);
         payload.append('type', 'PRODUCT');
         
         const res: any = await customInstance({
@@ -105,7 +167,7 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
       setFormData(prev => ({ ...prev, images: newImages }));
     } catch (error) {
       console.error('Upload failed', error);
-      alert('Tải ảnh thất bại');
+      showToast('Tải ảnh thất bại, vui lòng thử lại.', 'error');
     } finally {
       setUploading(false);
       e.target.value = ''; 
@@ -114,11 +176,27 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
 
   const handleSkuImageUpload = async (vi: number, si: number, e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
-    setUploading(true);
+
+    // ── Client-side format check ──
+    const invalid = findInvalidImages(e.target.files);
+    if (invalid.length > 0) {
+      showToast(
+        `Ảnh không đúng định dạng: ${invalid.join(', ')}. Chỉ chấp nhận JPG, PNG, WEBP, GIF.`,
+        'error'
+      );
+      e.target.value = '';
+      return;
+    }
+
+    const key = `${vi}_${si}`;
+    const inputEl = e.target;
+    setSkuUploading(prev => new Set(prev).add(key));
     try {
       const file = e.target.files[0];
       const payload = new FormData();
-      payload.append('file', file);
+      // toTypedBlob ensures Content-Type is always present in the multipart
+      // part header (some browsers omit it for non-first file fields).
+      payload.append('file', toTypedBlob(file), file.name);
       payload.append('type', 'PRODUCT');
       
       const res: any = await customInstance({
@@ -141,9 +219,15 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
       });
     } catch (error) {
       console.error('Upload failed', error);
-      alert('Tải ảnh thất bại');
+      showToast('Tải ảnh SKU thất bại, vui lòng thử lại.', 'error');
     } finally {
-      setUploading(false);
+      setSkuUploading(prev => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
+      // Reset input so the same file can be re-selected if needed
+      inputEl.value = '';
     }
   };
 
@@ -313,6 +397,35 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
   const inputCls = "w-full px-4 py-2 bg-background border border-border-warm rounded-lg focus:outline-none focus:border-primary text-body-md transition-colors";
   const inputErrCls = "w-full px-4 py-2 bg-red-50 border border-red-500 rounded-lg focus:outline-none focus:border-red-600 text-body-md transition-colors";
   const labelCls = "text-label-md font-label-md text-on-surface";
+
+  // ─── TOAST UI ────────────────────────────────────────────────────────
+  const toastConfig = {
+    error:   { bg: 'bg-red-50 border-red-300',   icon: 'error',            iconCls: 'text-red-500',    textCls: 'text-red-800' },
+    success: { bg: 'bg-emerald-50 border-emerald-300', icon: 'check_circle', iconCls: 'text-emerald-500', textCls: 'text-emerald-800' },
+    warning: { bg: 'bg-amber-50 border-amber-300', icon: 'warning',         iconCls: 'text-amber-500',  textCls: 'text-amber-800' },
+  };
+
+  const renderToast = () => {
+    if (!toast) return null;
+    const cfg = toastConfig[toast.type];
+    return (
+      <div
+        role="alert"
+        className={`fixed top-6 right-6 z-[9999] flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg max-w-sm animate-in slide-in-from-top-2 fade-in duration-300 ${cfg.bg}`}
+      >
+        <span className={`material-symbols-outlined text-xl flex-shrink-0 mt-0.5 ${cfg.iconCls}`}>{cfg.icon}</span>
+        <p className={`text-body-sm leading-snug ${cfg.textCls}`}>{toast.message}</p>
+        <button
+          type="button"
+          onClick={() => setToast(null)}
+          className="ml-auto -mr-1 p-1 rounded-lg hover:bg-black/10 transition-colors flex-shrink-0"
+          aria-label="Đóng thông báo"
+        >
+          <span className="material-symbols-outlined text-base text-current">close</span>
+        </button>
+      </div>
+    );
+  };
 
   const renderStep1 = () => (
     <div className="space-y-lg animate-in fade-in duration-300">
@@ -537,8 +650,18 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
                               </div>
                             ) : (
                               <div className="relative w-16 h-16 rounded border border-dashed border-border-warm bg-surface-container-low flex flex-col items-center justify-center text-text-muted hover:border-primary hover:text-primary transition-colors cursor-pointer">
-                                <span className="material-symbols-outlined text-xl mb-1">add_photo_alternate</span>
-                                <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" onChange={(e) => handleSkuImageUpload(vi, si, e)} disabled={uploading} />
+                                {skuUploading.has(`${vi}_${si}`) ? (
+                                  <span className="material-symbols-outlined text-xl animate-spin text-primary">progress_activity</span>
+                                ) : (
+                                  <span className="material-symbols-outlined text-xl mb-1">add_photo_alternate</span>
+                                )}
+                                <input
+                                  type="file"
+                                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                  accept="image/*"
+                                  onChange={(e) => handleSkuImageUpload(vi, si, e)}
+                                  disabled={skuUploading.has(`${vi}_${si}`)}
+                                />
                               </div>
                             )}
                           </div>
@@ -690,6 +813,7 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
   if (embedded) {
     return (
       <div className="flex flex-col relative space-y-md">
+        {renderToast()}
         {isLoading && (
           <div className="absolute inset-0 z-50 bg-background/50 backdrop-blur-[2px] rounded-2xl flex flex-col items-center justify-center">
              <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-ambient-lg border border-border-warm flex flex-col items-center gap-3">
@@ -712,6 +836,7 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
 
   return (
     <main className="flex-1 overflow-y-auto p-gutter bg-background">
+      {renderToast()}
       <div className="max-w-7xl mx-auto space-y-md">
         <div className="flex items-center gap-sm mb-6">
           <button onClick={() => router.back()} className="p-2 hover:bg-surface-container rounded-full transition-colors text-text-muted">

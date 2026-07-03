@@ -118,11 +118,11 @@ export default async function ProductsPage({
               )}
 
               {/* Pagination */}
-              {totalPages > 1 && (
+              {totalPages > 0 && (
                 <div className="mt-xl flex justify-center items-center gap-2">
                   <a 
                     href={currentPage > 0 ? generatePaginationUrl(currentPage - 1) : '#'} 
-                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${currentPage > 0 ? 'text-text-main hover:bg-surface-variant hover:text-primary' : 'text-text-muted cursor-not-allowed'}`}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${currentPage > 0 ? 'text-text-main hover:bg-surface-variant hover:text-primary' : 'text-text-muted opacity-50 cursor-default pointer-events-none'}`}
                     aria-label="Trang trước"
                     aria-disabled={currentPage === 0}
                   >
@@ -145,7 +145,7 @@ export default async function ProductsPage({
 
                   <a 
                     href={currentPage < totalPages - 1 ? generatePaginationUrl(currentPage + 1) : '#'} 
-                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${currentPage < totalPages - 1 ? 'text-text-main hover:bg-surface-variant hover:text-primary' : 'text-text-muted cursor-not-allowed'}`}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${currentPage < totalPages - 1 ? 'text-text-main hover:bg-surface-variant hover:text-primary' : 'text-text-muted opacity-50 cursor-default pointer-events-none'}`}
                     aria-label="Trang sau"
                     aria-disabled={currentPage === totalPages - 1}
                   >

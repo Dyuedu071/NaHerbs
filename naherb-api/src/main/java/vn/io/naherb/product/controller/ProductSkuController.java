@@ -47,4 +47,10 @@ public class ProductSkuController {
         productService.deleteSku(skuId);
         return ApiResponse.ok(null);
     }
+
+    @PatchMapping("/{skuId}/restore")
+    public ApiResponse<Object> restoreSku(@PathVariable UUID skuId) {
+        productService.restoreSku(skuId);
+        return ApiResponse.ok(null);
+    }
 }

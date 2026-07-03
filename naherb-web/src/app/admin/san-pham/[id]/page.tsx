@@ -41,13 +41,21 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [newStockQty, setNewStockQty] = useState(0);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  // Confirmation modal state
+  const [confirmModal, setConfirmModal] = useState<{
+    title: string;
+    message: string;
+    variant?: 'danger' | 'restore';
+    onConfirm: () => void;
+  } | null>(null);
+
   // Fetch specific product data
   const { data: productData, isLoading: isFetching, refetch: refetchProduct } = useGetAdminProductsProductId(id, {
     query: { enabled: !!id    }
   });
 
   const deleteVersionMutation = useMutation({
-    mutationFn: (versionId: string) => customInstance({ url: `/api/v1/admin/products/${id}/versions/${versionId}`, method: 'DELETE' }),
+    mutationFn: (versionId: string) => customInstance({ url: `/v1/admin/products/${id}/versions/${versionId}`, method: 'DELETE' }),
     onSuccess: () => {
       toast.success('Xóa phiên bản thành công');
       refetchVersions();
@@ -59,7 +67,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   });
 
   const deleteSkuMutation = useMutation({
-    mutationFn: (skuId: string) => customInstance({ url: `/api/v1/admin/product-skus/${skuId}`, method: 'DELETE' }),
+    mutationFn: (skuId: string) => customInstance({ url: `/v1/admin/product-skus/${skuId}`, method: 'DELETE' }),
     onSuccess: () => {
       toast.success('Xóa SKU thành công');
       refetchSkus();
@@ -70,15 +78,19 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   });
 
   const handleDeleteVersion = (versionId: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa phiên bản này? Các SKU thuộc phiên bản này cũng sẽ bị xóa vĩnh viễn.')) {
-      deleteVersionMutation.mutate(versionId);
-    }
+    setConfirmModal({
+      title: 'Xóa phiên bản',
+      message: 'Bạn có chắc chắn muốn xóa phiên bản này? Phiên bản và các SKU thuộc phiên bản này sẽ bị ẩn khỏi gian hàng (không xóa khỏi CSDL).',
+      onConfirm: () => deleteVersionMutation.mutate(versionId),
+    });
   };
 
   const handleDeleteSku = (skuId: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa SKU này?')) {
-      deleteSkuMutation.mutate(skuId);
-    }
+    setConfirmModal({
+      title: 'Xóa SKU',
+      message: 'Bạn có chắc chắn muốn xóa SKU này? SKU sẽ được ẩn khỏi gian hàng nhưng không bị xóa khỏi CSDL.',
+      onConfirm: () => deleteSkuMutation.mutate(skuId),
+    });
   };
 
   const product = (productData as any)?.data || productData;
@@ -111,11 +123,42 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const updateProductMutation = usePutAdminProductsProductId();
   const createVersionMutation = usePostAdminProductsProductIdVersions();
   const updateVersionMutation = useMutation({
-    mutationFn: ({ versionId, data }: { versionId: string; data: any }) => customInstance({ url: `/api/v1/admin/products/${id}/versions/${versionId}`, method: 'PUT', data })
+    mutationFn: ({ versionId, data }: { versionId: string; data: any }) =>
+      customInstance({ url: `/v1/admin/products/${id}/versions/${versionId}`, method: 'PUT', data })
+  });
+  const restoreVersionMutation = useMutation({
+    mutationFn: (versionId: string) =>
+      customInstance({ url: `/v1/admin/products/${id}/versions/${versionId}/restore`, method: 'PATCH' }),
+    onSuccess: () => { toast.success('Khôi phục phiên bản thành công'); refetchVersions(); refetchSkus(); },
+    onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi khôi phục phiên bản'),
   });
   const createSkuMutation = usePostAdminProductsProductIdSkus();
   const updateSkuMutation = usePutAdminProductSkusSkuId();
   const updateStockMutation = usePatchAdminProductSkusSkuIdStock();
+  const restoreSkuMutation = useMutation({
+    mutationFn: (skuId: string) =>
+      customInstance({ url: `/v1/admin/product-skus/${skuId}/restore`, method: 'PATCH' }),
+    onSuccess: () => { toast.success('Khôi phục SKU thành công'); refetchSkus(); },
+    onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi khôi phục SKU'),
+  });
+
+  const handleRestoreVersion = (versionId: string) => {
+    setConfirmModal({
+      title: 'Khôi phục phiên bản',
+      message: 'Phiên bản và các SKU của nó sẽ được khôi phục về trạng thái hoạt động bình thường.',
+      variant: 'restore',
+      onConfirm: () => restoreVersionMutation.mutate(versionId),
+    });
+  };
+
+  const handleRestoreSku = (skuId: string) => {
+    setConfirmModal({
+      title: 'Khôi phục SKU',
+      message: 'SKU này sẽ được khôi phục về trạng thái hoạt động và hiển thị trên gian hàng.',
+      variant: 'restore',
+      onConfirm: () => restoreSkuMutation.mutate(skuId),
+    });
+  };
 
   // Handlers
   const handleProductSubmit = async (data: any) => {
@@ -123,8 +166,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       await updateProductMutation.mutateAsync({ productId: id, data });
       refetchProduct();
       toast.success('Cập nhật sản phẩm thành công!');
-    } catch {
-      toast.error('Có lỗi xảy ra khi cập nhật sản phẩm.');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật sản phẩm.');
     }
   };
 
@@ -207,8 +250,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       setSkuForm({ ...EMPTY_SKU_FORM });
       refetchSkus();
       toast.success(editingSku ? 'Cập nhật SKU thành công' : 'Tạo SKU thành công');
-    } catch {
-      toast.error('Có lỗi xảy ra khi lưu SKU.');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Có lỗi xảy ra khi lưu SKU.');
     }
   };
 
@@ -218,8 +261,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       await updateStockMutation.mutateAsync({ skuId: stockModal.id, data: { stockQuantity: newStockQty } });
       setStockModal(null);
       refetchSkus();
-    } catch {
-      alert('Có lỗi xảy ra khi cập nhật tồn kho.');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật tồn kho.');
     }
   };
 
@@ -345,6 +388,78 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
   return (
     <main className="flex-1 overflow-y-auto bg-background">
+
+      {/* ── Confirmation Modal ─────────────────────────────────────────── */}
+      {confirmModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-modal-title"
+        >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-200"
+            onClick={() => setConfirmModal(null)}
+          />
+
+          {/* Card */}
+          <div className="relative z-10 bg-surface-container-lowest rounded-2xl border border-border-warm shadow-ambient-lg w-full max-w-md p-6 animate-in zoom-in-95 fade-in duration-200">
+            {/* Icon */}
+            <div className={`flex items-center justify-center w-12 h-12 rounded-full mx-auto mb-4 ${
+              confirmModal.variant === 'restore' ? 'bg-emerald-100' : 'bg-red-100'
+            }`}>
+              <span className={`material-symbols-outlined text-2xl ${
+                confirmModal.variant === 'restore' ? 'text-emerald-600' : 'text-red-600'
+              }`}>
+                {confirmModal.variant === 'restore' ? 'restore' : 'delete_forever'}
+              </span>
+            </div>
+
+            {/* Title */}
+            <h2
+              id="confirm-modal-title"
+              className="text-title-md font-title-md text-on-surface text-center mb-2"
+            >
+              {confirmModal.title}
+            </h2>
+
+            {/* Message */}
+            <p className="text-body-sm text-text-muted text-center leading-relaxed mb-6">
+              {confirmModal.message}
+            </p>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmModal(null)}
+                className="flex-1 px-4 py-2.5 rounded-full border border-border-warm text-text-main hover:bg-surface-container transition-colors text-label-md font-label-md"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  confirmModal.onConfirm();
+                  setConfirmModal(null);
+                }}
+                className={`flex-1 px-4 py-2.5 rounded-full text-white active:scale-[0.98] transition-all text-label-md font-label-md flex items-center justify-center gap-1.5 shadow-ambient-md ${
+                  confirmModal.variant === 'restore'
+                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">
+                  {confirmModal.variant === 'restore' ? 'restore' : 'delete'}
+                </span>
+                {confirmModal.variant === 'restore' ? 'Khôi phục' : 'Xóa'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Page header */}
       <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm border-b border-border-warm px-gutter py-3">
         <div className="max-w-7xl mx-auto flex items-center gap-sm">
@@ -428,7 +543,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   </thead>
                   <tbody className="divide-y divide-border-warm">
                     {versions.map((v: any) => (
-                      <tr key={v.id} className="hover:bg-surface/40 transition-colors group">
+                      <tr key={v.id} className={`hover:bg-surface/40 transition-colors group ${v.status === 'ARCHIVED' ? 'opacity-60' : ''}`}>
                         <td className="py-3 px-4 font-semibold text-on-surface">{v.name}</td>
                         <td className="py-3 px-4 font-mono text-caption text-text-muted">{v.code || '—'}</td>
                         <td className="py-3 px-4 text-text-muted">{v.displayOrder ?? 0}</td>
@@ -436,30 +551,43 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         <td className="py-3 px-4 text-text-muted">{v.skus?.length ?? 0} SKU</td>
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={() => {
-                                setEditingVersion(v);
-                                setVersionForm({
-                                  name: v.name || '',
-                                  code: v.code || '',
-                                  displayOrder: v.displayOrder || 0,
-                                  status: v.status || 'PUBLISHED'
-                                });
-                                setShowVersionModal(true);
-                              }}
-                              title="Sửa phiên bản"
-                              className="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"
-                            >
-                              <span className="material-symbols-outlined text-[18px]">edit</span>
-                            </button>
-                            <button
-                              onClick={() => handleDeleteVersion(v.id)}
-                              disabled={deleteVersionMutation.isPending}
-                              title="Xóa phiên bản"
-                              className="p-1.5 text-text-muted hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
-                            >
-                              <span className="material-symbols-outlined text-[18px]">delete</span>
-                            </button>
+                            {v.status !== 'ARCHIVED' && (
+                              <button
+                                onClick={() => {
+                                  setEditingVersion(v);
+                                  setVersionForm({
+                                    name: v.name || '',
+                                    code: v.code || '',
+                                    displayOrder: v.displayOrder || 0,
+                                    status: v.status || 'PUBLISHED'
+                                  });
+                                  setShowVersionModal(true);
+                                }}
+                                title="Sửa phiên bản"
+                                className="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"
+                              >
+                                <span className="material-symbols-outlined text-[18px]">edit</span>
+                              </button>
+                            )}
+                            {v.status === 'ARCHIVED' ? (
+                              <button
+                                onClick={() => handleRestoreVersion(v.id)}
+                                disabled={restoreVersionMutation.isPending}
+                                title="Khôi phục phiên bản"
+                                className="p-1.5 text-text-muted hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors disabled:opacity-50"
+                              >
+                                <span className="material-symbols-outlined text-[18px]">restore</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleDeleteVersion(v.id)}
+                                disabled={deleteVersionMutation.isPending}
+                                title="Lưu trữ phiên bản"
+                                className="p-1.5 text-text-muted hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                              >
+                                <span className="material-symbols-outlined text-[18px]">archive</span>
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -525,7 +653,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         const ver = versions.find((v: any) => v.id === sku.versionId);
                         const attrs = [sku.color, sku.scent, sku.type].filter(Boolean).join(' · ');
                         return (
-                          <tr key={sku.id} className="hover:bg-surface/40 transition-colors group">
+                          <tr key={sku.id} className={`hover:bg-surface/40 transition-colors group ${sku.status === 'INACTIVE' ? 'opacity-60' : ''}`}>
                             <td className="py-3 px-4">
                               <div className="flex items-center gap-3">
                                 {sku.thumbnailMedia?.location ? (
@@ -557,28 +685,43 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                             <td className="py-3 px-4"><StatusBadge status={sku.status} /></td>
                             <td className="py-3 px-4 text-right">
                               <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                  onClick={() => { setStockModal(sku); setNewStockQty(sku.stockQuantity); }}
-                                  title="Cập nhật tồn kho"
-                                  className="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"
-                                >
-                                  <span className="material-symbols-outlined text-[18px]">inventory</span>
-                                </button>
-                                <button
-                                  onClick={() => openEditSku(sku)}
-                                  title="Sửa SKU"
-                                  className="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"
-                                >
-                                  <span className="material-symbols-outlined text-[18px]">edit</span>
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteSku(sku.id)}
-                                  disabled={deleteSkuMutation.isPending}
-                                  title="Xóa SKU"
-                                  className="p-1.5 text-text-muted hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
-                                >
-                                  <span className="material-symbols-outlined text-[18px]">delete</span>
-                                </button>
+                                {sku.status !== 'INACTIVE' && (
+                                  <>
+                                    <button
+                                      onClick={() => { setStockModal(sku); setNewStockQty(sku.stockQuantity); }}
+                                      title="Cập nhật tồn kho"
+                                      className="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"
+                                    >
+                                      <span className="material-symbols-outlined text-[18px]">inventory</span>
+                                    </button>
+                                    <button
+                                      onClick={() => openEditSku(sku)}
+                                      title="Sửa SKU"
+                                      className="p-1.5 text-text-muted hover:text-primary rounded-lg hover:bg-surface-container transition-colors"
+                                    >
+                                      <span className="material-symbols-outlined text-[18px]">edit</span>
+                                    </button>
+                                  </>
+                                )}
+                                {sku.status === 'INACTIVE' ? (
+                                  <button
+                                    onClick={() => handleRestoreSku(sku.id)}
+                                    disabled={restoreSkuMutation.isPending}
+                                    title="Khôi phục SKU"
+                                    className="p-1.5 text-text-muted hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors disabled:opacity-50"
+                                  >
+                                    <span className="material-symbols-outlined text-[18px]">restore</span>
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleDeleteSku(sku.id)}
+                                    disabled={deleteSkuMutation.isPending}
+                                    title="Lưu trữ SKU"
+                                    className="p-1.5 text-text-muted hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                                  >
+                                    <span className="material-symbols-outlined text-[18px]">archive</span>
+                                  </button>
+                                )}
                               </div>
                             </td>
                           </tr>
