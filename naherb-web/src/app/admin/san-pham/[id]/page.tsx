@@ -23,6 +23,7 @@ const EMPTY_VERSION_FORM = { name: '', code: '', displayOrder: 0, status: 'PUBLI
 const EMPTY_SKU_FORM = {
   versionId: '', skuCode: '', name: '', color: '', scent: '',
   type: '', originalPrice: '', salePrice: '', stockQuantity: '0', status: 'ACTIVE',
+  thumbnailMediaId: '', thumbnailUrl: ''
 };
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
@@ -38,6 +39,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [versionForm, setVersionForm] = useState({ ...EMPTY_VERSION_FORM });
   const [skuForm, setSkuForm] = useState({ ...EMPTY_SKU_FORM });
   const [newStockQty, setNewStockQty] = useState(0);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Fetch specific product data
   const { data: productData, isLoading: isFetching, refetch: refetchProduct } = useGetAdminProductsProductId(id, {
@@ -120,9 +122,37 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     try {
       await updateProductMutation.mutateAsync({ productId: id, data });
       refetchProduct();
-      alert('Cập nhật sản phẩm thành công!');
+      toast.success('Cập nhật sản phẩm thành công!');
     } catch {
-      alert('Có lỗi xảy ra khi cập nhật sản phẩm.');
+      toast.error('Có lỗi xảy ra khi cập nhật sản phẩm.');
+    }
+  };
+
+  const handleSkuImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setUploadingImage(true);
+    try {
+      const file = e.target.files[0];
+      const payload = new FormData();
+      payload.append('file', file);
+      payload.append('type', 'PRODUCT');
+      
+      const res: any = await customInstance({
+        url: '/v1/admin/media/upload',
+        method: 'POST',
+        data: payload
+      });
+      
+      setSkuForm(prev => ({
+        ...prev,
+        thumbnailMediaId: res.id,
+        thumbnailUrl: res.location
+      }));
+    } catch (error) {
+      console.error('Upload failed', error);
+      toast.error('Tải ảnh thất bại');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -164,6 +194,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       salePrice: Number(skuForm.salePrice),
       stockQuantity: Number(skuForm.stockQuantity),
       status: skuForm.status,
+      thumbnailMediaId: skuForm.thumbnailMediaId || null,
     };
     try {
       if (editingSku) {
@@ -175,8 +206,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       setEditingSku(null);
       setSkuForm({ ...EMPTY_SKU_FORM });
       refetchSkus();
+      toast.success(editingSku ? 'Cập nhật SKU thành công' : 'Tạo SKU thành công');
     } catch {
-      alert('Có lỗi xảy ra khi lưu SKU.');
+      toast.error('Có lỗi xảy ra khi lưu SKU.');
     }
   };
 
@@ -204,6 +236,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       salePrice: sku.salePrice != null ? String(sku.salePrice) : '',
       stockQuantity: String(sku.stockQuantity ?? 0),
       status: sku.status || 'ACTIVE',
+      thumbnailMediaId: sku.thumbnailMedia?.id || '',
+      thumbnailUrl: sku.thumbnailMedia?.location || '',
     });
     setShowSkuModal(true);
   };
@@ -313,7 +347,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     <main className="flex-1 overflow-y-auto bg-background">
       {/* Page header */}
       <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm border-b border-border-warm px-gutter py-3">
-        <div className="max-w-4xl mx-auto flex items-center gap-sm">
+        <div className="max-w-7xl mx-auto flex items-center gap-sm">
           <Link
             href="/admin/san-pham"
             className="p-2 hover:bg-surface-container rounded-full transition-colors text-text-muted flex-shrink-0"
@@ -340,7 +374,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {/* Content area */}
-      <div className="max-w-4xl mx-auto p-gutter space-y-md">
+      <div className="max-w-7xl mx-auto p-gutter space-y-md">
 
         {/* ── Tab: Thông tin chung ────────────────────────────────────── */}
         {activeTab === 'info' && (
@@ -493,8 +527,21 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         return (
                           <tr key={sku.id} className="hover:bg-surface/40 transition-colors group">
                             <td className="py-3 px-4">
-                              <p className="font-semibold text-on-surface">{sku.skuName}</p>
-                              <p className="text-caption text-text-muted font-mono">{sku.skuCode}</p>
+                              <div className="flex items-center gap-3">
+                                {sku.thumbnailMedia?.location ? (
+                                  <div className="w-10 h-10 rounded border border-border-warm overflow-hidden flex-shrink-0 bg-surface-container-low">
+                                    <img src={sku.thumbnailMedia.location} alt="SKU" className="w-full h-full object-cover" />
+                                  </div>
+                                ) : (
+                                  <div className="w-10 h-10 rounded border border-border-warm flex items-center justify-center flex-shrink-0 bg-surface-container-low text-text-muted">
+                                    <span className="material-symbols-outlined text-[20px]">image</span>
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="font-semibold text-on-surface">{sku.skuName}</p>
+                                  <p className="text-caption text-text-muted font-mono">{sku.skuCode}</p>
+                                </div>
+                              </div>
                             </td>
                             <td className="py-3 px-4 text-text-muted whitespace-nowrap">{ver?.name ?? '—'}</td>
                             <td className="py-3 px-4 text-text-muted text-caption">{attrs || '—'}</td>
@@ -679,6 +726,31 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     ))}
                   </select>
                   <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none text-[18px]">expand_more</span>
+                </div>
+              </div>
+
+              {/* SKU Image Upload */}
+              <div className="mb-4">
+                <label className="block text-label-sm font-label-sm text-text-muted mb-2">Ảnh đại diện SKU</label>
+                <div className="flex items-center gap-4">
+                  {skuForm.thumbnailUrl ? (
+                    <div className="relative w-20 h-20 rounded overflow-hidden border border-border-warm bg-surface-container-low group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={skuForm.thumbnailUrl} alt="SKU Thumbnail" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => setSkuForm(prev => ({ ...prev, thumbnailUrl: '', thumbnailMediaId: '' }))} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="material-symbols-outlined text-white">delete</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative w-20 h-20 rounded border-2 border-dashed border-border-warm bg-surface-container-low flex flex-col items-center justify-center text-text-muted hover:border-primary hover:text-primary transition-colors cursor-pointer">
+                      {uploadingImage ? (
+                        <span className="material-symbols-outlined text-2xl mb-1 animate-spin">progress_activity</span>
+                      ) : (
+                        <span className="material-symbols-outlined text-2xl mb-1">add_photo_alternate</span>
+                      )}
+                      <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" onChange={handleSkuImageUpload} disabled={uploadingImage} />
+                    </div>
+                  )}
                 </div>
               </div>
 

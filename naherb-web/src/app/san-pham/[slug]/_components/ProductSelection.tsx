@@ -9,9 +9,10 @@ import { extractApiErrorMessage } from '@/lib/api-error';
 
 interface ProductSelectionProps {
   versions: ProductVersion[];
+  onSkuSelect?: (sku: ProductSku) => void;
 }
 
-export default function ProductSelection({ versions }: ProductSelectionProps) {
+export default function ProductSelection({ versions, onSkuSelect }: ProductSelectionProps) {
   const [selectedVersion, setSelectedVersion] = useState<ProductVersion | undefined>(versions[0]);
   const [selectedSku, setSelectedSku] = useState<ProductSku | undefined>(selectedVersion?.skus?.[0]);
   const [quantity, setQuantity] = useState(1);
@@ -24,6 +25,9 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
     setSelectedVersion(version);
     setSelectedSku(version.skus?.[0]);
     setQuantity(1);
+    if (onSkuSelect && version.skus?.[0]) {
+      onSkuSelect(version.skus[0]);
+    }
   };
 
   const isOutOfStock = selectedSku?.stockStatus === 'OUT_OF_STOCK' || (selectedSku?.stockQuantity ?? 0) === 0;
@@ -60,7 +64,7 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
         )}
       </div>
 
-      {versions.length > 1 && (
+      {versions.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-gray-900 mb-3">Phiên bản</h3>
           <div className="flex flex-wrap gap-3">
@@ -81,7 +85,7 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
         </div>
       )}
 
-      {selectedVersion && selectedVersion.skus && selectedVersion.skus.length > 1 && (
+      {selectedVersion && selectedVersion.skus && selectedVersion.skus.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-gray-900 mb-3">Tùy chọn (Mùi hương / Phân loại)</h3>
           <div className="flex flex-wrap gap-3">
@@ -91,6 +95,7 @@ export default function ProductSelection({ versions }: ProductSelectionProps) {
                 onClick={() => {
                   setSelectedSku(sku);
                   setQuantity(1);
+                  if (onSkuSelect) onSkuSelect(sku);
                 }}
                 className={`px-4 py-2 rounded-xl border text-sm font-medium transition ${
                   selectedSku?.id === sku.id

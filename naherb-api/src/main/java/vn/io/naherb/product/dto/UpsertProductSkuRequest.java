@@ -37,4 +37,6 @@ public class UpsertProductSkuRequest {
     private Integer stockQuantity = 0;
 
     private SkuStatus status = SkuStatus.ACTIVE;
+    
+    private UUID thumbnailMediaId;
 }

@@ -204,6 +204,12 @@ public class ProductService {
                         sku.setSalePrice(sReq.getSalePrice());
                         sku.setStockQuantity(sReq.getStockQuantity() != null ? sReq.getStockQuantity() : 0);
                         sku.setStatus(sReq.getStatus() != null ? sReq.getStatus() : SkuStatus.ACTIVE);
+                        
+                        if (sReq.getThumbnailMediaId() != null) {
+                            MediaAsset media = mediaAssetRepository.findById(sReq.getThumbnailMediaId()).orElse(null);
+                            sku.setThumbnailMedia(media);
+                        }
+                        
                         skuRepository.save(sku);
                     }
                 }
@@ -453,6 +459,12 @@ public class ProductService {
         sku.setSalePrice(request.getSalePrice());
         sku.setStockQuantity(request.getStockQuantity());
         sku.setStatus(request.getStatus() != null ? request.getStatus() : SkuStatus.ACTIVE);
+        if (request.getThumbnailMediaId() != null) {
+            MediaAsset media = mediaAssetRepository.findById(request.getThumbnailMediaId()).orElse(null);
+            sku.setThumbnailMedia(media);
+        } else {
+            sku.setThumbnailMedia(null);
+        }
         int qty = request.getStockQuantity();
         if (qty <= 0) {
             sku.setStockStatus(StockStatus.OUT_OF_STOCK);
@@ -478,6 +490,14 @@ public class ProductService {
         dto.setStockStatus(sku.getStockStatus());
         dto.setStatus(sku.getStatus());
         dto.setDisplayOrder(sku.getDisplayOrder());
+        
+        if (sku.getThumbnailMedia() != null) {
+            ProductSkuDetailDto.ThumbnailMediaDto mediaDto = new ProductSkuDetailDto.ThumbnailMediaDto();
+            mediaDto.setId(sku.getThumbnailMedia().getId());
+            mediaDto.setLocation(sku.getThumbnailMedia().getUrl());
+            dto.setThumbnailMedia(mediaDto);
+        }
+        
         return dto;
     }
 }

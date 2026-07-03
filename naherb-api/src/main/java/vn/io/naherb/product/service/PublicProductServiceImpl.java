@@ -109,8 +109,13 @@ public class PublicProductServiceImpl implements PublicProductService {
             List<ProductSku> skus = skusByProduct.getOrDefault(product.getId(), List.of());
             List<ProductImage> images = imagesByProduct.getOrDefault(product.getId(), List.of());
             
-            BigDecimal minSalePrice = skus.stream().map(ProductSku::getSalePrice).min(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
-            BigDecimal maxSalePrice = skus.stream().map(ProductSku::getSalePrice).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+            ProductSku cheapestSku = skus.stream()
+                    .filter(s -> s.getSalePrice() != null)
+                    .min(java.util.Comparator.comparing(ProductSku::getSalePrice))
+                    .orElse(null);
+            BigDecimal minSalePrice = cheapestSku != null ? cheapestSku.getSalePrice() : BigDecimal.ZERO;
+            BigDecimal originalPrice = cheapestSku != null ? cheapestSku.getOriginalPrice() : null;
+            BigDecimal maxSalePrice = skus.stream().map(ProductSku::getSalePrice).filter(java.util.Objects::nonNull).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
             boolean inStock = skus.stream().anyMatch(sku -> sku.getStockStatus() == StockStatus.IN_STOCK);
             
             String thumb = images.stream().filter(ProductImage::isThumbnail).findFirst()
@@ -119,15 +124,10 @@ public class PublicProductServiceImpl implements PublicProductService {
             if (inStockOnly != null && inStockOnly && !inStock) {
                 return null;
             }
-            if (minPrice != null && maxPrice != null) {
-                if (maxPrice.compareTo(minPrice) < 0) {
-                     if (maxPrice.compareTo(BigDecimal.ZERO) > 0 && minPrice.compareTo(maxPrice) > 0) return null;
-                }
-            }
-            if (minPrice != null && maxPrice.compareTo(minPrice) < 0) {
+            if (minPrice != null && maxSalePrice.compareTo(minPrice) < 0) {
                 return null;
             }
-            if (maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            if (maxPrice != null && minSalePrice.compareTo(maxPrice) > 0) {
                 return null;
             }
             
@@ -137,8 +137,9 @@ public class PublicProductServiceImpl implements PublicProductService {
                     .slug(product.getSlug())
                     .shortDescription(product.getShortDescription())
                     .thumbnailUrl(thumb)
-                    .minSalePrice(minPrice)
-                    .maxSalePrice(maxPrice)
+                    .originalPrice(originalPrice)
+                    .minSalePrice(minSalePrice)
+                    .maxSalePrice(maxSalePrice)
                     .stockStatus(inStock ? StockStatus.IN_STOCK : StockStatus.OUT_OF_STOCK)
                     .build();
         }).filter(java.util.Objects::nonNull).toList();

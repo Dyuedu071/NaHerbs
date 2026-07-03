@@ -60,15 +60,34 @@ export default function ProductCard({ product }: ProductCardProps) {
         
         {/* Price and Cart */}
         <div className="flex items-center justify-between pt-sm mt-auto">
-          <span className="text-tertiary font-price-display text-price-display">
-             {product.minSalePrice === product.maxSalePrice ? (
-                <span>{product.minSalePrice?.toLocaleString('vi-VN')} ₫</span>
-              ) : (
-                <span>
-                  {product.minSalePrice?.toLocaleString('vi-VN')} ₫ - {product.maxSalePrice?.toLocaleString('vi-VN')} ₫
+          <div className="flex flex-col justify-end">
+            {product.maxSalePrice && product.minSalePrice && product.maxSalePrice > product.minSalePrice ? (
+              <div className="flex items-center gap-1 mb-0.5">
+                <span className="text-text-muted text-xs line-through">
+                  {product.maxSalePrice.toLocaleString('vi-VN')} ₫
                 </span>
-              )}
-          </span>
+                <span className="text-error text-[10px] font-bold px-1 py-0.5 bg-error-container rounded">
+                  -{Math.round(((product.maxSalePrice - product.minSalePrice) / product.maxSalePrice) * 100)}%
+                </span>
+              </div>
+            ) : product.originalPrice && product.minSalePrice && product.originalPrice > product.minSalePrice ? (
+              <div className="flex items-center gap-1 mb-0.5">
+                <span className="text-text-muted text-xs line-through">
+                  {product.originalPrice.toLocaleString('vi-VN')} ₫
+                </span>
+                <span className="text-error text-[10px] font-bold px-1 py-0.5 bg-error-container rounded">
+                  -{Math.round(((product.originalPrice - product.minSalePrice) / product.originalPrice) * 100)}%
+                </span>
+              </div>
+            ) : null}
+            <span className="text-tertiary font-price-display text-price-display leading-none">
+               {product.minSalePrice ? (
+                 <span>{product.minSalePrice.toLocaleString('vi-VN')} ₫</span>
+               ) : (
+                 <span>Liên hệ</span>
+               )}
+            </span>
+          </div>
           <div className="z-10 relative">
             <AddToCartButton productSlug={product.slug || ''} isOutOfStock={isOutOfStock} />
           </div>

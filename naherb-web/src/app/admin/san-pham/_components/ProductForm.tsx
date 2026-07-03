@@ -12,6 +12,8 @@ export interface SkuFormState {
   originalPrice: string;
   salePrice: string;
   stockQuantity: string;
+  thumbnailMediaId?: string;
+  thumbnailUrl?: string;
 }
 
 export interface VersionFormState {
@@ -84,12 +86,12 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
         const file = e.target.files[i];
         const payload = new FormData();
         payload.append('file', file);
+        payload.append('type', 'PRODUCT');
         
         const res: any = await customInstance({
           url: '/v1/admin/media/upload',
           method: 'POST',
-          data: payload,
-          headers: { 'Content-Type': 'multipart/form-data' }
+          data: payload
         });
         
         newImages.push({
@@ -101,11 +103,47 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
         });
       }
       setFormData(prev => ({ ...prev, images: newImages }));
-    } catch (err) {
-      alert('Lỗi tải ảnh lên');
+    } catch (error) {
+      console.error('Upload failed', error);
+      alert('Tải ảnh thất bại');
     } finally {
       setUploading(false);
       e.target.value = ''; 
+    }
+  };
+
+  const handleSkuImageUpload = async (vi: number, si: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setUploading(true);
+    try {
+      const file = e.target.files[0];
+      const payload = new FormData();
+      payload.append('file', file);
+      payload.append('type', 'PRODUCT');
+      
+      const res: any = await customInstance({
+        url: '/v1/admin/media/upload',
+        method: 'POST',
+        data: payload
+      });
+      
+      setFormData(prev => {
+        if (!prev.versions) return prev;
+        const newVersions = [...prev.versions];
+        const newSkus = [...newVersions[vi].skus];
+        newSkus[si] = {
+          ...newSkus[si],
+          thumbnailMediaId: res.id,
+          thumbnailUrl: res.location
+        };
+        newVersions[vi] = { ...newVersions[vi], skus: newSkus };
+        return { ...prev, versions: newVersions };
+      });
+    } catch (error) {
+      console.error('Upload failed', error);
+      alert('Tải ảnh thất bại');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -484,7 +522,29 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
                             <span className="material-symbols-outlined text-[18px]">close</span>
                           </button>
                        )}
-                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
+                       
+                       {/* SKU Image Upload */}
+                       <div className="mb-4">
+                          <label className="block text-label-sm font-label-sm text-text-muted mb-2">Ảnh đại diện SKU</label>
+                          <div className="flex items-center gap-4">
+                            {sku.thumbnailUrl ? (
+                              <div className="relative w-16 h-16 rounded overflow-hidden border border-border-warm bg-surface-container-low group">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={sku.thumbnailUrl} alt="SKU Thumbnail" className="w-full h-full object-cover" />
+                                <button type="button" onClick={() => updateSku(vi, si, 'thumbnailUrl', '')} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <span className="material-symbols-outlined text-white text-sm">delete</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="relative w-16 h-16 rounded border border-dashed border-border-warm bg-surface-container-low flex flex-col items-center justify-center text-text-muted hover:border-primary hover:text-primary transition-colors cursor-pointer">
+                                <span className="material-symbols-outlined text-xl mb-1">add_photo_alternate</span>
+                                <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" onChange={(e) => handleSkuImageUpload(vi, si, e)} disabled={uploading} />
+                              </div>
+                            )}
+                          </div>
+                       </div>
+
+                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                           <div className="space-y-xs lg:col-span-2">
                             <label className={labelCls}>Tên SKU <span className="text-red-500">*</span></label>
                             <input type="text" value={sku.name} onChange={e => updateSku(vi, si, 'name', e.target.value)} className={formErrors[`sku_name_${vi}_${si}`] ? inputErrCls : inputCls} placeholder="VD: Màu Đỏ - Thường" />
@@ -652,7 +712,7 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
 
   return (
     <main className="flex-1 overflow-y-auto p-gutter bg-background">
-      <div className="max-w-5xl mx-auto space-y-md">
+      <div className="max-w-7xl mx-auto space-y-md">
         <div className="flex items-center gap-sm mb-6">
           <button onClick={() => router.back()} className="p-2 hover:bg-surface-container rounded-full transition-colors text-text-muted">
             <span className="material-symbols-outlined">arrow_back</span>

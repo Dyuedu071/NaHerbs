@@ -22,4 +22,11 @@ public class ProductSkuDetailDto {
     private StockStatus stockStatus;
     private SkuStatus status;
     private Integer displayOrder;
+    private ThumbnailMediaDto thumbnailMedia;
+
+    @Data
+    public static class ThumbnailMediaDto {
+        private UUID id;
+        private String location;
+    }
 }

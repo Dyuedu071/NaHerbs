@@ -14,6 +14,7 @@ public class ProductListResponse {
     private String slug;
     private String thumbnailUrl;
     private String shortDescription;
+    private BigDecimal originalPrice;
     private BigDecimal minSalePrice;
     private BigDecimal maxSalePrice;
     private StockStatus stockStatus;

@@ -21,7 +21,7 @@ public class MediaService {
         this.mediaAssetRepository = mediaAssetRepository;
     }
 
-    public MediaAsset uploadImage(MultipartFile file) throws IOException {
+    public MediaAsset uploadImage(MultipartFile file, MediaType type) throws IOException {
         // Validate file size (< 10MB)
         if (file.getSize() > 10 * 1024 * 1024) {
             throw new IllegalArgumentException("File size exceeds 10MB limit");
@@ -37,9 +37,13 @@ public class MediaService {
             throw new IllegalArgumentException("Invalid file format: " + contentType + ". Only JPG, PNG, WEBP, GIF are allowed.");
         }
 
+        MediaType actualType = type != null ? type : MediaType.OTHER;
+        String prefix = actualType.name().toLowerCase();
+        String folder = "naherb/" + prefix + "_images";
+
         Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
-                "public_id", "blog_" + UUID.randomUUID().toString(),
-                "folder", "naherb/blog_images"
+                "public_id", prefix + "_" + UUID.randomUUID().toString(),
+                "folder", folder
         ));
 
         String url = uploadResult.get("secure_url").toString();
@@ -48,7 +52,7 @@ public class MediaService {
         MediaAsset asset = new MediaAsset();
         asset.setUrl(url);
         asset.setStoragePath(publicId);
-        asset.setType(MediaType.BLOG);
+        asset.setType(actualType);
         asset.setFileName(file.getOriginalFilename());
         asset.setMimeType(contentType);
         asset.setFileSizeBytes(file.getSize());
