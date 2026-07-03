@@ -1,5 +1,8 @@
 "use client";
 
+import QrPaymentConfigSection, {
+  type QrPaymentSettingKey,
+} from "@/components/admin/settings/QrPaymentConfigSection";
 import { useEffect, useState } from "react";
 import { AXIOS_INSTANCE } from "@/services/api-client";
 import { useToast } from "@/contexts/ToastContext";
@@ -21,6 +24,11 @@ const STORE_KEYS = [
   "store_tiktok_url",
   "store_seo_title",
   "store_seo_description",
+  "bankName",
+  "bankAccountName",
+  "bankAccountNumber",
+  "bankQrImageUrl",
+  "bankQrMediaId",
 ] as const;
 
 type SettingKey = (typeof STORE_KEYS)[number];
@@ -42,13 +50,19 @@ const DEFAULT_SETTINGS: SettingsMap = {
   store_tiktok_url: "",
   store_seo_title: "",
   store_seo_description: "",
+  bankName: "",
+  bankAccountName: "",
+  bankAccountNumber: "",
+  bankQrImageUrl: "",
+  bankQrMediaId: "",
 };
 
-type TabId = "general" | "contact" | "social" | "seo";
+type TabId = "general" | "contact" | "payment" | "social" | "seo";
 
 const TABS: { id: TabId; label: string; icon: string }[] = [
   { id: "general", label: "Thông tin chung", icon: "storefront" },
   { id: "contact", label: "Liên hệ & Địa chỉ", icon: "contact_phone" },
+  { id: "payment", label: "Thanh toán QR", icon: "qr_code_2" },
   { id: "social", label: "Mạng xã hội", icon: "share" },
   { id: "seo", label: "SEO cơ bản", icon: "travel_explore" },
 ];
@@ -190,6 +204,10 @@ export default function AdminSettingsPage() {
     setIsDirty(true);
   };
 
+  const handleQrChange = (key: QrPaymentSettingKey, value: string) => {
+    handleChange(key, value);
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -215,7 +233,8 @@ export default function AdminSettingsPage() {
             Cài đặt cửa hàng
           </h2>
           <p className="mt-base text-body-md text-text-muted">
-            Quản lý thông tin, liên hệ và nhận diện thương hiệu của NaHerbs.
+            Quản lý thông tin cửa hàng, thanh toán QR và nhận diện thương hiệu
+            NaHerbs.
           </p>
         </div>
 
@@ -399,6 +418,22 @@ export default function AdminSettingsPage() {
               </>
             )}
           </SectionCard>
+        )}
+
+        {/* ── Payment Tab ── */}
+        {activeTab === "payment" && (
+          <QrPaymentConfigSection
+            settings={{
+              bankName: s.bankName,
+              bankAccountName: s.bankAccountName,
+              bankAccountNumber: s.bankAccountNumber,
+              bankQrImageUrl: s.bankQrImageUrl,
+              bankQrMediaId: s.bankQrMediaId,
+            }}
+            onChange={handleQrChange}
+            isLoading={isLoading}
+            showToast={showToast}
+          />
         )}
 
         {/* ── Social Tab ── */}
