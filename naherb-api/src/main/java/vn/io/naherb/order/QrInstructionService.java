@@ -1,5 +1,8 @@
 package vn.io.naherb.order;
 
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +33,10 @@ public class QrInstructionService {
             "bank.accountNumber",
             "bank_account_number",
             "BANK_ACCOUNT_NUMBER",
+            "bankBin",
+            "bank.bin",
+            "bank_bin",
+            "BANK_BIN",
             "bankQrImageUrl",
             "bank.qrImageUrl",
             "bank_qr_image_url",
@@ -49,12 +56,23 @@ public class QrInstructionService {
                         Function.identity(),
                         (first, ignored) -> first));
 
+        String bankName = firstValue(settings, "bankName", "bank.name", "bank_name");
+        String accountName = firstValue(settings, "bankAccountName", "bank.accountName", "bank_account_name");
+        String accountNumber = firstValue(settings, "bankAccountNumber", "bank.accountNumber", "bank_account_number");
+        String bankBin = firstValue(settings, "bankBin", "bank.bin", "bank_bin");
+        String transferContent = order.getOrderCode();
+        String qrImageUrl = buildVietQrImageUrl(bankBin, accountNumber, accountName, order.getFinalAmount(), transferContent);
+
+        if (qrImageUrl == null) {
+            qrImageUrl = firstValue(settings, "bankQrImageUrl", "bank.qrImageUrl", "bank_qr_image_url");
+        }
+
         return new QrInstructionResponse(
-                firstValue(settings, "bankName", "bank.name", "bank_name"),
-                firstValue(settings, "bankAccountName", "bank.accountName", "bank_account_name"),
-                firstValue(settings, "bankAccountNumber", "bank.accountNumber", "bank_account_number"),
-                firstValue(settings, "bankQrImageUrl", "bank.qrImageUrl", "bank_qr_image_url"),
-                order.getOrderCode());
+                bankName,
+                accountName,
+                accountNumber,
+                qrImageUrl,
+                transferContent);
     }
 
     private static String firstValue(Map<String, SiteSetting> settings, String... keys) {
@@ -65,5 +83,48 @@ public class QrInstructionService {
             }
         }
         return null;
+    }
+
+    private static String buildVietQrImageUrl(
+            String bankBin,
+            String accountNumber,
+            String accountName,
+            BigDecimal amount,
+            String transferContent) {
+        if (isBlank(bankBin) || isBlank(accountNumber)) {
+            return null;
+        }
+
+        StringBuilder url = new StringBuilder("https://img.vietqr.io/image/")
+                .append(encode(bankBin.trim()))
+                .append("-")
+                .append(encode(accountNumber.trim()))
+                .append("-compact2.png");
+
+        boolean hasQuery = false;
+        if (amount != null && amount.signum() > 0) {
+            url.append("?amount=").append(amount.toBigInteger());
+            hasQuery = true;
+        }
+        if (!isBlank(transferContent)) {
+            url.append(hasQuery ? "&" : "?")
+                    .append("addInfo=")
+                    .append(encode(transferContent.trim()));
+            hasQuery = true;
+        }
+        if (!isBlank(accountName)) {
+            url.append(hasQuery ? "&" : "?")
+                    .append("accountName=")
+                    .append(encode(accountName.trim()));
+        }
+        return url.toString();
+    }
+
+    private static String encode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

@@ -20,9 +20,9 @@ export interface UpdateSiteSettingsRequest {
   /** @nullable */
   bankName?: string | null;
   /** @nullable */
+  bankBin?: string | null;
+  /** @nullable */
   bankAccountName?: string | null;
   /** @nullable */
   bankAccountNumber?: string | null;
-  /** @nullable */
-  bankQrImageUrl?: string | null;
 }

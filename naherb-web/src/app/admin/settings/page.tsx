@@ -25,10 +25,9 @@ const STORE_KEYS = [
   "store_seo_title",
   "store_seo_description",
   "bankName",
+  "bankBin",
   "bankAccountName",
   "bankAccountNumber",
-  "bankQrImageUrl",
-  "bankQrMediaId",
 ] as const;
 
 type SettingKey = (typeof STORE_KEYS)[number];
@@ -51,10 +50,9 @@ const DEFAULT_SETTINGS: SettingsMap = {
   store_seo_title: "",
   store_seo_description: "",
   bankName: "",
+  bankBin: "",
   bankAccountName: "",
   bankAccountNumber: "",
-  bankQrImageUrl: "",
-  bankQrMediaId: "",
 };
 
 type TabId = "general" | "contact" | "payment" | "social" | "seo";
@@ -425,14 +423,12 @@ export default function AdminSettingsPage() {
           <QrPaymentConfigSection
             settings={{
               bankName: s.bankName,
+              bankBin: s.bankBin,
               bankAccountName: s.bankAccountName,
               bankAccountNumber: s.bankAccountNumber,
-              bankQrImageUrl: s.bankQrImageUrl,
-              bankQrMediaId: s.bankQrMediaId,
             }}
             onChange={handleQrChange}
             isLoading={isLoading}
-            showToast={showToast}
           />
         )}
 

@@ -27,18 +27,16 @@ import { useEffect, useState } from "react";
 
 const QR_SETTING_KEYS: QrPaymentSettingKey[] = [
   "bankName",
+  "bankBin",
   "bankAccountName",
   "bankAccountNumber",
-  "bankQrImageUrl",
-  "bankQrMediaId",
 ];
 
 const DEFAULT_QR_SETTINGS: QrPaymentSettings = {
   bankName: "",
+  bankBin: "",
   bankAccountName: "",
   bankAccountNumber: "",
-  bankQrImageUrl: "",
-  bankQrMediaId: "",
 };
 
 type TabId = "confirm" | "config";
@@ -107,8 +105,8 @@ export default function AdminQrPaymentSettingsPage() {
             Thanh toán QR
           </h2>
           <p className="mt-base text-body-md text-text-muted">
-            Xác nhận chuyển khoản thủ công và cấu hình ảnh QR cố định cho
-            khách hàng khi checkout.
+            Xác nhận chuyển khoản thủ công và cấu hình VietQR động cho khách
+            hàng khi checkout.
           </p>
         </div>
 
@@ -173,7 +171,6 @@ export default function AdminQrPaymentSettingsPage() {
           settings={settings}
           onChange={handleChange}
           isLoading={isLoading}
-          showToast={showToast}
         />
       )}
 
