@@ -12,6 +12,7 @@ export type GetProductsSort = typeof GetProductsSort[keyof typeof GetProductsSor
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetProductsSort = {
   latest: 'latest',
+  best_selling: 'best_selling',
   price_asc: 'price_asc',
   price_desc: 'price_desc',
 } as const;

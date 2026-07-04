@@ -1,20 +1,16 @@
 "use client";
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
-import { useGetAuthMe } from '@/services/generated/customer-profile/customer-profile';
 
-import { extractApiErrorMessage } from '@/lib/api-error';
-import { useToast } from '@/contexts/ToastContext';
 import { formatMoney } from '@/lib/order-format';
-import { getGetCartQueryKey, usePostCartItems } from '@/services/generated/cart/cart';
-import { getProductsSlug, useGetProducts } from '@/services/generated/public-products/public-products';
-import type { ProductDetail } from '@/services/generated/model/productDetail';
-import type { ProductPage } from '@/services/generated/model/productPage';
-import type { ProductSku } from '@/services/generated/model/productSku';
+import {
+  useGetProductCategories,
+  useGetProducts,
+} from '@/services/generated/public-products/public-products';
+import type { ProductCategorySummary } from '@/services/generated/model/productCategorySummary';
 import type { ProductSummary } from '@/services/generated/model/productSummary';
-import { useQueryClient } from '@tanstack/react-query';
+
 const fallbackProductImages = [
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCCHIGHpyiH_H6cd9_8Zslswa-mB_l-tp5H_0vn7u3WIMjMMnJY7Gl2AHTm2ZHsVUifzbG8EqLQm_Ixt9t8Vx6pOFbt6Dnyqw-ws8jjMUOL7dT-eoB0UiNVffG1mx5yV0Yt6PFc0k4DxdRLRW6XiG26G9nE62FJONsIsnH_ZG0o9R4e_TLJnVtJuj_Dbfde9XuaRyy8WboVSQRO9eDqyiGWc5DhIFUN4pvK2VY2a0BssBOHGBU4TU07jylZpmTjT4fMQUZiW3y9O4g",
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBQvwT_9-iT2SOajLu-FldGTE-JS02fCYW4Vn3r6HDGFmBcZAE6J1z4YGOPZz5TFuYXNl6TxtI7FYYw8e-p0kSgd8TCry0ZfSEEWdlJTKExoQpQJEC_IskQDCVFWnzJfUEarDOkZcPk2qhcENY_ci_MusEhUOPLOsg7LMNYnCSAKGGfYs0A86_rAalkCY3Jwg7C1Xmt2xtKOj16IyETjLs3IvU1Ef23zXjwmR4eRtyupcA3jLaZEMx4bZeghMprhbXBI0wdkUio9nY",
@@ -29,16 +25,26 @@ function formatProductPrice(product: ProductSummary): string {
   return `${formatMoney(product.minSalePrice)}`;
 }
 
+function unwrapApiData<T>(response: unknown, fallback: T): T {
+  if (response && typeof response === "object" && "data" in response) {
+    return (response as { data?: T }).data ?? fallback;
+  }
+  return (response as T) ?? fallback;
+}
+
 export default function Home() {
-  const queryClient = useQueryClient();
   const { open: openChatbot } = useChatbot();
 
   const { data: productsResponse, isLoading: productsLoading } = useGetProducts(
-    { size: 4, inStockOnly: true, sort: "latest" },
+    { size: 4, inStockOnly: true, sort: "best_selling" },
+    { query: { retry: false } },
+  );
+  const { data: categoriesResponse, isLoading: categoriesLoading } = useGetProductCategories(
     { query: { retry: false } },
   );
 
-  const featuredProducts = (productsResponse as any)?.items ?? [];
+  const featuredProducts = unwrapApiData<{ items?: ProductSummary[] }>(productsResponse, {})?.items ?? [];
+  const productCategories = unwrapApiData<ProductCategorySummary[]>(categoriesResponse, []).slice(0, 3);
 
 
 
@@ -116,77 +122,71 @@ export default function Home() {
                 </div>
             </div>
         </section>
-        {/* Category Cards */}
+        {/* Product Categories */}
         <section className="px-gutter max-w-container-max mx-auto py-xl border-t border-border-warm/50">
             <div className="flex justify-between items-end mb-md">
                 <div>
-                    <h2 className="font-headline-lg text-headline-lg text-primary">Dòng Sản Phẩm</h2>
-                    <p className="font-body-md text-body-md text-text-muted mt-xs">Giải pháp chuyên biệt cho từng nhu cầu cơ
-                        thể</p>
+                    <h2 className="font-headline-lg text-headline-lg text-primary">Danh Mục Sản Phẩm</h2>
+                    <p className="font-body-md text-body-md text-text-muted mt-xs">
+                        Khám phá sản phẩm theo từng nhóm danh mục đang bán tại NaHerbs
+                    </p>
                 </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
-                {/* Category 1 */}
-                <Link className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
-                    href="/san-pham?need=co-vai-gay">
-                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                        data-alt="A stylized, softly lit close-up of a person's neck and shoulders draped with a warm, natural linen herbal compress pad."
-                        style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8u-Pb9_W9jEDxC9-Wh8JBusTNpvaxS_X45dZ4hPbNIdwFkW2CxiDVHGIt5I0XRglSGyfzsm-Fb0W6Hmf-cZ8QCSRJvI18aTA86ozSEYDFGAunhiyrJiJQXJpoyRUn-D9oUBgvMZ2v7alitiKvNmjD_nPOwWrfrxCpHEdlRYCQMqO70oan7jVafF0d8LiIr7RYFP0yK4tPPX6BZfnO00vvhZtnyASBGi65hfMbD3NyBQLgt0t75Ep6UpBChHony6rZxHkt2MkJols')" }}>
-                    </div>
-                    <div
-                        className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent">
-                    </div>
-                    <div className="absolute bottom-0 left-0 p-md w-full">
-                        <h3 className="font-headline-md text-headline-md text-on-primary mb-xs">Cổ Vai Gáy</h3>
-                        <p className="font-body-md text-body-md text-on-primary/90 flex items-center gap-xs">
-                            Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                        </p>
-                    </div>
-                </Link>
-                {/* Category 2 */}
-                <Link className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
-                    href="/san-pham?need=chuom-nong">
-                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                        data-alt="A minimal flat lay composition featuring a rectangular herbal heating pad on a bamboo tray."
-                        style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDU7Hg-nRJRypliTAzxSs5krgiNSxMW3rKV9hWJ8vet76xLN48JzIa7vDioWHnv8HqPXkdp9G8hKpgmTglsn-P1fdgoA3CGU03pnAJ8Ujwso2DyVPuvK8VvxqhP-Fv0YDE-_8efnv3dQhvgy-kAytVJvrMnSyMksS39ZbntQm6vAbQQ59nOy6ossHCXBozSNAgw9plzyGPSTBEwb0B1aikKUUDX_lLwWNod9sFc6Z1qzlkCIGqFQiAqaiG5Hb68UqwTmdqSukSm9eU')" }}>
-                    </div>
-                    <div
-                        className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent">
-                    </div>
-                    <div className="absolute bottom-0 left-0 p-md w-full">
-                        <h3 className="font-headline-md text-headline-md text-on-primary mb-xs">Chườm Nóng Tổng Hợp</h3>
-                        <p className="font-body-md text-body-md text-on-primary/90 flex items-center gap-xs">
-                            Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                        </p>
-                    </div>
-                </Link>
-                {/* Category 3 */}
-                <Link className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
-                    href="/san-pham?need=thu-gian-mat">
-                    <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                        data-alt="A peaceful image showing a person wearing a soft herbal eye mask."
-                        style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuABJZSNEW3ls3UPS_Nfv-b4r4hlwn2FmDH4ySn_3fDBPvDHygptxHFlqDpkcbFI8Obmnuk5v-35LypmsaBYp1TR8yzf8ALWhPQEdHb5bSaziowppeSB9s2Tal1v4U8bUDkhpzi9Tc4gI41cz70fQ0CiELkMq2wgbNbODO4LG-_GVxc3ibWoZmPhFJBIl-Ju5Kb2-c3koCiR4fAcUD4mZTjK4c66isWpoibanQ2bLNQhwbqIvfOcHY94rX0C2F-1Q91QGv_vbCdTIVo')" }}>
-                    </div>
-                    <div
-                        className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent">
-                    </div>
-                    <div className="absolute bottom-0 left-0 p-md w-full">
-                        <h3 className="font-headline-md text-headline-md text-on-primary mb-xs">Thư Giãn Mắt</h3>
-                        <p className="font-body-md text-body-md text-on-primary/90 flex items-center gap-xs">
-                            Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                        </p>
-                    </div>
-                </Link>
-            </div>
+            {categoriesLoading ? (
+                <p className="text-center text-body-md text-text-muted">Đang tải danh mục...</p>
+            ) : productCategories.length === 0 ? (
+                <div className="rounded-[1.5rem] border border-border-warm bg-surface-container-low p-lg text-center">
+                    <p className="text-body-md text-text-muted">Chưa có danh mục sản phẩm để hiển thị.</p>
+                    <Link href="/san-pham" className="mt-sm inline-flex items-center gap-xs text-primary hover:underline">
+                        Xem tất cả sản phẩm <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    </Link>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
+                    {productCategories.map((category, index) => {
+                        const imageUrl = category.imageUrl ?? fallbackProductImages[index % fallbackProductImages.length];
+                        const categoryHref = category.slug
+                            ? `/san-pham?categorySlugs=${encodeURIComponent(category.slug)}`
+                            : "/san-pham";
+
+                        return (
+                            <Link
+                                key={category.id ?? category.slug ?? category.name}
+                                className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
+                                href={categoryHref}
+                            >
+                                <div
+                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                                    style={{ backgroundImage: `url('${imageUrl}')` }}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent" />
+                                <div className="absolute bottom-0 left-0 p-md w-full">
+                                    <h3 className="font-headline-md text-headline-md text-on-primary mb-xs">
+                                        {category.name ?? "Danh mục NaHerbs"}
+                                    </h3>
+                                    {category.description && (
+                                        <p className="mb-xs line-clamp-2 font-caption text-caption text-on-primary/85">
+                                            {category.description}
+                                        </p>
+                                    )}
+                                    <p className="font-body-md text-body-md text-on-primary/90 flex items-center gap-xs">
+                                        Khám phá <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                                    </p>
+                                </div>
+                            </Link>
+                        );
+                    })}
+                </div>
+            )}
         </section>
         {/* Featured Products */}
         <section className="px-gutter max-w-container-max mx-auto py-xl">
-            <h2 className="font-headline-lg text-headline-lg text-primary text-center mb-xl">Sản Phẩm Nổi Bật</h2>
+            <h2 className="font-headline-lg text-headline-lg text-primary text-center mb-xl">Sản Phẩm Bán Chạy</h2>
 
             {productsLoading ? (
                 <p className="text-center text-body-md text-text-muted">Đang tải sản phẩm...</p>
             ) : featuredProducts.length === 0 ? (
-                <p className="text-center text-body-md text-text-muted">Chưa có sản phẩm còn hàng để hiển thị.</p>
+                <p className="text-center text-body-md text-text-muted">Chưa có sản phẩm bán chạy để hiển thị.</p>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
                     {featuredProducts.map((product: ProductSummary, index: number) => {
