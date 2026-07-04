@@ -16,7 +16,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
   return (
     <div className="bg-surface-container-lowest rounded-xl p-sm shadow-[0_4px_20px_-2px_rgba(46,77,57,0.12)] group block h-full flex flex-col transition-shadow hover:shadow-[0_8px_30px_-4px_rgba(46,77,57,0.2)]">
       <div className="relative mb-sm overflow-hidden rounded-xl bg-surface-container-low aspect-square flex-shrink-0">
-        <Link href={productUrl} className="relative block w-full h-full">
+        <Link href={productUrl} className="relative block w-full h-full" style={{ position: 'relative' }}>
           {product.thumbnailUrl ? (
             <Image
               src={product.thumbnailUrl}

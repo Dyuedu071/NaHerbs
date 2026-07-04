@@ -1,6 +1,6 @@
 package vn.io.naherb.product.controller;
 import vn.io.naherb.product.service.ProductService;
-import vn.io.naherb.product.entity.*;
+
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +78,18 @@ public class ProductController {
     @org.springframework.web.bind.annotation.PatchMapping("/{productId}/restore")
     public ApiResponse<Object> restoreProduct(@PathVariable UUID productId) {
         productService.restoreProduct(productId);
+        return ApiResponse.ok(null);
+    }
+
+    @org.springframework.web.bind.annotation.PatchMapping("/{productId}/publish")
+    public ApiResponse<Object> publishProduct(@PathVariable UUID productId) {
+        productService.publishProduct(productId);
+        return ApiResponse.ok(null);
+    }
+
+    @org.springframework.web.bind.annotation.PatchMapping("/{productId}/unpublish")
+    public ApiResponse<Object> unpublishProduct(@PathVariable UUID productId) {
+        productService.unpublishProduct(productId);
         return ApiResponse.ok(null);
     }
 

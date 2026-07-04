@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { ProductPage, ProductCategorySummary } from '@/services/generated/model';
 import { getProducts, getProductCategories } from '@/services/generated/public-products/public-products';
@@ -95,12 +96,16 @@ export default async function ProductsPage({
         <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter items-start">
             {/* Sidebar Filters */}
             <aside className="md:col-span-3 space-y-md sticky top-32">
+              <Suspense fallback={<div>Đang tải bộ lọc...</div>}>
                 <ProductFilter categories={categories} />
+              </Suspense>
             </aside>
 
             {/* Product Grid Area */}
             <div className="md:col-span-9">
-              <ProductSortBar />
+              <Suspense fallback={<div>Đang tải...</div>}>
+                <ProductSortBar />
+              </Suspense>
 
               {products.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">

@@ -142,6 +142,18 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi khôi phục SKU'),
   });
 
+  const publishProductMutation = useMutation({
+    mutationFn: () => customInstance({ url: `/v1/admin/products/${id}/publish`, method: 'PATCH' }),
+    onSuccess: () => { toast.success('Xuất bản sản phẩm thành công'); refetchProduct(); },
+    onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi xuất bản sản phẩm'),
+  });
+
+  const unpublishProductMutation = useMutation({
+    mutationFn: () => customInstance({ url: `/v1/admin/products/${id}/unpublish`, method: 'PATCH' }),
+    onSuccess: () => { toast.success('Chuyển sản phẩm về nháp thành công'); refetchProduct(); },
+    onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi chuyển trạng thái sản phẩm'),
+  });
+
   const handleRestoreVersion = (versionId: string) => {
     setConfirmModal({
       title: 'Khôi phục phiên bản',
@@ -469,19 +481,48 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           >
             <span className="material-symbols-outlined">arrow_back</span>
           </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-headline-sm font-headline-sm text-on-surface truncate">Chỉnh sửa sản phẩm</h1>
-            <p className="text-caption text-text-muted truncate">{product.name}</p>
+          <div className="flex-1 min-w-0 flex items-center gap-2">
+            <div>
+              <h1 className="text-headline-sm font-headline-sm text-on-surface truncate">Chỉnh sửa sản phẩm</h1>
+              <p className="text-caption text-text-muted truncate">{product.name}</p>
+            </div>
+            <div className="hidden sm:block ml-2">
+              <StatusBadge status={product.status} />
+            </div>
           </div>
+          
+          <div className="flex items-center gap-2">
+            {(product.status === 'DRAFT' || product.status === 'HIDDEN') && (
+              <button
+                onClick={() => publishProductMutation.mutate()}
+                disabled={publishProductMutation.isPending}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-label-sm font-label-sm hover:bg-emerald-700 transition-colors disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-[18px]">publish</span>
+                <span className="hidden sm:inline">Xuất bản</span>
+              </button>
+            )}
+            {product.status === 'PUBLISHED' && (
+              <button
+                onClick={() => unpublishProductMutation.mutate()}
+                disabled={unpublishProductMutation.isPending}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-label-sm font-label-sm hover:bg-amber-200 transition-colors disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-[18px]">unpublished</span>
+                <span className="hidden sm:inline">Đưa về nháp</span>
+              </button>
+            )}
+          </div>
+
           {/* Tabs in header */}
-          <div className="hidden md:flex gap-2">
+          <div className="hidden lg:flex gap-2 ml-4 border-l border-border-warm pl-4">
             <TabBtn tab="info"     label="Thông tin"  icon="info"        />
             <TabBtn tab="versions" label="Phiên bản"  icon="layers"      count={versions.length} />
             <TabBtn tab="skus"     label="Phân loại (SKU)" icon="inventory_2" count={skus.length} />
           </div>
         </div>
         {/* Mobile tabs */}
-        <div className="flex md:hidden gap-2 overflow-x-auto mt-2 px-gutter pb-1">
+        <div className="flex lg:hidden gap-2 overflow-x-auto mt-3 px-gutter pb-1">
           <TabBtn tab="info"     label="Thông tin"  icon="info"        />
           <TabBtn tab="versions" label="Phiên bản"  icon="layers"      count={versions.length} />
           <TabBtn tab="skus"     label="Phân loại (SKU)" icon="inventory_2" count={skus.length} />

@@ -282,6 +282,35 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    @Transactional
+    public void publishProduct(UUID productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
+        
+        List<ProductVersion> versions = versionRepository.findByProductIdOrderByDisplayOrderAsc(productId);
+        List<ProductSku> skus = skuRepository.findByProductId(productId);
+        
+        boolean hasActive = skus.stream().anyMatch(sku -> 
+            sku.getStatus() == SkuStatus.ACTIVE && 
+            versions.stream().anyMatch(v -> v.getId().equals(sku.getVersion().getId()) && v.getStatus() == ContentStatus.PUBLISHED)
+        );
+        
+        if (!hasActive) {
+            throw new vn.io.naherb.exception.BadRequestException("Không thể xuất bản vì không có Phiên bản hoặc SKU nào đang hoạt động.");
+        }
+        
+        product.setStatus(ContentStatus.PUBLISHED);
+        productRepository.save(product);
+    }
+
+    @Transactional
+    public void unpublishProduct(UUID productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
+        product.setStatus(ContentStatus.DRAFT);
+        productRepository.save(product);
+    }
+
     private void mapRequestToProduct(UpsertProductRequest request, Product product) {
         product.setName(request.getName());
         product.setSlug(request.getSlug());

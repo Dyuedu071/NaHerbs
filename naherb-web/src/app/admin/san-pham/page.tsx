@@ -37,6 +37,20 @@ export default function AdminProducts() {
     onError: () => toast.error('Lỗi khi khôi phục sản phẩm'),
   });
 
+  const publishMutation = useMutation({
+    mutationFn: (productId: string) =>
+      customInstance({ url: `/v1/admin/products/${productId}/publish`, method: 'PATCH' }),
+    onSuccess: () => { toast.success('Xuất bản sản phẩm thành công'); refetch(); },
+    onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi xuất bản sản phẩm'),
+  });
+
+  const unpublishMutation = useMutation({
+    mutationFn: (productId: string) =>
+      customInstance({ url: `/v1/admin/products/${productId}/unpublish`, method: 'PATCH' }),
+    onSuccess: () => { toast.success('Chuyển sản phẩm về nháp thành công'); refetch(); },
+    onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi chuyển trạng thái sản phẩm'),
+  });
+
   // Confirmation modal state
   const [confirmModal, setConfirmModal] = useState<{
     title: string;
@@ -508,6 +522,28 @@ export default function AdminProducts() {
                           >
                             <span className="material-symbols-outlined text-[20px]">archive</span>
                           </button>
+                          
+                          {product.status === 'hidden' && (
+                            <button
+                              onClick={() => publishMutation.mutate(product.id)}
+                              title="Xuất bản sản phẩm"
+                              disabled={publishMutation.isPending}
+                              className="p-1.5 text-text-muted hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors disabled:opacity-50"
+                            >
+                              <span className="material-symbols-outlined text-[20px]">publish</span>
+                            </button>
+                          )}
+                          {product.status === 'active' && (
+                            <button
+                              onClick={() => unpublishMutation.mutate(product.id)}
+                              title="Chuyển về nháp"
+                              disabled={unpublishMutation.isPending}
+                              className="p-1.5 text-text-muted hover:text-amber-600 rounded-lg hover:bg-amber-50 transition-colors disabled:opacity-50"
+                            >
+                              <span className="material-symbols-outlined text-[20px]">unpublished</span>
+                            </button>
+                          )}
+                          
                           {(product.status as any) === 'archived' && (
                             <button
                               onClick={() => handleRestore(product.id, product.name)}
