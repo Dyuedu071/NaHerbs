@@ -1,5 +1,6 @@
 const ERROR_TRANSLATIONS: Record<string, string> = {
   "Quantity exceeds available stock": "Số lượng yêu cầu vượt quá kho hàng hiện có.",
+  "Refresh token không hợp lệ hoặc đã hết hạn": "Yêu cầu đăng nhập tài khoản để tiếp tục.",
 };
 
 export function extractApiErrorMessage(
