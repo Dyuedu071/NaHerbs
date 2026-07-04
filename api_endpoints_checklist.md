@@ -69,7 +69,7 @@ This checklist is generated from `docs/openapi.yml`.
 - [X] `POST` /admin/products/{productId}/versions - Create product version (@Chien)
 - [X] `POST` /admin/products/{productId}/skus - Create product SKU (@Chien)
 - [X] `PUT` /admin/product-skus/{skuId} - Update SKU (@Chien)
-- [X] `PATCH` /admin/product-skus/{skuId}/stock - Update SKU stock (@Chien)
+- [X] `PATCH` /admin/product-skus/{skuId}/stock - Update SKU stock (@Chien
 
 ## Admin Orders
 
