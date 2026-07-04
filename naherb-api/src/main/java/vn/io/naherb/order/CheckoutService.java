@@ -55,6 +55,7 @@ public class CheckoutService {
     private final PaymentRecordService paymentRecordService;
     private final QrInstructionService qrInstructionService;
     private final NotificationService notificationService;
+    private final OrderEmailService orderEmailService;
 
     @Transactional
     public CheckoutResponse checkout(JwtAuthenticationToken authentication, CheckoutRequest request) {
@@ -103,6 +104,8 @@ public class CheckoutService {
         order.setCustomerNote(blankToNull(request.note()));
         Order savedOrder = orderRepository.saveAndFlush(order);
 
+        java.util.List<OrderItem> savedOrderItems = new java.util.ArrayList<>();
+
         for (CartItem cartItem : cartItems) {
             ProductSku sku = cartItem.getSku();
             validateCheckoutSku(sku, cartItem.getQuantity());
@@ -115,7 +118,7 @@ public class CheckoutService {
             orderItem.setUnitPrice(sku.getSalePrice());
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setTotalPrice(lineTotal(cartItem));
-            orderItemRepository.save(orderItem);
+            savedOrderItems.add(orderItemRepository.save(orderItem));
 
             sku.setStockQuantity(sku.getStockQuantity() - cartItem.getQuantity());
             sku.setStockStatus(resolveStockStatus(sku));
@@ -141,6 +144,9 @@ public class CheckoutService {
                 "Đơn hàng " + savedOrder.getOrderCode() + " của bạn đã được ghi nhận. Chúng tôi sẽ sớm liên hệ để xác nhận.",
                 "/account/orders"
         );
+
+        orderEmailService.sendOrderConfirmationToCustomer(savedOrder, savedOrderItems);
+        orderEmailService.sendOrderNotificationToAdmin(savedOrder, savedOrderItems);
 
         return new CheckoutResponse(
                 savedOrder.getId(),
