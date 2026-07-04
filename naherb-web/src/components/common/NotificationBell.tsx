@@ -152,7 +152,7 @@ export default function NotificationBell() {
                       </span>
                       {!notif.isRead && <span className="w-2 h-2 rounded-full bg-error flex-shrink-0 mt-1.5"></span>}
                     </div>
-                    <p className="text-body-sm text-secondary line-clamp-2">
+                    <p className="text-body-sm text-secondary whitespace-pre-wrap break-words">
                       {notif.message}
                     </p>
                     <span className="text-[10px] text-secondary mt-2 block">
