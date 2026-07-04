@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # 1. Cơ sở dữ liệu PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: naherb_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-naherb}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - naherb_network
+
+  # 2. Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: naherb_redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:-change-me}
+    volumes:
+      - redis_data:/data
+    networks:
+      - naherb_network
+
+  # 3. Backend API (Kéo từ Docker Hub về)
+  naherb-api:
+    image: ${DOCKER_USERNAME:-yourusername}/naherb-api:latest
+    container_name: naherb_api
+    restart: always
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/${DB_NAME:-naherb}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-change-me}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-change-me}
+      # Có thể thêm env_file: .env.backend nếu muốn dùng chung file env ở đây
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - naherb_network
+
+  # 4. Frontend Web (Kéo từ Docker Hub về)
+  naherb-web:
+    image: ${DOCKER_USERNAME:-yourusername}/naherb-web:latest
+    container_name: naherb_web
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+    depends_on:
+      - naherb-api
+    networks:
+      - naherb_network
+
+  # 5. Nginx Proxy Manager (Quản lý SSL, Proxy tên miền)
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx_proxy_manager
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '81:81'
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+    networks:
+      - naherb_network
+
+  # 6. Watchtower (Tự động cập nhật Docker Container)
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    # --interval 300 nghĩa là cứ 5 phút (300 giây) kiểm tra Docker Hub 1 lần.
+    # --cleanup tự xoá image cũ đi cho nhẹ ổ cứng.
+    command: --interval 300 --cleanup naherb_api naherb_web
+    networks:
+      - naherb_network
+
+networks:
+  naherb_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
