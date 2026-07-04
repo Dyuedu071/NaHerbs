@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import AuthFooterLink from './AuthFooterLink';
 
 async function fetchSiteSettings(): Promise<Record<string, string>> {
     try {
@@ -55,8 +56,7 @@ export default async function PublicFooter() {
                         href="/gioi-thieu">Giới thiệu {storeName}</Link>
                     <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors w-fit"
                         href="/lien-he">Liên hệ</Link>
-                    <Link className="font-body-md text-body-md text-on-primary/80 hover:text-tertiary-fixed transition-colors w-fit"
-                        href="/dang-nhap">Đăng nhập / Đăng ký</Link>
+                    <AuthFooterLink />
                 </div>
                 {/* Contact Column */}
                 <div className="flex flex-col gap-sm">
