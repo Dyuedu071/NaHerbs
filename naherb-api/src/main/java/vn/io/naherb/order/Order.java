@@ -39,6 +39,9 @@ public class Order extends BaseEntity {
     @Column(name = "order_status", nullable = false)
     private OrderStatus status = OrderStatus.PENDING_CONFIRMATION;
 
+    @Column(name = "status", nullable = false)
+    private String legacyStatus = OrderStatus.PENDING_CONFIRMATION.name();
+
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod = PaymentMethod.COD;
@@ -76,4 +79,17 @@ public class Order extends BaseEntity {
 
     @Column(name = "admin_note", columnDefinition = "TEXT")
     private String adminNote;
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+        this.legacyStatus = status == null ? null : status.name();
+    }
+
+    @PrePersist
+    @PreUpdate
+    void syncLegacyStatus() {
+        if (status != null) {
+            legacyStatus = status.name();
+        }
+    }
 }

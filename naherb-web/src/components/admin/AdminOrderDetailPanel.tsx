@@ -39,9 +39,10 @@ export function AdminOrderDetailPanel({
   emptyText = "Chọn một đơn hàng để xem chi tiết.",
 }: AdminOrderDetailPanelProps) {
   const queryClient = useQueryClient();
-  const [statusValue, setStatusValue] = useState<OrderStatusType | "">("");
-  const [paymentValue, setPaymentValue] = useState<PaymentStatusType | "">("");
-  const [adminNote, setAdminNote] = useState("");
+  const [statusValue, setStatusValue] = useState<OrderStatusType | null>(null);
+  const [paymentValue, setPaymentValue] = useState<PaymentStatusType | null>(null);
+  const [orderNote, setOrderNote] = useState("");
+  const [paymentNote, setPaymentNote] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,11 +60,11 @@ export function AdminOrderDetailPanel({
   const order = (detailResponse as { data?: OrderDetail } | undefined)?.data;
 
   const effectiveStatusValue = useMemo(
-    () => statusValue || order?.orderStatus || OrderStatus.CONFIRMED,
+    () => statusValue ?? order?.orderStatus ?? OrderStatus.CONFIRMED,
     [order?.orderStatus, statusValue],
   );
   const effectivePaymentValue = useMemo(
-    () => paymentValue || order?.paymentStatus || PaymentStatus.PAID,
+    () => paymentValue ?? order?.paymentStatus ?? PaymentStatus.PAID,
     [order?.paymentStatus, paymentValue],
   );
 
@@ -87,7 +88,7 @@ export function AdminOrderDetailPanel({
         onSuccess: () => {
           setError(null);
           setMessage("Đã cập nhật trạng thái đơn hàng.");
-          setStatusValue("");
+          setOrderNote("");
           refreshDetail();
         },
         onError: onMutationError,
@@ -100,7 +101,7 @@ export function AdminOrderDetailPanel({
         onSuccess: () => {
           setError(null);
           setMessage("Đã cập nhật trạng thái thanh toán.");
-          setPaymentValue("");
+          setPaymentNote("");
           refreshDetail();
         },
         onError: onMutationError,
@@ -115,7 +116,7 @@ export function AdminOrderDetailPanel({
       orderId: activeOrderId,
       data: {
         orderStatus: effectiveStatusValue,
-        note: adminNote.trim() || null,
+        note: orderNote.trim() || null,
       },
     });
   };
@@ -128,7 +129,7 @@ export function AdminOrderDetailPanel({
       orderId: activeOrderId,
       data: {
         paymentStatus: effectivePaymentValue,
-        note: adminNote.trim() || null,
+        note: paymentNote.trim() || null,
       },
     });
   };
@@ -236,7 +237,14 @@ export function AdminOrderDetailPanel({
         </section>
 
         <section className="rounded-xl border border-border-warm bg-surface p-sm">
-          <h3 className="text-label-md font-label-md text-text-main">Cập nhật</h3>
+          <div className="flex items-center gap-xs">
+            <span className="material-symbols-outlined text-[18px] text-primary">
+              local_shipping
+            </span>
+            <h3 className="text-label-md font-label-md text-text-main">
+              Cập nhật đơn hàng
+            </h3>
+          </div>
           <div className="mt-sm grid gap-sm">
             <AdminOrderSelect
               value={effectiveStatusValue}
@@ -247,6 +255,34 @@ export function AdminOrderDetailPanel({
               }))}
               placeholder="Trạng thái đơn"
             />
+            <input
+              value={orderNote}
+              onChange={(event) => setOrderNote(event.target.value)}
+              placeholder="Ghi chú cho đơn hàng"
+              className="h-11 rounded-lg border border-border-warm bg-surface px-sm text-body-md outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+            <button
+              type="button"
+              disabled={isUpdatingStatus}
+              onClick={handleUpdateStatus}
+              className="inline-flex h-11 items-center justify-center gap-xs rounded-full bg-primary px-sm text-caption font-semibold text-on-primary hover:bg-secondary disabled:opacity-60"
+            >
+              <span className="material-symbols-outlined text-[16px]">local_shipping</span>
+              Cập nhật đơn
+            </button>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-border-warm bg-surface p-sm">
+          <div className="flex items-center gap-xs">
+            <span className="material-symbols-outlined text-[18px] text-primary">
+              payments
+            </span>
+            <h3 className="text-label-md font-label-md text-text-main">
+              Cập nhật thanh toán
+            </h3>
+          </div>
+          <div className="mt-sm grid gap-sm">
             <AdminOrderSelect
               value={effectivePaymentValue}
               onChange={(value) => setPaymentValue(value as PaymentStatusType)}
@@ -257,31 +293,20 @@ export function AdminOrderDetailPanel({
               placeholder="Trạng thái thanh toán"
             />
             <input
-              value={adminNote}
-              onChange={(event) => setAdminNote(event.target.value)}
-              placeholder="Ghi chú admin"
+              value={paymentNote}
+              onChange={(event) => setPaymentNote(event.target.value)}
+              placeholder="Ghi chú cho thanh toán"
               className="h-11 rounded-lg border border-border-warm bg-surface px-sm text-body-md outline-none focus:border-primary focus:ring-1 focus:ring-primary"
             />
-            <div className="grid gap-xs sm:grid-cols-2">
-              <button
-                type="button"
-                disabled={isUpdatingStatus}
-                onClick={handleUpdateStatus}
-                className="inline-flex items-center justify-center gap-xs rounded-full bg-primary px-sm py-2 text-caption font-semibold text-on-primary hover:bg-secondary disabled:opacity-60"
-              >
-                <span className="material-symbols-outlined text-[16px]">local_shipping</span>
-                Cập nhật đơn
-              </button>
-              <button
-                type="button"
-                disabled={isUpdatingPayment}
-                onClick={handleUpdatePayment}
-                className="inline-flex items-center justify-center gap-xs rounded-full bg-primary px-sm py-2 text-caption font-semibold text-on-primary hover:bg-secondary disabled:opacity-60"
-              >
-                <span className="material-symbols-outlined text-[16px]">payments</span>
-                Cập nhật tiền
-              </button>
-            </div>
+            <button
+              type="button"
+              disabled={isUpdatingPayment}
+              onClick={handleUpdatePayment}
+              className="inline-flex h-11 items-center justify-center gap-xs rounded-full bg-primary px-sm text-caption font-semibold text-on-primary hover:bg-secondary disabled:opacity-60"
+            >
+              <span className="material-symbols-outlined text-[16px]">payments</span>
+              Cập nhật tiền
+            </button>
           </div>
         </section>
 
