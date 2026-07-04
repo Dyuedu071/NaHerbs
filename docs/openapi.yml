@@ -2309,13 +2309,13 @@ components:
         bankName:
           type: string
           nullable: true
+        bankBin:
+          type: string
+          nullable: true
         bankAccountName:
           type: string
           nullable: true
         bankAccountNumber:
-          type: string
-          nullable: true
-        bankQrImageUrl:
           type: string
           nullable: true
     Role:

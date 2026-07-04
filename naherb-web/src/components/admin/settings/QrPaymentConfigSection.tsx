@@ -1,37 +1,61 @@
 "use client";
 
-import { AXIOS_INSTANCE } from "@/services/api-client";
-import { useRef, useState } from "react";
-
-const MAX_QR_BYTES = 10 * 1024 * 1024;
-const ACCEPTED_IMAGE_TYPES = new Set([
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-]);
-
 export type QrPaymentSettingKey =
   | "bankName"
+  | "bankBin"
   | "bankAccountName"
-  | "bankAccountNumber"
-  | "bankQrImageUrl"
-  | "bankQrMediaId";
+  | "bankAccountNumber";
 
 export interface QrPaymentSettings {
   bankName: string;
+  bankBin: string;
   bankAccountName: string;
   bankAccountNumber: string;
-  bankQrImageUrl: string;
-  bankQrMediaId: string;
 }
 
 interface QrPaymentConfigSectionProps {
   settings: QrPaymentSettings;
   onChange: (key: QrPaymentSettingKey, value: string) => void;
   isLoading: boolean;
-  showToast: (msg: string, kind: "success" | "error") => void;
+}
+
+const VIETQR_BANKS = [
+  { bin: "970436", name: "Vietcombank" },
+  { bin: "970415", name: "VietinBank" },
+  { bin: "970418", name: "BIDV" },
+  { bin: "970405", name: "Agribank" },
+  { bin: "970407", name: "Techcombank" },
+  { bin: "970422", name: "MB Bank" },
+  { bin: "970416", name: "ACB" },
+  { bin: "970432", name: "VPBank" },
+  { bin: "970403", name: "Sacombank" },
+  { bin: "970423", name: "TPBank" },
+  { bin: "970441", name: "VIB" },
+  { bin: "970437", name: "HDBank" },
+  { bin: "970443", name: "SHB" },
+  { bin: "970426", name: "MSB" },
+  { bin: "970448", name: "OCB" },
+  { bin: "970440", name: "SeABank" },
+] as const;
+
+const SAMPLE_AMOUNT = 250000;
+const SAMPLE_ORDER_CODE = "NAHERBS-DEMO-001";
+
+function buildVietQrPreviewUrl(settings: QrPaymentSettings): string | null {
+  if (!settings.bankBin || !settings.bankAccountNumber) {
+    return null;
+  }
+
+  const params = new URLSearchParams({
+    amount: String(SAMPLE_AMOUNT),
+    addInfo: SAMPLE_ORDER_CODE,
+  });
+  if (settings.bankAccountName) {
+    params.set("accountName", settings.bankAccountName);
+  }
+  return `https://img.vietqr.io/image/${encodeURIComponent(settings.bankBin)}-${encodeURIComponent(
+    settings.bankAccountNumber,
+  )}-compact2.png?${params.toString()}`;
 }
 
 function BankField({
@@ -90,84 +114,13 @@ export default function QrPaymentConfigSection({
   settings,
   onChange,
   isLoading,
-  showToast,
 }: QrPaymentConfigSectionProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isUploadingQr, setIsUploadingQr] = useState(false);
+  const previewUrl = buildVietQrPreviewUrl(settings);
 
-  const validateFile = (file: File): string | null => {
-    if (!ACCEPTED_IMAGE_TYPES.has(file.type)) {
-      return "Chỉ chấp nhận ảnh PNG, JPG, WEBP hoặc GIF.";
-    }
-    if (file.size > MAX_QR_BYTES) {
-      return "Ảnh vượt quá 10MB.";
-    }
-    return null;
-  };
-
-  const uploadQrFile = async (file: File) => {
-    const validationError = validateFile(file);
-    if (validationError) {
-      showToast(validationError, "error");
-      return;
-    }
-
-    const oldMediaId = settings.bankQrMediaId;
-    setIsUploadingQr(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("type", "QR");
-
-      const res = await AXIOS_INSTANCE.post("/v1/admin/media/upload", formData);
-      const location = res.data?.location as string | undefined;
-      const id = res.data?.id as string | undefined;
-
-      if (!location || !id) {
-        showToast("Phản hồi upload không hợp lệ.", "error");
-        return;
-      }
-
-      onChange("bankQrImageUrl", location);
-      onChange("bankQrMediaId", id);
-
-      if (oldMediaId) {
-        AXIOS_INSTANCE.delete(`/v1/admin/media/${oldMediaId}`).catch(() => {
-          // best-effort cleanup
-        });
-      }
-
-      showToast("Đã tải ảnh QR mới.", "success");
-    } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error ?? "Upload ảnh thất bại.";
-      showToast(message, "error");
-    } finally {
-      setIsUploadingQr(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) void uploadQrFile(file);
-  };
-
-  const handleRemoveQr = async () => {
-    const oldMediaId = settings.bankQrMediaId;
-    onChange("bankQrImageUrl", "");
-    onChange("bankQrMediaId", "");
-    if (oldMediaId) {
-      try {
-        await AXIOS_INSTANCE.delete(`/v1/admin/media/${oldMediaId}`);
-      } catch {
-        // best-effort
-      }
-    }
-    showToast("Đã xoá ảnh QR.", "success");
+  const handleBankChange = (bin: string) => {
+    const bank = VIETQR_BANKS.find((item) => item.bin === bin);
+    onChange("bankBin", bin);
+    onChange("bankName", bank?.name ?? "");
   };
 
   return (
@@ -185,9 +138,9 @@ export default function QrPaymentConfigSection({
             Lưu ý quan trọng
           </h4>
           <p className="mt-1 font-body-md text-body-md text-error-text/80">
-            QR là mã cố định của tài khoản shop. Sau khi đổi ảnh, khách checkout
-            mới sẽ thấy ảnh mới. Hệ thống không tự đối soát ngân hàng — admin
-            xác nhận thanh toán thủ công tại trang Thanh toán QR.
+            VietQR được tạo tự động theo từng đơn, có sẵn số tiền và nội dung
+            chuyển khoản là mã đơn hàng. Hệ thống vẫn không tự đối soát ngân
+            hàng — admin xác nhận thanh toán thủ công tại trang Thanh toán QR.
           </p>
         </div>
       </div>
@@ -218,15 +171,33 @@ export default function QrPaymentConfigSection({
             </>
           ) : (
             <>
-              <BankField
-                label="Tên ngân hàng"
-                fieldKey="bankName"
-                value={settings.bankName}
-                onChange={onChange}
-                placeholder="Vietcombank"
-                icon="account_balance"
-                description="Hiển thị trên modal chuyển khoản của khách"
-              />
+              <div>
+                <label
+                  htmlFor="qr-setting-bankBin"
+                  className="mb-1 flex items-center gap-xs text-label-md font-label-md text-text-main"
+                >
+                  <span className="material-symbols-outlined text-[18px] text-primary">
+                    account_balance
+                  </span>
+                  Ngân hàng
+                </label>
+                <p className="mb-2 text-caption text-text-muted">
+                  Chọn ngân hàng theo chuẩn VietQR
+                </p>
+                <select
+                  id="qr-setting-bankBin"
+                  value={settings.bankBin}
+                  onChange={(e) => handleBankChange(e.target.value)}
+                  className="organic-input w-full rounded-xl px-4 text-body-md font-body-md text-text-main"
+                >
+                  <option value="">Chọn ngân hàng</option>
+                  {VIETQR_BANKS.map((bank) => (
+                    <option key={bank.bin} value={bank.bin}>
+                      {bank.name} ({bank.bin})
+                    </option>
+                  ))}
+                </select>
+              </div>
               <BankField
                 label="Tên chủ tài khoản"
                 fieldKey="bankAccountName"
@@ -250,7 +221,7 @@ export default function QrPaymentConfigSection({
         </div>
       </div>
 
-      {/* QR image */}
+      {/* VietQR preview */}
       <div className="overflow-hidden rounded-2xl border border-herbal-beige bg-surface-container-lowest shadow-ambient-1">
         <div className="flex items-center gap-sm border-b border-herbal-beige bg-surface-container-low/50 px-md py-sm">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-success-bg text-primary">
@@ -262,85 +233,34 @@ export default function QrPaymentConfigSection({
             </span>
           </div>
           <h3 className="text-body-lg font-semibold text-text-main">
-            Ảnh QR chuyển khoản
+            Xem trước VietQR động
           </h3>
         </div>
         <div className="grid grid-cols-1 gap-md p-md md:grid-cols-2">
-          {/* Uploader */}
-          <div className="relative">
-            {isUploadingQr && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/70 backdrop-blur-sm">
-                <span className="material-symbols-outlined animate-spin text-[32px] text-primary">
-                  progress_activity
-                </span>
-              </div>
-            )}
-
-            {isLoading ? (
-              <div className="h-48 animate-pulse rounded-xl bg-surface-container" />
-            ) : settings.bankQrImageUrl ? (
-              <div className="flex flex-col gap-sm rounded-xl border border-border-warm bg-white p-md sm:flex-row sm:items-start">
+          <div className="rounded-xl border border-border-warm bg-white p-md">
+            {previewUrl ? (
+              <div className="flex flex-col items-center gap-xs">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={settings.bankQrImageUrl}
-                  alt="QR chuyển khoản"
-                  className="h-40 w-40 shrink-0 rounded-lg border border-border-warm bg-white object-contain"
+                  src={previewUrl}
+                  alt="Xem trước VietQR"
+                  className="h-60 w-60 object-contain"
                 />
-                <div className="flex flex-col gap-xs">
-                  <button
-                    type="button"
-                    disabled={isUploadingQr}
-                    onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center justify-center gap-xs rounded-full bg-primary px-md py-sm font-label-md text-label-md text-on-primary shadow-sm transition-colors hover:bg-surface-tint disabled:opacity-60"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      swap_horiz
-                    </span>
-                    Đổi ảnh khác
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isUploadingQr}
-                    onClick={() => void handleRemoveQr()}
-                    className="inline-flex items-center justify-center gap-xs rounded-full border border-error-text/40 px-md py-sm font-label-md text-label-md text-error-text transition-colors hover:bg-error-container/50 disabled:opacity-60"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      delete
-                    </span>
-                    Xoá ảnh
-                  </button>
-                  <p className="font-caption text-caption text-text-muted">
-                    PNG / JPG / WEBP, tối đa 10MB. Ảnh lưu trên Cloudinary.
-                  </p>
-                </div>
+                <p className="text-center font-caption text-caption text-text-muted">
+                  Đây là QR demo. Khi khách đặt hàng, hệ thống tự thay số tiền
+                  và nội dung bằng đơn thực tế.
+                </p>
               </div>
             ) : (
-              <button
-                type="button"
-                disabled={isUploadingQr}
-                onClick={() => fileInputRef.current?.click()}
-                className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border-warm bg-surface-container-low/50 transition-colors hover:border-primary hover:bg-surface-container-low disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <span className="material-symbols-outlined text-[40px] text-text-muted">
-                  upload_file
+              <div className="flex h-60 flex-col items-center justify-center rounded-xl border border-dashed border-border-warm bg-surface-container-low text-center text-text-muted">
+                <span className="material-symbols-outlined text-[48px]">
+                  qr_code_2
                 </span>
-                <span className="mt-xs font-label-md text-label-md text-text-main">
-                  Chọn ảnh QR
-                </span>
-                <span className="mt-1 font-caption text-caption text-text-muted">
-                  PNG / JPG / WEBP, tối đa 10MB
-                </span>
-              </button>
+                <p className="mt-xs font-label-md text-label-md">
+                  Chọn ngân hàng và nhập số tài khoản để xem trước VietQR
+                </p>
+              </div>
             )}
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/gif"
-              className="hidden"
-              onChange={handleFileChange}
-              disabled={isUploadingQr}
-            />
           </div>
 
           {/* Customer preview mock */}
@@ -349,10 +269,10 @@ export default function QrPaymentConfigSection({
               Khách sẽ nhìn thấy
             </p>
             <div className="flex flex-col items-center rounded-lg bg-white p-sm">
-              {settings.bankQrImageUrl ? (
+              {previewUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
-                  src={settings.bankQrImageUrl}
+                  src={previewUrl}
                   alt="Xem trước QR"
                   className="h-40 w-40 object-contain"
                 />
@@ -373,7 +293,7 @@ export default function QrPaymentConfigSection({
                 {settings.bankAccountNumber || "—"}
               </code>
               <p className="mt-sm text-center font-caption text-caption text-text-muted">
-                Nội dung CK = mã đơn hàng (tự sinh khi checkout)
+                Số tiền + nội dung CK tự động theo từng đơn hàng
               </p>
             </div>
           </div>
