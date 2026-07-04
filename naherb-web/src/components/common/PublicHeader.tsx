@@ -10,6 +10,7 @@ import { useGetAuthMe } from '@/services/generated/customer-profile/customer-pro
 
 import { useGetCart } from '@/services/generated/cart/cart';
 import type { Cart } from '@/services/generated/model/cart';
+import NotificationBell from './NotificationBell';
 
 export default function PublicHeader() {
   const pathname = usePathname();
@@ -67,9 +68,9 @@ export default function PublicHeader() {
 
         {/* Trailing Actions */}
         <div className="flex items-center gap-md">
-          <Link href="/san-pham" className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95" title="Tìm kiếm">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>search</span>
-          </Link>
+
+          <NotificationBell />
+
           <Link
             href="/cart"
             className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 relative inline-flex items-center"

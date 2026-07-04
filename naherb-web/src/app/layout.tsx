@@ -5,6 +5,7 @@ import CartShell from "@/components/cart/CartShell";
 import ChatbotShell from "@/components/chatbot/ChatbotShell";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import ToastProvider from "@/components/providers/ToastProvider";
+import { WebSocketProvider } from "@/components/websocket/WebSocketContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -111,10 +112,12 @@ export default function RootLayout({
           }
         >
           <QueryProvider>
-            <ToastProvider />
-            <CartShell>
-              <ChatbotShell>{children}</ChatbotShell>
-            </CartShell>
+            <WebSocketProvider>
+              <ToastProvider />
+              <CartShell>
+                <ChatbotShell>{children}</ChatbotShell>
+              </CartShell>
+            </WebSocketProvider>
           </QueryProvider>
         </GoogleOAuthProvider>
       </body>

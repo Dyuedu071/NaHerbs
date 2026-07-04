@@ -35,6 +35,7 @@ import vn.io.naherb.order.dto.CheckoutResponse;
 import vn.io.naherb.product.entity.ProductSku;
 import vn.io.naherb.product.repository.ProductSkuRepository;
 import vn.io.naherb.security.CurrentAccountHelper;
+import vn.io.naherb.notification.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +54,7 @@ public class CheckoutService {
     private final OrderItemRepository orderItemRepository;
     private final PaymentRecordService paymentRecordService;
     private final QrInstructionService qrInstructionService;
+    private final NotificationService notificationService;
 
     @Transactional
     public CheckoutResponse checkout(JwtAuthenticationToken authentication, CheckoutRequest request) {
@@ -126,6 +128,19 @@ public class CheckoutService {
 
         cartItemRepository.deleteAll(cartItems);
         cartService.recalculateAndMap(cart);
+
+        notificationService.notifyAdmins(
+                "Đơn hàng mới",
+                "Khách hàng " + account.getName() + " vừa đặt đơn hàng " + savedOrder.getOrderCode(),
+                "/admin/orders/" + savedOrder.getId()
+        );
+
+        notificationService.notifyUser(
+                account.getId(),
+                "Đặt hàng thành công",
+                "Đơn hàng " + savedOrder.getOrderCode() + " của bạn đã được ghi nhận. Chúng tôi sẽ sớm liên hệ để xác nhận.",
+                "/account/orders"
+        );
 
         return new CheckoutResponse(
                 savedOrder.getId(),

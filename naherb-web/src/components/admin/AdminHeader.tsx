@@ -4,6 +4,7 @@ import { logoutToGuestHome } from "@/lib/auth-logout";
 import { extractSessionUser } from "@/lib/current-user";
 import { useGetAuthMe } from "@/services/generated/customer-profile/customer-profile";
 import { useQueryClient } from "@tanstack/react-query";
+import NotificationBell from "../common/NotificationBell";
 
 export default function AdminHeader() {
   const queryClient = useQueryClient();
@@ -29,9 +30,7 @@ export default function AdminHeader() {
           Hệ thống quản trị NaHerbs
         </span>
         <div className="flex items-center gap-sm">
-          <button className="flex h-10 w-10 items-center justify-center rounded-full text-text-muted transition-all hover:bg-surface-container hover:text-primary">
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
+          <NotificationBell />
           <div className="ml-sm h-8 w-8 overflow-hidden rounded-full border border-border-warm shadow-sm">
             <img
               className="h-full w-full object-cover"
