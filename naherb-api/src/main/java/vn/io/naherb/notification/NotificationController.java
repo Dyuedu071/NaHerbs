@@ -61,4 +61,18 @@ public class NotificationController {
             }
         });
     }
+
+    @Transactional
+    @PostMapping("/my/read-all")
+    public void markAllMyNotificationsAsRead(JwtAuthenticationToken authentication) {
+        UUID accountId = CurrentAccountHelper.requireAccountId(authentication, accountRepository);
+        notificationRepository.markAllAsReadByAccountId(accountId);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    @PostMapping("/admin/read-all")
+    public void markAllAdminNotificationsAsRead() {
+        notificationRepository.markAllAsReadByAccountIsNull();
+    }
 }

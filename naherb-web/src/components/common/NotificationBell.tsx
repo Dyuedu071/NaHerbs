@@ -91,6 +91,16 @@ export default function NotificationBell() {
     }
   };
 
+  const handleMarkAllAsRead = async () => {
+    try {
+      const endpoint = isAdmin ? '/notifications/admin/read-all' : '/notifications/my/read-all';
+      await customInstance({ url: endpoint, method: 'POST' });
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch (e) {
+      console.error("Failed to mark all as read", e);
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -115,6 +125,14 @@ export default function NotificationBell() {
           <div className="absolute right-0 top-full mt-2 w-80 bg-surface rounded-xl shadow-ambient-2 z-50 border border-herbal-beige overflow-hidden">
             <div className="px-4 py-3 border-b border-herbal-beige flex justify-between items-center bg-surface-container-low">
               <h3 className="font-bold text-label-lg text-primary">Thông báo</h3>
+              {unreadCount > 0 && (
+                <button 
+                  onClick={(e) => { e.stopPropagation(); handleMarkAllAsRead(); }}
+                  className="text-[12px] text-primary hover:underline font-medium cursor-pointer"
+                >
+                  Đánh dấu tất cả đã đọc
+                </button>
+              )}
             </div>
             <div className="max-h-96 overflow-y-auto">
               {notifications.length === 0 ? (
