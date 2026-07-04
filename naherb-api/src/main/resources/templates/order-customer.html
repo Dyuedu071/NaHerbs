@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác nhận đơn hàng - NaHerbs</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; }
+        .header h1 { color: #2e7d32; margin: 0; }
+        .order-info, .customer-info { margin-bottom: 20px; }
+        .order-info h3, .customer-info h3 { color: #2e7d32; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f9f9f9; }
+        .total-row { font-weight: bold; }
+        .total-amount { color: #d32f2f; font-size: 1.1em; }
+        .footer { text-align: center; font-size: 0.9em; color: #777; border-top: 1px solid #eee; padding-top: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NaHerbs</h1>
+            <h2>Xác nhận đặt hàng thành công</h2>
+        </div>
+
+        <p>Chào <strong th:text="${order.receiverName}">Khách hàng</strong>,</p>
+        <p>Cảm ơn bạn đã tin tưởng và mua sắm tại NaHerbs. Đơn hàng của bạn đã được ghi nhận và đang được chúng tôi xử lý. Dưới đây là thông tin chi tiết về đơn hàng của bạn:</p>
+
+        <div class="order-info">
+            <h3>Mã đơn hàng: <span th:text="${order.orderCode}"></span></h3>
+            <p><strong>Ngày đặt:</strong> <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></span></p>
+            <p><strong>Phương thức thanh toán:</strong> <span th:text="${order.paymentMethod}"></span></p>
+            <p><strong>Trạng thái thanh toán:</strong> <span th:text="${order.paymentStatus}"></span></p>
+        </div>
+
+        <div class="customer-info">
+            <h3>Thông tin giao hàng</h3>
+            <p><strong>Người nhận:</strong> <span th:text="${order.receiverName}"></span></p>
+            <p><strong>Số điện thoại:</strong> <span th:text="${order.receiverPhone}"></span></p>
+            <p><strong>Địa chỉ giao hàng:</strong> <span th:text="${order.shippingAddress}"></span></p>
+            <p th:if="${order.customerNote != null}"><strong>Ghi chú:</strong> <span th:text="${order.customerNote}"></span></p>
+        </div>
+
+        <div class="order-items">
+            <h3>Chi tiết sản phẩm</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>SL</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${items}">
+                        <td>
+                            <span th:text="${item.productNameSnapshot}"></span><br>
+                            <small style="color: #666;" th:text="${item.skuName}"></small>
+                        </td>
+                        <td th:text="${item.quantity}"></td>
+                        <td th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                        <td th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3" style="text-align: right;">Tổng phụ:</td>
+                        <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                    </tr>
+                    <tr class="total-row" th:if="${order.discountAmount > 0}">
+                        <td colspan="3" style="text-align: right;">Giảm giá:</td>
+                        <td th:text="'- ' + ${#numbers.formatDecimal(order.discountAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                    </tr>
+                    <tr class="total-row" th:if="${order.shippingFee > 0}">
+                        <td colspan="3" style="text-align: right;">Phí vận chuyển:</td>
+                        <td th:text="${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3" style="text-align: right;">Tổng thanh toán:</td>
+                        <td class="total-amount" th:text="${#numbers.formatDecimal(order.finalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Chúng tôi sẽ sớm liên hệ với bạn để xác nhận đơn hàng và thông báo thời gian giao hàng dự kiến.</p>
+        <p>Mọi thắc mắc xin vui lòng liên hệ hotline: <strong>0972760489</strong> hoặc email: <strong>Naherb26@gmail.com</strong></p>
+
+        <div class="footer">
+            <p>&copy; 2026 NaHerbs. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
