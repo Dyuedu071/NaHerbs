@@ -4,22 +4,23 @@ import vn.io.naherb.product.entity.*;
 import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.io.naherb.common.enums.ContentStatus;
+import vn.io.naherb.common.enums.OrderStatus;
 import vn.io.naherb.common.enums.StockStatus;
 import vn.io.naherb.common.response.PageResponse;
 import vn.io.naherb.exception.NotFoundException;
+import vn.io.naherb.order.OrderItemRepository;
 import vn.io.naherb.product.entity.Product;
 import vn.io.naherb.product.entity.ProductCategory;
 import vn.io.naherb.product.entity.ProductImage;
@@ -46,6 +47,7 @@ public class PublicProductServiceImpl implements PublicProductService {
     private final ProductSkuRepository skuRepository;
     private final ProductVersionRepository versionRepository;
     private final ProductImageRepository imageRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -61,19 +63,7 @@ public class PublicProductServiceImpl implements PublicProductService {
     @Transactional(readOnly = true)
     public PageResponse<ProductListResponse> searchProducts(
             String keyword, List<String> categorySlugs, String need, java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice, Boolean inStockOnly, String sortStr, int page, int size) {
-        
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        if ("price_asc".equals(sortStr)) {
-            // Note: Basic sort on entity won't work perfectly for SKU prices without joins, 
-            // but for simplicity we sort by display order or default if complex logic is needed.
-            // Using displayOrder as fallback for simple implementation.
-            sort = Sort.by(Sort.Direction.ASC, "displayOrder");
-        } else if ("price_desc".equals(sortStr)) {
-            sort = Sort.by(Sort.Direction.DESC, "displayOrder");
-        }
-        
-        Pageable pageable = PageRequest.of(page, size, sort);
-        
+
         Specification<Product> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("status"), ContentStatus.PUBLISHED));
@@ -91,35 +81,42 @@ public class PublicProductServiceImpl implements PublicProductService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        Page<Product> productPage = productRepository.findAll(spec, pageable);
-        
+        List<Product> matchedProducts = productRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createdAt"));
+
         // Fetch all SKUs and Images for these products to avoid N+1 where possible
-        List<UUID> productIds = productPage.getContent().stream().map(Product::getId).toList();
-        
+        List<UUID> productIds = matchedProducts.stream().map(Product::getId).toList();
+
         Map<UUID, List<ProductSku>> skusByProduct = productIds.isEmpty() ? Map.of() : skuRepository.findByProductIdIn(productIds).stream()
                 .filter(sku -> sku.getStatus() == vn.io.naherb.common.enums.SkuStatus.ACTIVE)
                 .filter(sku -> sku.getVersion() == null || sku.getVersion().getStatus() == ContentStatus.PUBLISHED)
                 .collect(Collectors.groupingBy(sku -> sku.getProduct().getId()));
-                
+
         Map<UUID, List<ProductImage>> imagesByProduct = productIds.isEmpty() ? Map.of() : imageRepository.findByProductIdIn(productIds).stream()
                 .collect(Collectors.groupingBy(img -> img.getProduct().getId()));
 
-        List<ProductListResponse> items = productPage.getContent().stream().map(product -> {
+        Map<UUID, Long> soldQuantityByProduct = productIds.isEmpty()
+                ? Map.of()
+                : orderItemRepository.sumSoldQuantityByProductId(productIds, OrderStatus.CANCELLED).stream()
+                        .collect(Collectors.toMap(
+                                row -> (UUID) row[0],
+                                row -> ((Number) row[1]).longValue()));
+
+        List<ProductListItem> filteredItems = matchedProducts.stream().map(product -> {
             List<ProductSku> skus = skusByProduct.getOrDefault(product.getId(), List.of());
             List<ProductImage> images = imagesByProduct.getOrDefault(product.getId(), List.of());
-            
+
             ProductSku cheapestSku = skus.stream()
                     .filter(s -> s.getSalePrice() != null)
-                    .min(java.util.Comparator.comparing(ProductSku::getSalePrice))
+                    .min(Comparator.comparing(ProductSku::getSalePrice))
                     .orElse(null);
             BigDecimal minSalePrice = cheapestSku != null ? cheapestSku.getSalePrice() : BigDecimal.ZERO;
             BigDecimal originalPrice = cheapestSku != null ? cheapestSku.getOriginalPrice() : null;
-            BigDecimal maxSalePrice = skus.stream().map(ProductSku::getSalePrice).filter(java.util.Objects::nonNull).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+            BigDecimal maxSalePrice = skus.stream().map(ProductSku::getSalePrice).filter(Objects::nonNull).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
             boolean inStock = skus.stream().anyMatch(sku -> sku.getStockStatus() == StockStatus.IN_STOCK);
-            
+
             String thumb = images.stream().filter(ProductImage::isThumbnail).findFirst()
                     .map(ProductImage::getUrl).orElse(null);
-                    
+
             if (inStockOnly != null && inStockOnly && !inStock) {
                 return null;
             }
@@ -129,8 +126,8 @@ public class PublicProductServiceImpl implements PublicProductService {
             if (maxPrice != null && minSalePrice.compareTo(maxPrice) > 0) {
                 return null;
             }
-            
-            return ProductListResponse.builder()
+
+            ProductListResponse response = ProductListResponse.builder()
                     .id(product.getId())
                     .name(product.getName())
                     .slug(product.getSlug())
@@ -141,16 +138,69 @@ public class PublicProductServiceImpl implements PublicProductService {
                     .maxSalePrice(maxSalePrice)
                     .stockStatus(inStock ? StockStatus.IN_STOCK : StockStatus.OUT_OF_STOCK)
                     .build();
-        }).filter(java.util.Objects::nonNull).toList();
+
+            return new ProductListItem(
+                    product,
+                    response,
+                    priceForSort(minSalePrice),
+                    soldQuantityByProduct.getOrDefault(product.getId(), 0L));
+        }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
+
+        filteredItems.sort(productComparator(sortStr));
+
+        int normalizedPage = Math.max(page, 0);
+        int normalizedSize = size <= 0 ? 12 : Math.min(size, 100);
+        int fromIndex = Math.min(normalizedPage * normalizedSize, filteredItems.size());
+        int toIndex = Math.min(fromIndex + normalizedSize, filteredItems.size());
+        List<ProductListResponse> items = filteredItems.subList(fromIndex, toIndex).stream()
+                .map(ProductListItem::response)
+                .toList();
+        int totalPages = filteredItems.isEmpty()
+                ? 0
+                : (int) Math.ceil((double) filteredItems.size() / normalizedSize);
 
         return PageResponse.<ProductListResponse>builder()
                 .items(items)
-                .page(productPage.getNumber())
-                .size(productPage.getSize())
-                .totalItems(productPage.getTotalElements())
-                .totalPages(productPage.getTotalPages())
+                .page(normalizedPage)
+                .size(normalizedSize)
+                .totalItems(filteredItems.size())
+                .totalPages(totalPages)
                 .build();
     }
+
+    private static Comparator<ProductListItem> productComparator(String sortStr) {
+        Comparator<ProductListItem> newestFirst = Comparator
+                .comparing((ProductListItem item) -> item.product().getCreatedAt(), Comparator.nullsLast(Comparator.reverseOrder()))
+                .thenComparing(item -> item.product().getDisplayOrder(), Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(item -> item.product().getName(), String.CASE_INSENSITIVE_ORDER);
+
+        if ("price_asc".equals(sortStr)) {
+            return Comparator
+                    .comparing(ProductListItem::sortPrice, Comparator.nullsLast(Comparator.naturalOrder()))
+                    .thenComparing(newestFirst);
+        }
+        if ("price_desc".equals(sortStr)) {
+            return Comparator
+                    .comparing(ProductListItem::sortPrice, Comparator.nullsLast(Comparator.reverseOrder()))
+                    .thenComparing(newestFirst);
+        }
+        if ("best_selling".equals(sortStr)) {
+            return Comparator
+                    .comparing(ProductListItem::soldQuantity, Comparator.reverseOrder())
+                    .thenComparing(newestFirst);
+        }
+        return newestFirst;
+    }
+
+    private static BigDecimal priceForSort(BigDecimal price) {
+        return price != null && price.signum() > 0 ? price : null;
+    }
+
+    private record ProductListItem(
+            Product product,
+            ProductListResponse response,
+            BigDecimal sortPrice,
+            Long soldQuantity) {}
 
     @Override
     @Transactional(readOnly = true)

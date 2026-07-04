@@ -31,6 +31,7 @@ export default function ProductSortBar() {
               className="bg-transparent border-none font-label-md text-label-md text-primary cursor-pointer focus:ring-0 p-0"
           >
               <option value="latest">Mới nhất</option>
+              <option value="best_selling">Bán chạy nhất</option>
               <option value="price_asc">Giá thấp đến cao</option>
               <option value="price_desc">Giá cao đến thấp</option>
           </select>
