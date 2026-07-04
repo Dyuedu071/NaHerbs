@@ -16,6 +16,23 @@ interface NotificationDto {
   createdAt: string;
 }
 
+const formatNotificationMessage = (msg: string) => {
+  if (!msg) return msg;
+  return msg
+    .replace(/\bPENDING_CONFIRMATION\b/g, 'Chờ xác nhận')
+    .replace(/\bCONFIRMED\b/g, 'Đã xác nhận')
+    .replace(/\bPACKING\b/g, 'Đang đóng gói')
+    .replace(/\bSHIPPING\b/g, 'Đang giao hàng')
+    .replace(/\bCOMPLETED\b/g, 'Hoàn thành')
+    .replace(/\bCANCELLED\b/g, 'Đã hủy')
+    .replace(/\bPAID\b/g, 'Đã thanh toán')
+    .replace(/\bUNPAID\b/g, 'Chưa thanh toán')
+    .replace(/\bFAILED\b/g, 'Thất bại')
+    .replace(/\bREFUNDED\b/g, 'Đã hoàn tiền')
+    .replace(/\bCOD_PENDING\b/g, 'Chờ thanh toán COD')
+    .replace(/\bWAITING_BANK_TRANSFER\b/g, 'Chờ chuyển khoản ngân hàng');
+};
+
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState<NotificationDto[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -152,8 +169,8 @@ export default function NotificationBell() {
                       </span>
                       {!notif.isRead && <span className="w-2 h-2 rounded-full bg-error flex-shrink-0 mt-1.5"></span>}
                     </div>
-                    <p className="text-body-sm text-secondary whitespace-pre-wrap break-words">
-                      {notif.message}
+                    <p className="text-body-sm text-secondary break-words">
+                      {formatNotificationMessage(notif.message)}
                     </p>
                     <span className="text-[10px] text-secondary mt-2 block">
                       {new Date(notif.createdAt).toLocaleString('vi-VN')}
