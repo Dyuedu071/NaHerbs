@@ -20,6 +20,7 @@ import vn.io.naherb.order.dto.OrderPageResponse;
 import vn.io.naherb.order.dto.UpdateOrderStatusRequest;
 import vn.io.naherb.order.dto.UpdatePaymentStatusRequest;
 import vn.io.naherb.security.CurrentAccountHelper;
+import vn.io.naherb.notification.NotificationService;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final PaymentRecordService paymentRecordService;
     private final QrInstructionService qrInstructionService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public OrderPageResponse listMyOrders(JwtAuthenticationToken authentication, int page, int size) {
@@ -95,6 +97,13 @@ public class OrderService {
             order.setAdminNote(request.note().trim());
         }
         orderRepository.save(order);
+
+        notificationService.notifyUser(
+                order.getAccount().getId(),
+                "Cập nhật đơn hàng",
+                "Đơn hàng " + order.getOrderCode() + " của bạn đã được cập nhật trạng thái: " + request.orderStatus(),
+                "/account/orders"
+        );
     }
 
     @Transactional
