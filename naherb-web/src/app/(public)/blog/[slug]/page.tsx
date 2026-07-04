@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import PublicHeader from '@/components/common/PublicHeader';
-import PublicFooter from '@/components/common/PublicFooter';
 import { AXIOS_INSTANCE } from '@/services/api-client';
 
 interface BlogDetailProps {
@@ -175,7 +173,7 @@ export default function BlogDetail({ params }: BlogDetailProps) {
         }
       `}</style>
 
-      <PublicHeader />
+      
 
       <main className="flex-grow pt-[120px] pb-xl px-sm md:px-gutter bg-background">
 
@@ -418,7 +416,7 @@ export default function BlogDetail({ params }: BlogDetailProps) {
         )}
       </main>
 
-      <PublicFooter />
+      
     </>
   );
 }

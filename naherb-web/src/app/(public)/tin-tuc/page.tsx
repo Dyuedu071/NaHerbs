@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import PublicHeader from '@/components/common/PublicHeader';
-import PublicFooter from '@/components/common/PublicFooter';
 import { AXIOS_INSTANCE } from '@/services/api-client';
 
 interface BlogCategory {
@@ -119,7 +117,7 @@ export default function Blog() {
 
     return (
         <>
-            <PublicHeader />
+            
 
             <main className="flex-grow pt-20">
                 {/* Hero Section */}
@@ -296,7 +294,7 @@ export default function Blog() {
                 </section>
             </main>
 
-            <PublicFooter />
+            
         </>
     );
 }

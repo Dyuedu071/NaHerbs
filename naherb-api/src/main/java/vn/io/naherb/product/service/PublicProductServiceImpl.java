@@ -96,13 +96,12 @@ public class PublicProductServiceImpl implements PublicProductService {
         // Fetch all SKUs and Images for these products to avoid N+1 where possible
         List<UUID> productIds = productPage.getContent().stream().map(Product::getId).toList();
         
-        Map<UUID, List<ProductSku>> skusByProduct = skuRepository.findAll().stream()
-                .filter(sku -> sku.getProduct() != null && productIds.contains(sku.getProduct().getId()))
+        Map<UUID, List<ProductSku>> skusByProduct = productIds.isEmpty() ? Map.of() : skuRepository.findByProductIdIn(productIds).stream()
                 .filter(sku -> sku.getStatus() == vn.io.naherb.common.enums.SkuStatus.ACTIVE)
                 .filter(sku -> sku.getVersion() == null || sku.getVersion().getStatus() == ContentStatus.PUBLISHED)
                 .collect(Collectors.groupingBy(sku -> sku.getProduct().getId()));
                 
-        Map<UUID, List<ProductImage>> imagesByProduct = imageRepository.findByProductIdIn(productIds).stream()
+        Map<UUID, List<ProductImage>> imagesByProduct = productIds.isEmpty() ? Map.of() : imageRepository.findByProductIdIn(productIds).stream()
                 .collect(Collectors.groupingBy(img -> img.getProduct().getId()));
 
         List<ProductListResponse> items = productPage.getContent().stream().map(product -> {

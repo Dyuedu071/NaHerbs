@@ -1,6 +1,4 @@
 import { Metadata } from 'next';
-import PublicHeader from '@/components/common/PublicHeader';
-import PublicFooter from '@/components/common/PublicFooter';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
@@ -11,7 +9,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden flex flex-col">
-      <PublicHeader />
+      
       
       <main className="flex-grow pt-20">
 
@@ -217,7 +215,7 @@ export default function AboutPage() {
     
       </main>
 
-      <PublicFooter />
+      
     </div>
   );
 }

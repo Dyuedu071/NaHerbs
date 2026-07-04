@@ -15,9 +15,6 @@ import type { ProductPage } from '@/services/generated/model/productPage';
 import type { ProductSku } from '@/services/generated/model/productSku';
 import type { ProductSummary } from '@/services/generated/model/productSummary';
 import { useQueryClient } from '@tanstack/react-query';
-import PublicHeader from '@/components/common/PublicHeader';
-import PublicFooter from '@/components/common/PublicFooter';
-
 const fallbackProductImages = [
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCCHIGHpyiH_H6cd9_8Zslswa-mB_l-tp5H_0vn7u3WIMjMMnJY7Gl2AHTm2ZHsVUifzbG8EqLQm_Ixt9t8Vx6pOFbt6Dnyqw-ws8jjMUOL7dT-eoB0UiNVffG1mx5yV0Yt6PFc0k4DxdRLRW6XiG26G9nE62FJONsIsnH_ZG0o9R4e_TLJnVtJuj_Dbfde9XuaRyy8WboVSQRO9eDqyiGWc5DhIFUN4pvK2VY2a0BssBOHGBU4TU07jylZpmTjT4fMQUZiW3y9O4g",
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBQvwT_9-iT2SOajLu-FldGTE-JS02fCYW4Vn3r6HDGFmBcZAE6J1z4YGOPZz5TFuYXNl6TxtI7FYYw8e-p0kSgd8TCry0ZfSEEWdlJTKExoQpQJEC_IskQDCVFWnzJfUEarDOkZcPk2qhcENY_ci_MusEhUOPLOsg7LMNYnCSAKGGfYs0A86_rAalkCY3Jwg7C1Xmt2xtKOj16IyETjLs3IvU1Ef23zXjwmR4eRtyupcA3jLaZEMx4bZeghMprhbXBI0wdkUio9nY",
@@ -47,7 +44,7 @@ export default function Home() {
 
   return (
     <>
-    <PublicHeader />
+    
     <main className="flex-grow pt-24 pb-xl">
         {/* Hero Section */}
         <section id="about" className="px-gutter max-w-container-max mx-auto py-xl">
@@ -300,7 +297,7 @@ export default function Home() {
             </div>
         </section>
     </main>
-    <PublicFooter />
+    
     </>
   );
 }

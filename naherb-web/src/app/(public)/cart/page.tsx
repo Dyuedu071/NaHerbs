@@ -16,9 +16,6 @@ import type { CartItem } from "@/services/generated/model/cartItem";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import PublicHeader from "@/components/common/PublicHeader";
-import PublicFooter from "@/components/common/PublicFooter";
-
 const EMPTY_ITEMS: CartItem[] = [];
 
 export default function CartPage() {
@@ -150,7 +147,7 @@ export default function CartPage() {
 
   return (
     <>
-      <PublicHeader />
+      
       <main className="pt-32 pb-xl px-gutter max-w-container-max mx-auto min-h-[819px]">
         {/* Header */}
         <header className="mb-12">
@@ -392,7 +389,7 @@ export default function CartPage() {
           </>
         )}
       </main>
-      <PublicFooter />
+      
     </>
   );
 }

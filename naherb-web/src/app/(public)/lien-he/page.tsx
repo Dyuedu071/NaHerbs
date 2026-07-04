@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
-import { getSiteSettingsPublic } from '@/services/generated/seo/seo';
-import PublicHeader from '@/components/common/PublicHeader';
-import PublicFooter from '@/components/common/PublicFooter';
+// Removed unused import
 import Image from 'next/image';
 
 export const metadata: Metadata = {
@@ -10,24 +8,33 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-    const siteSettings = await getSiteSettingsPublic().catch(() => null);
-
     let settingsData: Record<string, string> = {};
-    if (siteSettings && typeof siteSettings === 'object' && 'data' in siteSettings) {
-        settingsData = (siteSettings as { data?: Record<string, string> }).data || {};
-    } else if (siteSettings) {
-        settingsData = siteSettings as unknown as Record<string, string>;
+    try {
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+        const res = await fetch(`${apiBase}/v1/settings/site-info`, {
+            next: { revalidate: 3600 },
+        });
+        if (res.ok) {
+            const json = await res.json();
+            settingsData = json?.data || json || {};
+        }
+    } catch {
+        // Fallback to empty object if fetch fails
     }
 
     const {
-        contactEmail = 'contact@naherbs.vn',
-        contactPhone = '0988 123 456',
-        address = '123 Đường Mẫu, Quận 1, TP. Hồ Chí Minh',
+        store_email: contactEmail = 'contact@naherbs.vn',
+        store_hotline: contactPhone = '0988 123 456',
+        store_address: address = '123 Đường Mẫu, Quận 1, TP. Hồ Chí Minh',
+        store_zalo_url: zaloUrl = '#',
+        store_facebook_url: facebookUrl = '#',
+        store_working_hours: workingHours = '8:00 - 17:30',
+        store_name: storeName = 'NaHerbs',
     } = settingsData;
 
     return (
         <div className="min-h-screen bg-surface-container-lowest flex flex-col">
-            <PublicHeader />
+            
 
             <main className="flex-grow pt-xl pb-xl mt-20 relative">
 
@@ -103,13 +110,34 @@ export default async function ContactPage() {
                                     <span className="material-symbols-outlined text-[32px]"
                                         data-icon="alternate_email">alternate_email</span>
                                 </div>
-                                <div className="flex-1">
-                                    <h3 className="font-label-md text-label-md text-text-muted mb-base">Zalo &amp; Email</h3>
-                                    <div className="space-y-base">
-                                        <p className="font-body-lg font-bold text-on-surface">{contactEmail}</p>
-                                        <p className="font-body-lg font-bold text-on-surface">Zalo: NaHerbs Official</p>
+                                    <div className="flex-1">
+                                        <h3 className="font-label-md text-label-md text-text-muted mb-base">Zalo &amp; Email</h3>
+                                        <div className="space-y-base">
+                                            <p className="font-body-lg font-bold text-on-surface hover:text-primary transition-colors">
+                                                <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+                                            </p>
+                                            <p className="font-body-lg font-bold text-on-surface hover:text-primary transition-colors">
+                                                <a href={zaloUrl} target="_blank" rel="noopener noreferrer">Zalo: {storeName} Official</a>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
+                                {/*  Facebook Card  */}
+                                <div
+                                    className="bg-surface-container-lowest p-md rounded-xl custom-shadow border border-herbal-beige/30 flex items-start gap-md group hover:translate-y-[-4px] transition-transform duration-300">
+                                    <div
+                                        className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                        <span className="material-symbols-outlined text-[32px]"
+                                            data-icon="public">public</span>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="font-label-md text-label-md text-text-muted mb-base">Mạng xã hội</h3>
+                                        <div className="space-y-base">
+                                            <p className="font-body-lg font-bold text-on-surface hover:text-primary transition-colors">
+                                                <a href={facebookUrl} target="_blank" rel="noopener noreferrer">Facebook Fanpage</a>
+                                            </p>
+                                        </div>
+                                    </div>
                             </div>
                             {/*  Address Card  */}
                             <div
@@ -122,6 +150,19 @@ export default async function ContactPage() {
                                 <div>
                                     <h3 className="font-label-md text-label-md text-text-muted mb-base">Địa chỉ trụ sở</h3>
                                     <p className="font-body-md text-body-md text-on-surface">{address}</p>
+                                </div>
+                            </div>
+                            {/*  Working Hours Card  */}
+                            <div
+                                className="bg-surface-container-lowest p-md rounded-xl custom-shadow border border-herbal-beige/30 flex items-start gap-md group hover:translate-y-[-4px] transition-transform duration-300">
+                                <div
+                                    className="w-14 h-14 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                                    <span className="material-symbols-outlined text-[32px]"
+                                        data-icon="schedule">schedule</span>
+                                </div>
+                                <div>
+                                    <h3 className="font-label-md text-label-md text-text-muted mb-base">Giờ làm việc</h3>
+                                    <p className="font-body-md text-body-md text-on-surface">{workingHours}</p>
                                 </div>
                             </div>
                             {/*  Featured Botanical Image  */}
@@ -137,7 +178,7 @@ export default async function ContactPage() {
 
             </main>
 
-            <PublicFooter />
+            
         </div>
     );
 }

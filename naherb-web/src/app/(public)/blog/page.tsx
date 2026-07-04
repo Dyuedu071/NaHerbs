@@ -1,13 +1,10 @@
 "use client";
 
 import Link from 'next/link';
-import PublicHeader from '@/components/common/PublicHeader';
-import PublicFooter from '@/components/common/PublicFooter';
-
 export default function Blog() {
   return (
     <>
-    <PublicHeader />
+    
     <main className="flex-grow pt-20">
         {/* Hero Section */}
         <section className="w-full bg-surface py-xl px-gutter">
@@ -250,7 +247,7 @@ export default function Blog() {
         </section>
     </main>
 
-    <PublicFooter />
+    
     </>
   );
 }

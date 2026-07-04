@@ -1,8 +1,6 @@
 "use client";
 
 import { useRequireAuth } from "@/components/account/useRequireAuth";
-import PublicHeader from "@/components/common/PublicHeader";
-
 import { extractApiErrorMessage } from "@/lib/api-error";
 import { formatMoney, paymentMethodLabels } from "@/lib/order-format";
 import {
@@ -210,7 +208,7 @@ function CheckoutContent() {
 
   return (
     <>
-      <PublicHeader />
+      
       <main className="min-h-screen bg-background pt-28">
         <section className="mx-auto grid max-w-container-max gap-md px-gutter pb-lg lg:grid-cols-[1fr_360px]">
         <form
@@ -652,7 +650,7 @@ function CheckoutField({
 function CheckoutShell({ children }: { children: string }) {
   return (
     <>
-      <PublicHeader />
+      
       <main className="flex min-h-screen items-center justify-center bg-background px-gutter pt-20">
         <p className="text-body-md text-text-muted">{children}</p>
       </main>

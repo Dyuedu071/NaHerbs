@@ -6,21 +6,23 @@ import AddToCartButton from './AddToCartButton';
 
 interface ProductCardProps {
   product: ProductSummary;
+  priority?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, priority = false }: ProductCardProps) {
   const isOutOfStock = product.stockStatus === 'OUT_OF_STOCK';
   const productUrl = `/san-pham/${product.slug}`;
 
   return (
     <div className="bg-surface-container-lowest rounded-xl p-sm shadow-[0_4px_20px_-2px_rgba(46,77,57,0.12)] group block h-full flex flex-col transition-shadow hover:shadow-[0_8px_30px_-4px_rgba(46,77,57,0.2)]">
       <div className="relative mb-sm overflow-hidden rounded-xl bg-surface-container-low aspect-square flex-shrink-0">
-        <Link href={productUrl} className="block w-full h-full">
+        <Link href={productUrl} className="relative block w-full h-full">
           {product.thumbnailUrl ? (
             <Image
               src={product.thumbnailUrl}
               alt={product.name || 'Product Image'}
               fill
+              priority={priority}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
