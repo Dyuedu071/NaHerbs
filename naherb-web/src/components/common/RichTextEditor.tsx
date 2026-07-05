@@ -7,9 +7,10 @@ import { AXIOS_INSTANCE } from '@/services/api-client';
 interface RichTextEditorProps {
   initialValue?: string;
   onChange: (content: string) => void;
+  mediaType?: string;
 }
 
-export default function RichTextEditor({ initialValue = '', onChange }: RichTextEditorProps) {
+export default function RichTextEditor({ initialValue = '', onChange, mediaType = 'GENERAL' }: RichTextEditorProps) {
   const editorRef = useRef<any>(null);
 
   const handleEditorChange = (content: string) => {
@@ -19,7 +20,19 @@ export default function RichTextEditor({ initialValue = '', onChange }: RichText
   const imagesUploadHandler = async (blobInfo: any, progress: any): Promise<string> => {
     return new Promise(async (resolve, reject) => {
       const formData = new FormData();
-      formData.append('file', blobInfo.blob(), blobInfo.filename());
+      const fileBlob = blobInfo.blob();
+      const filename = blobInfo.filename();
+      
+      const EXT_MIME: Record<string, string> = {
+        jpg: 'image/jpeg', jpeg: 'image/jpeg',
+        png: 'image/png', webp: 'image/webp', gif: 'image/gif',
+      };
+      const ext = filename.split('.').pop()?.toLowerCase() ?? '';
+      const mimeType = fileBlob.type || EXT_MIME[ext] || 'application/octet-stream';
+      const typedBlob = new Blob([fileBlob], { type: mimeType });
+
+      formData.append('file', typedBlob, filename);
+      formData.append('type', mediaType);
 
       try {
         // Upload to backend API (which forwards to Cloudinary)

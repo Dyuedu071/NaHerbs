@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { UpsertProductRequest, ProductStatus } from '@/services/generated/model';
 import { useGetProductCategories } from '@/services/generated/public-products/public-products';
 import { customInstance } from '@/services/api-client';
+import RichTextEditor from '@/components/common/RichTextEditor';
 
 export interface SkuFormState {
   skuCode: string;
@@ -465,15 +466,21 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
       </div>
 
       <div className="bg-surface-container-lowest p-6 rounded-2xl border border-border-warm space-y-md">
-        <h3 className="text-title-md font-title-md text-on-surface border-b border-border-warm pb-3">Chi tiết & Lợi ích</h3>
+        <h3 className="text-title-md font-title-md text-on-surface border-b border-border-warm pb-3">Chi tiết & Lưu ý</h3>
         <div className="space-y-xs">
           <label className={labelCls}>Mô tả chi tiết</label>
-          <textarea name="detailDescription" value={formData.detailDescription || ''} onChange={handleChange} rows={4} className={inputCls} />
+          <div className="border border-border-warm rounded-lg overflow-hidden">
+            <RichTextEditor 
+              initialValue={formData.detailDescription || ''} 
+              onChange={(content) => setFormData(prev => ({ ...prev, detailDescription: content }))}
+              mediaType="PRODUCT"
+            />
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
           <div className="space-y-xs">
-            <label className={labelCls}>Lợi ích</label>
-            <textarea name="benefits" value={formData.benefits || ''} onChange={handleChange} rows={3} className={inputCls} />
+            <label className={labelCls}>Lưu ý an toàn</label>
+            <textarea name="safetyNote" value={formData.safetyNote || ''} onChange={handleChange} rows={3} className={inputCls} />
           </div>
           <div className="space-y-xs">
             <label className={labelCls}>Hướng dẫn sử dụng</label>
