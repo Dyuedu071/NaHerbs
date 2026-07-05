@@ -370,6 +370,7 @@ function CreatePostContent() {
                 <RichTextEditor 
                   initialValue={content}
                   onChange={(newContent) => setContent(newContent)}
+                  mediaType="BLOG"
                 />
              </div>
           </div>
