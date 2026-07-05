@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -56,20 +55,7 @@ export default function PublicHeader() {
     <header className="fixed top-0 w-full z-50 bg-surface/88 backdrop-blur-md shadow-sm">
       <div className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
         {/* Brand Logo */}
-        <Link
-          className="inline-flex items-center gap-2.5 text-primary transition-transform duration-200 hover:scale-[1.01]"
-          href="/"
-        >
-          <Image
-            src="/naherbs-logo-transparent.png"
-            alt="NaHerbs logo"
-            width={1200}
-            height={719}
-            priority
-            className="h-10 w-auto shrink-0 object-contain md:h-11"
-          />
-          <span className="text-2xl font-semibold tracking-tight text-[#556b0a] md:text-[1.75rem]">NaHerbs</span>
-        </Link>
+        <Link className="font-display-lg text-display-lg text-primary tracking-tight" href="/">NaHerbs</Link>
         
         {/* Navigation Links */}
         <nav className="hidden md:flex gap-gutter items-center">
