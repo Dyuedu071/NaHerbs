@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { ProductImage } from '@/services/generated/model';
+import { resolveImageUrl } from '@/lib/image-url';
 
 interface ProductGalleryProps {
   images: ProductImage[];
@@ -10,19 +10,24 @@ interface ProductGalleryProps {
 }
 
 export default function ProductGallery({ images, activeSkuUrl }: ProductGalleryProps) {
+  const normalizedImages = images
+    .map((img) => ({ ...img, url: resolveImageUrl(img.url) }))
+    .filter((img) => Boolean(img.url));
+  const normalizedActiveSkuUrl = resolveImageUrl(activeSkuUrl);
+
   const [activeImage, setActiveImage] = useState(
-    images.find((img) => img.isThumbnail)?.url || images[0]?.url || ''
+    normalizedImages.find((img) => img.isThumbnail)?.url || normalizedImages[0]?.url || ''
   );
 
   // Sync active image when activeSkuUrl changes
   useEffect(() => {
-    if (activeSkuUrl) {
+    if (normalizedActiveSkuUrl) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveImage(activeSkuUrl);
+      setActiveImage(normalizedActiveSkuUrl);
     }
-  }, [activeSkuUrl]);
+  }, [normalizedActiveSkuUrl]);
 
-  if (!images || images.length === 0) {
+  if (normalizedImages.length === 0) {
     return (
       <div className="aspect-square bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400">
         No Image Available
@@ -34,19 +39,17 @@ export default function ProductGallery({ images, activeSkuUrl }: ProductGalleryP
     <div className="space-y-4">
       <div className="aspect-square relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100">
         {activeImage && (
-          <Image
+          <img
             src={activeImage}
             alt="Main product image"
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
+            className="h-full w-full object-cover"
           />
         )}
       </div>
 
-      {images.length > 1 && (
+      {normalizedImages.length > 1 && (
         <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-          {images.map((img) => (
+          {normalizedImages.map((img) => (
             <button
               key={img.id}
               onClick={() => setActiveImage(img.url!)}
@@ -55,7 +58,7 @@ export default function ProductGallery({ images, activeSkuUrl }: ProductGalleryP
               }`}
               style={{ position: 'relative' }}
             >
-              <Image src={img.url!} alt={img.altText || 'Thumbnail'} fill sizes="80px" className="object-cover" />
+              <img src={img.url!} alt={img.altText || 'Thumbnail'} className="h-full w-full object-cover" />
             </button>
           ))}
         </div>
