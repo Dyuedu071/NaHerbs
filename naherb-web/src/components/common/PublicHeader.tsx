@@ -68,7 +68,7 @@ export default function PublicHeader() {
             priority
             className="h-10 w-auto shrink-0 object-contain md:h-11"
           />
-          <span className="text-2xl font-semibold tracking-tight md:text-[1.75rem]">NaHerbs</span>
+          <span className="text-2xl font-semibold tracking-tight text-[#556b0a] md:text-[1.75rem]">NaHerbs</span>
         </Link>
         
         {/* Navigation Links */}
