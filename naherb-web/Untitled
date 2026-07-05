@@ -1,6 +1,0 @@
-# Frontend Environment configuration for naherb-web
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=356287825696-v4e6k1n584l29t32p918ifqbuvbhgh8a.apps.googleusercontent.com
-
-
-

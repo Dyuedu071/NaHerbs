@@ -36,7 +36,7 @@ async function fetchSitemapData(): Promise<SitemapData> {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://naherbs.vn';
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://naherb.com.vn';
 
   const data = await fetchSitemapData();
 

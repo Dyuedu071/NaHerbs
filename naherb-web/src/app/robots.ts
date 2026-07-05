@@ -6,7 +6,7 @@ import { MetadataRoute } from 'next';
  */
 export default function robots(): MetadataRoute.Robots {
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://naherbs.vn';
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://naherb.com.vn';
 
   return {
     rules: [

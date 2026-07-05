@@ -22,7 +22,7 @@ export default async function PublicFooter() {
     const storeName = settings.store_name || "NaHerbs";
     const tagline = settings.store_tagline || "Giải pháp thư giãn và phục hồi năng lượng từ thảo dược thiên nhiên, mang spa về ngôi nhà của bạn.";
     const hotline = settings.store_hotline || "1900 xxxx";
-    const email = settings.store_email || "care@naherbs.vn";
+    const email = settings.store_email || "care@naherb.com.vn";
     const zaloUrl = settings.store_zalo_url || "https://zalo.me";
 
     return (

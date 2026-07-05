@@ -1,87 +1,80 @@
-version: '3.8'
-
 services:
-  # 1. Cơ sở dữ liệu PostgreSQL
-  postgres:
-    image: postgres:15-alpine
-    container_name: naherb_postgres
-    restart: always
-    environment:
-      POSTGRES_DB: ${DB_NAME:-naherb}
-      POSTGRES_USER: ${DB_USERNAME:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - naherb_network
-
-  # 2. Redis Cache
   redis:
     image: redis:7-alpine
     container_name: naherb_redis
-    restart: always
-    command: redis-server --requirepass ${REDIS_PASSWORD:-change-me}
+    restart: unless-stopped
+    command: /bin/sh -c "redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\""
+    env_file:
+      - ./.env
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - naherb_network
 
-  # 3. Backend API (Kéo từ Docker Hub về)
   naherb-api:
-    image: ${DOCKER_USERNAME:-yourusername}/naherb-api:latest
+    image: ${DOCKER_USERNAME}/naherb-api:latest
     container_name: naherb_api
-    restart: always
+    restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/${DB_NAME:-naherb}
-      - DB_USERNAME=${DB_USERNAME:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD:-change-me}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-change-me}
-      # Có thể thêm env_file: .env.backend nếu muốn dùng chung file env ở đây
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SERVER_PORT: 8080
     depends_on:
-      - postgres
-      - redis
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/api/health >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     networks:
       - naherb_network
 
-  # 4. Frontend Web (Kéo từ Docker Hub về)
   naherb-web:
-    image: ${DOCKER_USERNAME:-yourusername}/naherb-web:latest
+    image: ${DOCKER_USERNAME}/naherb-web:latest
     container_name: naherb_web
-    restart: always
+    restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
-      - NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+      PORT: 3000
     depends_on:
-      - naherb-api
+      naherb-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000 >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - naherb_network
 
-  # 5. Nginx Proxy Manager (Quản lý SSL, Proxy tên miền)
   nginx-proxy-manager:
-    image: 'jc21/nginx-proxy-manager:latest'
+    image: jc21/nginx-proxy-manager:latest
     container_name: nginx_proxy_manager
     restart: unless-stopped
     ports:
-      - '80:80'
-      - '443:443'
-      - '81:81'
+      - "80:80"
+      - "443:443"
+      - "81:81"
     volumes:
       - ./npm/data:/data
       - ./npm/letsencrypt:/etc/letsencrypt
-    networks:
-      - naherb_network
-
-  # 6. Watchtower (Tự động cập nhật Docker Container)
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    # --interval 300 nghĩa là cứ 5 phút (300 giây) kiểm tra Docker Hub 1 lần.
-    # --cleanup tự xoá image cũ đi cho nhẹ ổ cứng.
-    command: --interval 300 --cleanup naherb_api naherb_web
+    depends_on:
+      naherb-web:
+        condition: service_started
+      naherb-api:
+        condition: service_started
     networks:
       - naherb_network
 
@@ -90,5 +83,4 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
   redis_data:
