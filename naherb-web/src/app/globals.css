@@ -162,6 +162,23 @@
     box-shadow: 0 4px 20px rgba(55, 86, 59, 0.08), 0 1px 3px rgba(55, 86, 59, 0.04);
 }
 
+.naherbs-marquee {
+    animation: naherbs-marquee 48s linear infinite;
+}
+
+.naherbs-marquee:hover {
+    animation-play-state: paused;
+}
+
+@keyframes naherbs-marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }

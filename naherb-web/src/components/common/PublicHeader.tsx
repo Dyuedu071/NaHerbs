@@ -46,73 +46,73 @@ export default function PublicHeader() {
   const getLinkClass = (path: string, exact = false) => {
     const isActive = exact ? pathname === path : (pathname?.startsWith(path) && path !== '/');
     if (isActive) {
-      return "text-primary font-bold relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-soft-sage after:rounded-full font-label-md text-label-md hover:scale-105 transition-transform duration-200";
+      return "text-primary font-bold relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-px after:bg-primary font-label-md text-label-md transition-colors";
     }
-    return "text-secondary hover:text-primary font-label-md text-label-md hover:scale-105 transition-transform duration-200";
+    return "text-text-main hover:text-primary font-label-md text-label-md transition-colors";
   };
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-surface/88 backdrop-blur-md shadow-sm">
-      <div className="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto">
-        {/* Brand Logo */}
-        <Link className="font-display-lg text-display-lg text-primary tracking-tight" href="/">NaHerbs</Link>
-        
-        {/* Navigation Links */}
-        <nav className="hidden md:flex gap-gutter items-center">
-          <Link className={getLinkClass('/', true)} href="/">Trang chủ</Link>
-          <Link className={getLinkClass('/san-pham')} href="/san-pham">Sản phẩm</Link>
-          <Link className={getLinkClass('/tin-tuc')} href="/tin-tuc">Tin tức</Link>
-          <Link className={getLinkClass('/gioi-thieu')} href="/gioi-thieu">Giới thiệu</Link>
-          <Link className={getLinkClass('/lien-he')} href="/lien-he">Liên hệ</Link>
-        </nav>
+    <header className="fixed top-0 z-50 w-full bg-surface shadow-sm">
+      <div className="flex min-h-9 items-center justify-center bg-[#1f1b15] px-gutter py-1 text-center font-label-md text-[13px] font-semibold leading-tight text-[#f4ead5]">
+        Tinh hoa thảo dược, chăm sóc sức khỏe từ thiên nhiên
+      </div>
 
-        {/* Trailing Actions */}
-        <div className="flex items-center gap-md">
+      <div className="relative flex min-h-[72px] items-center justify-between border-b border-border-warm bg-surface px-gutter">
+        <div className="flex min-w-0 flex-1 items-center gap-md">
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center text-text-main transition-colors hover:text-primary"
+            aria-label="Tìm kiếm"
+          >
+            <span className="material-symbols-outlined">search</span>
+          </button>
+          <nav className="hidden items-center gap-md lg:flex">
+            <Link className={getLinkClass('/', true)} href="/">Trang chủ</Link>
+            <Link className={getLinkClass('/san-pham')} href="/san-pham">Sản phẩm</Link>
+            <Link className={getLinkClass('/tin-tuc')} href="/tin-tuc">Tin tức</Link>
+            <Link className={getLinkClass('/gioi-thieu')} href="/gioi-thieu">Giới thiệu</Link>
+          </nav>
+        </div>
 
+        <Link
+          className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center leading-none text-primary"
+          href="/"
+          aria-label="NaHerbs"
+        >
+          <img src="/naherbs-logo-transparent.png" alt="" className="h-7 w-auto object-contain" />
+          <span className="font-display-lg text-[22px] font-black tracking-normal text-[#40520a]">NaHerbs</span>
+        </Link>
+
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-sm md:gap-md">
           <NotificationBell />
 
-          <Link
-            href="/cart"
-            className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 relative inline-flex items-center"
-            title="Giỏ hàng"
-          >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>shopping_cart</span>
-            {cartItemCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-error text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center border border-surface">
-                {cartItemCount > 99 ? '99+' : cartItemCount}
-              </span>
-            )}
-          </Link>
-          
           {user ? (
             <div className="relative hidden md:flex items-center gap-xs">
               <button
                 type="button"
                 onClick={() => setAccountMenuOpen((open) => !open)}
-                className="flex items-center gap-xs rounded-full py-1 pl-1 pr-2 hover:bg-success-bg transition-colors"
+                className="flex items-center gap-xs py-1 text-primary transition-colors hover:text-on-primary-fixed-variant"
               >
-                <div className="w-8 h-8 rounded-full overflow-hidden border border-primary/20 shadow-sm">
+                <div className="h-8 w-8 overflow-hidden rounded-full border border-primary/20 shadow-sm">
                   <img
                     src={user.avatarUrl || '/images/avatars/default-avatar.jpg'}
                     alt="User Avatar"
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
-                <span className="font-label-md text-label-md text-primary font-semibold max-w-[120px] truncate">
+                <span className="max-w-[120px] truncate font-label-md text-label-md font-semibold">
                   {user.name}
                 </span>
-                <span className="material-symbols-outlined text-primary text-[18px]">
-                  expand_more
-                </span>
+                <span className="material-symbols-outlined text-[18px]">expand_more</span>
               </button>
-              
+
               {accountMenuOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 min-w-[200px] rounded-xl border border-herbal-beige bg-surface py-2 shadow-ambient-2">
+                <div className="absolute right-0 top-full z-50 mt-4 min-w-[220px] border border-herbal-beige bg-surface py-2 shadow-ambient-2">
                   {user.role === 'ADMIN' && (
                     <Link
                       href="/admin/dashboard"
                       onClick={() => setAccountMenuOpen(false)}
-                      className="block px-md py-2 font-label-md text-label-md text-primary font-semibold hover:bg-success-bg border-b border-herbal-beige/50"
+                      className="block px-md py-2 font-label-md text-label-md font-semibold text-primary hover:bg-success-bg"
                     >
                       Trang quản lý (Admin)
                     </Link>
@@ -150,23 +150,31 @@ export default function PublicHeader() {
               )}
             </div>
           ) : (
-            <>
-              <Link href="/dang-nhap" className="text-primary hover:scale-105 transition-transform duration-200 active:scale-95 hidden md:block">
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
-              </Link>
-              <Link
-                href="/dang-nhap"
-                className="border border-primary text-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-success-bg transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
-                Đăng nhập
-              </Link>
-            </>
+            <Link href="/dang-nhap" className="hidden font-label-md text-label-md text-text-main transition-colors hover:text-primary md:block">
+              Đăng nhập
+            </Link>
           )}
-          
+
+          <Link href="/lien-he" className="hidden font-label-md text-label-md text-text-main transition-colors hover:text-primary md:block">
+            Liên hệ
+          </Link>
+
+          <Link
+            href="/cart"
+            className="relative inline-flex items-center gap-1 font-label-md text-label-md text-text-main transition-colors hover:text-primary"
+            title="Giỏ hàng"
+          >
+            <span className="hidden sm:inline">Giỏ hàng</span>
+            <span className="sm:hidden material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>shopping_cart</span>
+            <span>({cartItemCount})</span>
+          </Link>
+
           <button
             type="button"
             onClick={openChatbot}
-            className="bg-primary text-on-primary rounded-full px-sm py-xs font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors shadow-ambient-1 active:scale-95 hidden md:block">
-            Tư vấn ngay
+            className="hidden border border-primary px-sm py-xs font-label-md text-label-md text-primary transition-colors hover:bg-primary hover:text-on-primary md:block"
+          >
+            NAKI
           </button>
         </div>
       </div>
