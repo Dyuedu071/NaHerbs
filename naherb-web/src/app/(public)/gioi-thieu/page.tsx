@@ -205,7 +205,7 @@ export default function AboutPage() {
                                         <Image className="object-cover"
                                             fill
                                             alt="A cinematic close-up of clear glass dropper bottles containing golden herbal oil"
-                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkzyx12B4fNeHc_Xa5LNAKoPQAJv3qoQfqFnr2HkPiE8vLjbeS5JDtAV7M2fImvg2vXVYcE2zwgpwjDXGkmBxqpHja2A9_z_ur2GRStWpfBj4zTpe6XvrExKI_SFtR9-XONCgluGaIZlHSAk4NXpp6iy_wZgE7Xs96O5duX5QU5ZIQmDsMammm5x-lkQNYyQ2ifKKaYtDhSqBszo0d-fONnvtZfHllyYGcTPmRhyqdq0bJ_LfzhNwRVvjmycqZ8PmEWQ6EBaLdoms" />
+                                            src="/images/background/aboutnaherb.jpeg" />
                                     </div>
                                 </div>
                             </div>
