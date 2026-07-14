@@ -289,7 +289,7 @@ export default function ChatbotWidget() {
         <button
           type="button"
           onClick={open}
-          aria-label="Mở NAKI"
+          aria-label="Mở chatbot tư vấn NaHerbs"
           className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-ambient-3 transition-transform duration-300 hover:scale-110 active:scale-95 md:bottom-8 md:right-8"
         >
           <span
@@ -313,7 +313,7 @@ export default function ChatbotWidget() {
           <section
             role="dialog"
             aria-modal="true"
-            aria-label="NAKI"
+            aria-label="NaHerbs AI Tư vấn"
             className="fixed inset-x-0 bottom-0 z-[60] flex max-h-[90vh] flex-col overflow-hidden rounded-t-[1.5rem] border border-border-warm bg-surface shadow-ambient-3 md:inset-auto md:bottom-24 md:right-8 md:h-[min(640px,80vh)] md:w-[min(400px,calc(100vw-2rem))] md:rounded-2xl"
           >
             <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-border-warm md:hidden" />
@@ -328,7 +328,7 @@ export default function ChatbotWidget() {
                 </span>
                 <div>
                   <h2 className="font-label-md text-label-md text-on-primary">
-                    NAKI
+                    NaHerbs AI Tư vấn
                   </h2>
                   <p className="font-caption text-caption text-on-primary/80">
                     Hỗ trợ 24/7
