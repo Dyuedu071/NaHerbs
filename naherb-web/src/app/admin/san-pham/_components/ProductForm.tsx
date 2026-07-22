@@ -537,9 +537,24 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
         <h3 className="text-title-md font-title-md text-on-surface border-b border-border-warm pb-3">SEO & Cấu hình</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
           <div className="space-y-xs">
+            <label className={labelCls}>Tiêu đề SEO</label>
+            <input
+              type="text"
+              name="seoTitle"
+              value={formData.seoTitle || ''}
+              onChange={handleChange}
+              maxLength={255}
+              placeholder="Để trống sẽ dùng tên sản phẩm"
+              className={inputCls}
+            />
+            <p className="text-caption text-text-muted text-right">{(formData.seoTitle || '').length}/60</p>
+          </div>
+          <div className="space-y-xs">
             <label className={labelCls}>Từ khóa SEO</label>
             <input type="text" name="primaryKeyword" value={formData.primaryKeyword || ''} onChange={handleChange} className={inputCls} />
           </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
           <div className="space-y-xs">
             <label className={labelCls}>Thứ tự hiển thị</label>
             <input type="number" name="displayOrder" value={formData.displayOrder || 0} onChange={handleChange} className={inputCls} />
@@ -547,7 +562,8 @@ export default function ProductForm({ initialData, onSubmit, isLoading, title, e
         </div>
         <div className="space-y-xs">
           <label className={labelCls}>Mô tả SEO</label>
-          <textarea name="seoDescription" value={formData.seoDescription || ''} onChange={handleChange} rows={2} className={inputCls} />
+          <textarea name="seoDescription" value={formData.seoDescription || ''} onChange={handleChange} rows={2} maxLength={500} className={inputCls} />
+          <p className="text-caption text-text-muted text-right">{(formData.seoDescription || '').length}/160</p>
         </div>
         <div className="flex items-center gap-3 pt-2">
           <input type="checkbox" id="isFeatured" name="isFeatured" checked={!!formData.isFeatured} onChange={handleChange} className="w-5 h-5 accent-primary cursor-pointer" />

@@ -1,10 +1,13 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
+import { buildPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
     title: 'Về NaHerbs | Tinh hoa thảo dược thiên nhiên',
-    description: 'Tinh hoa thảo dược, chăm sóc sức khỏe từ thiên nhiên',
-};
+    description: 'Tìm hiểu câu chuyện, sứ mệnh và tinh hoa thảo dược thiên nhiên của NaHerbs.',
+    path: '/gioi-thieu',
+    absoluteTitle: true,
+});
 
 export default function AboutPage() {
     return (

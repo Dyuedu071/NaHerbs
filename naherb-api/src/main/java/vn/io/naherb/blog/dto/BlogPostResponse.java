@@ -21,6 +21,7 @@ public class BlogPostResponse implements Serializable {
     private String primaryKeyword;
     private ContentStatus status;
     private boolean isFeatured;
+    private Instant publishedAt;
     private Instant createdAt;
     private Instant updatedAt;
     

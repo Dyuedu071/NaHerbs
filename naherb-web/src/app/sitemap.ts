@@ -1,9 +1,11 @@
 import { MetadataRoute } from 'next';
+import { getSiteUrl } from '@/lib/seo';
 
 /**
  * Next.js dynamic sitemap
  * Tự động được serve tại /sitemap.xml
  * Dữ liệu lấy từ backend endpoint GET /api/v1/seo/sitemap-data
+ * (products.slug, blog_posts.slug, product_categories.slug từ schema naherb)
  */
 
 interface SitemapItem {
@@ -23,7 +25,6 @@ async function fetchSitemapData(): Promise<SitemapData> {
     const apiBase =
       process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
     const res = await fetch(`${apiBase}/v1/seo/sitemap-data`, {
-      // Revalidate mỗi 1 tiếng để sitemap không quá cũ
       next: { revalidate: 3600 },
     });
     if (!res.ok) return {};
@@ -35,15 +36,14 @@ async function fetchSitemapData(): Promise<SitemapData> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://naherb.com.vn';
-
+  const siteUrl = getSiteUrl();
   const data = await fetchSitemapData();
-
   const entries: MetadataRoute.Sitemap = [];
 
-  // ── Static pages ─────────────────────────────────────────────
-  const staticDefaults: Record<string, { priority: number; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] }> = {
+  const staticDefaults: Record<
+    string,
+    { priority: number; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] }
+  > = {
     '/': { priority: 1.0, changeFrequency: 'daily' },
     '/san-pham': { priority: 0.9, changeFrequency: 'daily' },
     '/tin-tuc': { priority: 0.8, changeFrequency: 'weekly' },
@@ -53,7 +53,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticPages = data.staticPages ?? Object.keys(staticDefaults);
   staticPages.forEach((path) => {
-    const meta = staticDefaults[path] ?? { priority: 0.5, changeFrequency: 'monthly' as const };
+    const meta = staticDefaults[path] ?? {
+      priority: 0.5,
+      changeFrequency: 'monthly' as const,
+    };
     entries.push({
       url: `${siteUrl}${path}`,
       priority: meta.priority,
@@ -61,7 +64,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  // ── Product detail pages ──────────────────────────────────────
   (data.products ?? []).forEach(({ slug, updatedAt }) => {
     if (!slug) return;
     entries.push({
@@ -72,17 +74,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  // ── Category pages (filtered view) ───────────────────────────
-  (data.categories ?? []).forEach(({ slug }) => {
-    if (!slug) return;
-    entries.push({
-      url: `${siteUrl}/san-pham?categorySlugs=${encodeURIComponent(slug)}`,
-      priority: 0.7,
-      changeFrequency: 'weekly',
-    });
-  });
+  // Category filter URLs are query-string based — skip from sitemap to avoid
+  // thin/duplicate URLs. Category discovery remains via /san-pham UI.
 
-  // ── Blog post pages ───────────────────────────────────────────
   (data.blogPosts ?? []).forEach(({ slug, updatedAt }) => {
     if (!slug) return;
     entries.push({

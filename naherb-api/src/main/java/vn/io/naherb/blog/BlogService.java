@@ -253,6 +253,7 @@ public class BlogService {
         response.setPrimaryKeyword(post.getPrimaryKeyword());
         response.setStatus(post.getStatus());
         response.setFeatured(post.isFeatured());
+        response.setPublishedAt(post.getPublishedAt());
         response.setCreatedAt(post.getCreatedAt());
         response.setUpdatedAt(post.getUpdatedAt());
 

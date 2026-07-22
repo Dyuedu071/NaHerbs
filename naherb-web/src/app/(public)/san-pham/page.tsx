@@ -6,11 +6,13 @@ import { getProducts, getProductCategories } from '@/services/generated/public-p
 import ProductCard from '@/components/ProductCard';
 import ProductFilter from './_components/ProductFilter';
 import ProductSortBar from './_components/ProductSortBar';
+import { buildPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Sản phẩm | NaHerbs',
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Sản phẩm thảo dược',
   description: 'Khám phá các sản phẩm thảo dược chăm sóc sức khỏe từ NaHerbs.',
-};
+  path: '/san-pham',
+});
 
 export default async function ProductsPage({
   searchParams,

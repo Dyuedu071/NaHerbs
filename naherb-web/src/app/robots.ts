@@ -13,8 +13,15 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        // Không cho index các trang admin/auth/checkout
-        disallow: ['/admin/', '/dang-nhap', '/dang-ky', '/checkout', '/tai-khoan'],
+        disallow: [
+          '/admin/',
+          '/dang-nhap',
+          '/dang-ky',
+          '/checkout',
+          '/cart',
+          '/tai-khoan',
+          '/account/',
+        ],
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,

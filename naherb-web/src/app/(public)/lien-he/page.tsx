@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-// Removed unused import
 import Image from 'next/image';
+import { buildPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-    title: 'Liên hệ | NaHerbs',
+export const metadata: Metadata = buildPageMetadata({
+    title: 'Liên hệ',
     description: 'Liên hệ với NaHerbs để được tư vấn về các sản phẩm thảo dược và chăm sóc sức khỏe.',
-};
+    path: '/lien-he',
+});
 
 export default async function ContactPage() {
     let settingsData: Record<string, string> = {};

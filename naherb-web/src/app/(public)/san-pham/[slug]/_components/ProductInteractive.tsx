@@ -38,7 +38,8 @@ export default function ProductInteractive({ product }: Props) {
       <div className="lg:sticky lg:top-28 h-fit">
         <ProductGallery 
           images={allImages} 
-          activeSkuUrl={selectedSku?.thumbnailUrl ?? undefined} 
+          activeSkuUrl={selectedSku?.thumbnailUrl ?? undefined}
+          productName={product.name}
         />
       </div>
 

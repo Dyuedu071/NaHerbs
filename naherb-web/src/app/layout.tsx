@@ -6,6 +6,14 @@ import ChatbotShell from "@/components/chatbot/ChatbotShell";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import ToastProvider from "@/components/providers/ToastProvider";
 import { WebSocketProvider } from "@/components/websocket/WebSocketContext";
+import JsonLd from "@/components/seo/JsonLd";
+import {
+  DEFAULT_STORE_NAME,
+  buildOrganizationJsonLd,
+  buildPageMetadata,
+  fetchSiteInfo,
+  getSiteUrl,
+} from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({
@@ -19,39 +27,34 @@ const merriweather = Merriweather({
   subsets: ["latin", "vietnamese"],
 });
 
-async function fetchSiteInfo(): Promise<Record<string, string>> {
-  try {
-    const apiBase =
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
-    const res = await fetch(`${apiBase}/v1/settings/site-info`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return {};
-    const json = await res.json();
-    return json?.data || json || {};
-  } catch {
-    return {};
-  }
-}
-
 export async function generateMetadata(): Promise<Metadata> {
   const info = await fetchSiteInfo();
+  const storeName = info.store_name?.trim() || DEFAULT_STORE_NAME;
+  const title =
+    info.store_seo_title?.trim() ||
+    `${storeName} - ${info.store_tagline?.trim() || "Tinh hoa thảo dược"}`;
+  const description =
+    info.store_seo_description?.trim() ||
+    info.store_tagline?.trim() ||
+    "Tinh hoa thảo dược, chăm sóc sức khỏe từ thiên nhiên";
 
-  const title = "NaHerbs - Tinh hoa thảo dược";
-  const description = "Tinh hoa thảo dược, chăm sóc sức khỏe từ thiên nhiên";
+  const base = buildPageMetadata({
+    title,
+    description,
+    path: "/",
+    absoluteTitle: true,
+  });
 
   return {
+    ...base,
+    metadataBase: new URL(getSiteUrl()),
     title: {
       default: title,
-      template: `%s | ${info.store_name || "NaHerbs"}`,
+      template: `%s | ${storeName}`,
     },
-    description,
     openGraph: {
-      title,
-      description,
-      siteName: info.store_name || "NaHerbs",
-      locale: "vi_VN",
-      type: "website",
+      ...base.openGraph,
+      siteName: storeName,
     },
     icons: {
       icon: [
@@ -69,18 +72,27 @@ export async function generateMetadata(): Promise<Metadata> {
         },
       ],
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const info = await fetchSiteInfo();
+  const organizationLd = buildOrganizationJsonLd({
+    name: info.store_name,
+    description: info.store_seo_description || info.store_tagline,
+    phone: info.store_hotline || info.store_phone,
+    email: info.store_email,
+    address: info.store_address,
+    city: info.store_city,
+    facebookUrl: info.store_facebook_url,
+    zaloUrl: info.store_zalo_url,
+    instagramUrl: info.store_instagram_url,
+  });
+
   return (
     <html
       lang="vi"
@@ -105,6 +117,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col" suppressHydrationWarning>
+        <JsonLd data={organizationLd} />
         <GoogleOAuthProvider
           clientId={
             process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
