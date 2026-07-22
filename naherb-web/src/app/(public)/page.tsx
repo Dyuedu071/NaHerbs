@@ -18,11 +18,48 @@ const fallbackProductImages = [
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDzCQwZw62I0hglOAs3IAoSmW3kupqhrDkCy-POmeYr7l2nw0YzDDf61GMar_cc4ynai-1Yt59GbzL6LwL-pOdqFzxmJQToKbBOJZP1a2DVmNF5xiz6bThlmXbFPblg_2TSUbMQn4NAXuP-XrJjllZ4y95M2KdVlBSciBebh7bjTn_qi8Ox5vqUjgYhviRF_Xw7V3fdUpR06DozgCYWFf6PbpuUElMUH3pX_cPNMP4z2lNegeXQ_3CTB472QRnEdaHhb0MGdJt3sAw",
 ];
 
+const homepageCategoryImages = [
+  "/images/brand/DSCF5790.JPG",
+  "/images/brand/DSCF6394.JPG",
+  "/images/brand/DSCF6006.JPG",
+];
+
+const homepageCategoryImagesBySlug: Record<string, string> = {
+  "goi-co-vai-gay": "/images/brand/DSCF5790.JPG",
+  "tui-goi-chuom-thao-duoc": "/images/brand/DSCF6394.JPG",
+  "xong-ngai-cuu": "/images/brand/DSCF6006.JPG",
+};
+
+const fallbackHomepageCategories: ProductCategorySummary[] = [
+  {
+    name: "Gối cổ vai gáy",
+    slug: "goi-co-vai-gay",
+    description: "Gối và sản phẩm hỗ trợ thư giãn vùng cổ vai gáy.",
+  },
+  {
+    name: "Túi/gối chườm thảo dược",
+    slug: "tui-goi-chuom-thao-duoc",
+    description: "Sản phẩm chườm nóng thảo dược cho lưng, bụng, vai gáy.",
+  },
+  {
+    name: "Xông ngải cứu",
+    slug: "xong-ngai-cuu",
+    description: "Cốc xông, bộ xông và điếu ngải cứu.",
+  },
+];
+
 function formatProductPrice(product: ProductSummary): string {
   if (product.minSalePrice == null) {
     return "Liên hệ";
   }
   return `${formatMoney(product.minSalePrice)}`;
+}
+
+function getHomepageCategoryImage(category: ProductCategorySummary, index: number): string {
+  if (category.slug && homepageCategoryImagesBySlug[category.slug]) {
+    return homepageCategoryImagesBySlug[category.slug];
+  }
+  return category.imageUrl ?? homepageCategoryImages[index % homepageCategoryImages.length];
 }
 
 function unwrapApiData<T>(response: unknown, fallback: T): T {
@@ -44,7 +81,10 @@ export default function Home() {
   );
 
   const featuredProducts = unwrapApiData<{ items?: ProductSummary[] }>(productsResponse, {})?.items ?? [];
-  const productCategories = unwrapApiData<ProductCategorySummary[]>(categoriesResponse, []).slice(0, 3);
+  const fetchedProductCategories = unwrapApiData<ProductCategorySummary[]>(categoriesResponse, []).slice(0, 3);
+  const productCategories = fetchedProductCategories.length > 0
+    ? fetchedProductCategories
+    : fallbackHomepageCategories;
 
 
 
@@ -150,7 +190,7 @@ export default function Home() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
                     {productCategories.map((category, index) => {
-                        const imageUrl = category.imageUrl ?? fallbackProductImages[index % fallbackProductImages.length];
+                        const imageUrl = getHomepageCategoryImage(category, index);
                         const categoryHref = category.slug
                             ? `/san-pham?categorySlugs=${encodeURIComponent(category.slug)}`
                             : "/san-pham";
