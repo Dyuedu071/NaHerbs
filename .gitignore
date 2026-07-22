@@ -75,3 +75,6 @@ Desktop.ini
 
 # Optional local Docker bind-mount data
 .docker-data/
+
+# Large source media kept outside public/ (not deployed)
+media-source/
