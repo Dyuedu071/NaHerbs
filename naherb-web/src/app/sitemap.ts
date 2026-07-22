@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getSiteUrl } from '@/lib/seo';
+import { categoryPath } from '@/lib/product-listing';
 
 /**
  * Next.js dynamic sitemap
@@ -74,8 +75,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  // Category filter URLs are query-string based — skip from sitemap to avoid
-  // thin/duplicate URLs. Category discovery remains via /san-pham UI.
+  (data.categories ?? []).forEach(({ slug, updatedAt }) => {
+    if (!slug) return;
+    entries.push({
+      url: `${siteUrl}${categoryPath(slug)}`,
+      lastModified: updatedAt ? new Date(updatedAt) : undefined,
+      priority: 0.7,
+      changeFrequency: 'weekly',
+    });
+  });
 
   (data.blogPosts ?? []).forEach(({ slug, updatedAt }) => {
     if (!slug) return;

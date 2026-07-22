@@ -9,6 +9,7 @@ import {
   buildPageMetadata,
   buildProductJsonLd,
 } from "@/lib/seo";
+import { categoryPath } from "@/lib/product-listing";
 import ProductInteractive from "./_components/ProductInteractive";
 import ProductTabs from "./_components/ProductTabs";
 
@@ -89,7 +90,7 @@ export default async function ProductDetailPage({ params }: Props) {
       ? [
           {
             name: product.category.name || "Danh mục",
-            path: `/san-pham?categorySlugs=${encodeURIComponent(product.category.slug || "")}`,
+            path: categoryPath(product.category.slug || ""),
           },
         ]
       : []),
@@ -126,7 +127,7 @@ export default async function ProductDetailPage({ params }: Props) {
             <>
               <span className="mx-2">/</span>
               <Link
-                href={`/san-pham?categorySlugs=${encodeURIComponent(product.category.slug || "")}`}
+                href={categoryPath(product.category.slug || "")}
                 className="hover:text-green-700"
               >
                 {product.category.name}

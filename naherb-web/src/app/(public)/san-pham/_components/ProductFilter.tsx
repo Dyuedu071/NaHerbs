@@ -1,56 +1,94 @@
 "use client";
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
-import { ProductCategorySummary } from '@/services/generated/model';
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
+import { ProductCategorySummary } from "@/services/generated/model";
+import { buildProductListingHref, categoryPath } from "@/lib/product-listing";
 
 interface ProductFilterProps {
   categories: ProductCategorySummary[];
+  basePath?: string;
+  categoryInPath?: boolean;
+  activeCategorySlugs?: string[];
 }
 
-export default function ProductFilter({ categories }: ProductFilterProps) {
+export default function ProductFilter({
+  categories,
+  basePath = "/san-pham",
+  categoryInPath = false,
+  activeCategorySlugs,
+}: ProductFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [keyword, setKeyword] = useState(searchParams.get('keyword') || '');
-  const currentCategorySlugs = searchParams.getAll('categorySlugs');
-  const inStockOnly = searchParams.get('inStockOnly') === 'true';
-  const currentMinPrice = searchParams.get('minPrice') || '';
-  const currentMaxPrice = searchParams.get('maxPrice') || '';
+  const [keyword, setKeyword] = useState(searchParams.get("keyword") || "");
+  const queryCategorySlugs = searchParams.getAll("categorySlugs");
+  const currentCategorySlugs =
+    activeCategorySlugs ??
+    (categoryInPath && basePath.startsWith("/san-pham/danh-muc/")
+      ? [decodeURIComponent(basePath.replace("/san-pham/danh-muc/", ""))]
+      : queryCategorySlugs);
+
+  const inStockOnly = searchParams.get("inStockOnly") === "true";
+  const currentMinPrice = searchParams.get("minPrice") || "";
+  const currentMaxPrice = searchParams.get("maxPrice") || "";
 
   const [minPrice, setMinPrice] = useState(currentMinPrice);
   const [maxPrice, setMaxPrice] = useState(currentMaxPrice);
 
-  const updateFilters = useCallback(
-    (key: string, value: string | string[] | boolean) => {
-      const params = new URLSearchParams(searchParams.toString());
-      
-      if (key === 'categorySlugs') {
-        params.delete('categorySlugs');
-        if (Array.isArray(value)) {
-          value.forEach(v => params.append('categorySlugs', v));
-        }
-      } else if (typeof value === 'boolean') {
-        if (value) params.set(key, 'true');
-        else params.delete(key);
-      } else if (typeof value === 'string') {
-        if (value) params.set(key, value);
-        else params.delete(key);
+  const pushListing = useCallback(
+    (opts: {
+      keyword?: string;
+      categorySlugs?: string[];
+      minPrice?: string;
+      maxPrice?: string;
+      inStockOnly?: boolean;
+    }) => {
+      const nextCategories = opts.categorySlugs ?? currentCategorySlugs;
+      const nextKeyword =
+        opts.keyword !== undefined ? opts.keyword : searchParams.get("keyword") || "";
+      const nextMin =
+        opts.minPrice !== undefined
+          ? opts.minPrice
+          : searchParams.get("minPrice") || "";
+      const nextMax =
+        opts.maxPrice !== undefined
+          ? opts.maxPrice
+          : searchParams.get("maxPrice") || "";
+      const nextStock =
+        opts.inStockOnly !== undefined
+          ? opts.inStockOnly
+          : searchParams.get("inStockOnly") === "true";
+      const sort = searchParams.get("sort") || undefined;
+
+      let targetBase = "/san-pham";
+      let categoryInPathNext = false;
+
+      if (nextCategories.length === 1) {
+        targetBase = categoryPath(nextCategories[0]);
+        categoryInPathNext = true;
       }
-      
-      params.set('page', '0'); // reset page on filter
-      
-      const newQueryString = params.toString();
-      if (newQueryString !== searchParams.toString()) {
-        router.push(`/san-pham?${newQueryString}`, { scroll: false });
-      }
+
+      const href = buildProductListingHref(targetBase, {
+        keyword: nextKeyword || undefined,
+        categorySlugs: nextCategories,
+        minPrice: nextMin || undefined,
+        maxPrice: nextMax || undefined,
+        inStockOnly: nextStock,
+        sort,
+        page: 0,
+        categoryInPath: categoryInPathNext,
+      });
+
+      router.push(href, { scroll: false });
     },
-    [router, searchParams]
+    [router, searchParams, currentCategorySlugs],
   );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    updateFilters('keyword', keyword);
+    pushListing({ keyword });
   };
 
   const handleCategoryChange = (slug: string, checked: boolean) => {
@@ -58,72 +96,80 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
     if (checked) {
       if (!newSlugs.includes(slug)) newSlugs.push(slug);
     } else {
-      newSlugs = newSlugs.filter(s => s !== slug);
+      newSlugs = newSlugs.filter((s) => s !== slug);
     }
-    updateFilters('categorySlugs', newSlugs);
+    pushListing({ categorySlugs: newSlugs });
   };
 
   const handlePriceApply = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (minPrice) params.set('minPrice', minPrice);
-    else params.delete('minPrice');
-    
-    if (maxPrice) params.set('maxPrice', maxPrice);
-    else params.delete('maxPrice');
-    
-    params.set('page', '0');
-    
-    const newQueryString = params.toString();
-    if (newQueryString !== searchParams.toString()) {
-      router.push(`/san-pham?${newQueryString}`, { scroll: false });
-    }
+    pushListing({ minPrice, maxPrice });
   };
 
   return (
     <div className="space-y-md">
-      {/* Search */}
       <form onSubmit={handleSearch} className="relative">
-        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-[20px]">search</span>
-        <input 
+        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-[20px]">
+          search
+        </span>
+        <input
           type="text"
-          className="w-full h-10 pl-10 pr-4 rounded-lg bg-surface-container-low border border-surface-variant focus:ring-2 focus:ring-primary/20 text-body-md placeholder:text-text-muted transition-all" 
-          placeholder="Tìm sản phẩm..." 
+          className="w-full h-10 pl-10 pr-4 rounded-lg bg-surface-container-low border border-surface-variant focus:ring-2 focus:ring-primary/20 text-body-md placeholder:text-text-muted transition-all"
+          placeholder="Tìm sản phẩm..."
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
         />
       </form>
 
-      {/* Category Filter */}
       <div className="bg-surface-container-low rounded-xl p-md border border-surface-variant">
-        <h3 className="font-label-md text-label-md text-primary mb-sm border-b border-border-warm pb-2">Danh mục</h3>
+        <div className="flex items-center justify-between mb-sm border-b border-border-warm pb-2">
+          <h3 className="font-label-md text-label-md text-primary">Danh mục</h3>
+          {currentCategorySlugs.length > 0 && (
+            <Link
+              href={buildProductListingHref("/san-pham", {
+                keyword: searchParams.get("keyword") || undefined,
+                minPrice: searchParams.get("minPrice") || undefined,
+                maxPrice: searchParams.get("maxPrice") || undefined,
+                inStockOnly,
+                sort: searchParams.get("sort") || undefined,
+                page: 0,
+              })}
+              className="font-caption text-caption text-secondary hover:text-primary"
+              scroll={false}
+            >
+              Tất cả
+            </Link>
+          )}
+        </div>
         <ul className="space-y-sm max-h-[300px] overflow-y-auto custom-scrollbar">
           {categories.map((cat) => {
-             const isChecked = currentCategorySlugs.includes(cat.slug || '');
-             return (
-               <li key={cat.id}>
-                 <label className="flex items-center gap-xs cursor-pointer group">
-                   <input 
-                     type="checkbox"
-                     checked={isChecked}
-                     onChange={(e) => handleCategoryChange(cat.slug || '', e.target.checked)}
-                     className="form-checkbox text-primary focus:ring-primary rounded border-outline w-4 h-4" 
-                   />
-                   <span className="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">
-                     {cat.name}
-                   </span>
-                 </label>
-               </li>
-             );
+            const slug = cat.slug || "";
+            const isChecked = currentCategorySlugs.includes(slug);
+            return (
+              <li key={cat.id}>
+                <label className="flex items-center gap-xs cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={(e) => handleCategoryChange(slug, e.target.checked)}
+                    className="form-checkbox text-primary focus:ring-primary rounded border-outline w-4 h-4"
+                  />
+                  <span className="font-body-md text-body-md text-text-main group-hover:text-primary transition-colors">
+                    {cat.name}
+                  </span>
+                </label>
+              </li>
+            );
           })}
         </ul>
       </div>
 
-      {/* Price Filter */}
       <div className="bg-surface-container-low rounded-xl p-md border border-surface-variant">
-        <h3 className="font-label-md text-label-md text-primary mb-sm border-b border-border-warm pb-2">Khoảng giá</h3>
+        <h3 className="font-label-md text-label-md text-primary mb-sm border-b border-border-warm pb-2">
+          Khoảng giá
+        </h3>
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <input 
+            <input
               type="number"
               placeholder="Từ"
               className="w-full px-2 py-1 text-sm border border-surface-variant rounded focus:ring-primary focus:border-primary"
@@ -131,7 +177,7 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
               onChange={(e) => setMinPrice(e.target.value)}
             />
             <span className="text-text-muted">-</span>
-            <input 
+            <input
               type="number"
               placeholder="Đến"
               className="w-full px-2 py-1 text-sm border border-surface-variant rounded focus:ring-primary focus:border-primary"
@@ -139,7 +185,8 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
               onChange={(e) => setMaxPrice(e.target.value)}
             />
           </div>
-          <button 
+          <button
+            type="button"
             onClick={handlePriceApply}
             className="w-full mt-2 py-1 px-3 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded text-sm font-medium transition-colors"
           >
@@ -148,16 +195,17 @@ export default function ProductFilter({ categories }: ProductFilterProps) {
         </div>
       </div>
 
-      {/* In Stock Toggle */}
       <div className="bg-surface-container-low rounded-xl p-md border border-surface-variant">
         <label className="flex items-center gap-3 cursor-pointer">
-          <input 
-            type="checkbox" 
-            checked={inStockOnly} 
-            onChange={(e) => updateFilters('inStockOnly', e.target.checked)}
-            className="rounded border-outline text-primary focus:ring-primary w-5 h-5 transition-colors" 
+          <input
+            type="checkbox"
+            checked={inStockOnly}
+            onChange={(e) => pushListing({ inStockOnly: e.target.checked })}
+            className="rounded border-outline text-primary focus:ring-primary w-5 h-5 transition-colors"
           />
-          <span className="font-label-md text-on-surface select-none">Chỉ hiện sản phẩm còn hàng</span>
+          <span className="font-label-md text-on-surface select-none">
+            Chỉ hiện sản phẩm còn hàng
+          </span>
         </label>
       </div>
     </div>

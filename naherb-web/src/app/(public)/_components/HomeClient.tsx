@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
 
 import { formatMoney } from '@/lib/order-format';
+import { categoryPath } from '@/lib/product-listing';
 import {
   useGetProductCategories,
   useGetProducts,
@@ -192,7 +193,7 @@ export default function HomeClient() {
                     {productCategories.map((category, index) => {
                         const imageUrl = getHomepageCategoryImage(category, index);
                         const categoryHref = category.slug
-                            ? `/san-pham?categorySlugs=${encodeURIComponent(category.slug)}`
+                            ? categoryPath(category.slug)
                             : "/san-pham";
 
                         return (
