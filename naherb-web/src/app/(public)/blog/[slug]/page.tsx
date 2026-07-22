@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
+import MediaImage from "@/components/MediaImage";
 import {
   fetchBlogPostBySlug,
   fetchBlogPosts,
   type BlogPostSummary,
 } from "@/lib/blog-api";
 import {
-  absoluteImageUrl,
   buildArticleJsonLd,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
@@ -218,11 +217,12 @@ export default async function BlogDetailPage({ params }: Props) {
 
           {post.thumbnailUrl && (
             <div className="mb-lg relative rounded-xl overflow-hidden shadow-[0_2px_8px_-2px_rgba(55,86,59,0.08),0_4px_16px_-4px_rgba(55,86,59,0.04)] aspect-video">
-              <Image
-                src={absoluteImageUrl(post.thumbnailUrl) || post.thumbnailUrl}
+              <MediaImage
+                src={post.thumbnailUrl}
                 alt={post.title}
                 fill
                 priority
+                cloudinaryWidth={1200}
                 className="object-cover"
                 sizes="(max-width: 820px) 100vw, 820px"
               />
@@ -294,12 +294,11 @@ export default async function BlogDetailPage({ params }: Props) {
                   <div className="bg-surface rounded-xl shadow-[0_2px_8px_-2px_rgba(55,86,59,0.08),0_4px_16px_-4px_rgba(55,86,59,0.04)] border border-herbal-beige overflow-hidden hover:shadow-[0_4px_12px_-2px_rgba(55,86,59,0.12),0_8px_24px_-4px_rgba(55,86,59,0.08)] transition-shadow duration-300 flex flex-col h-full">
                     <div className="relative aspect-square overflow-hidden bg-surface-container-low p-sm">
                       {product.thumbnailUrl ? (
-                        <Image
-                          src={
-                            absoluteImageUrl(product.thumbnailUrl) || product.thumbnailUrl
-                          }
+                        <MediaImage
+                          src={product.thumbnailUrl}
                           alt={product.name}
                           fill
+                          cloudinaryWidth={600}
                           className="object-contain group-hover:scale-105 transition-transform duration-500"
                           sizes="(max-width: 768px) 100vw, 33vw"
                         />
@@ -346,10 +345,11 @@ export default async function BlogDetailPage({ params }: Props) {
                 <Link key={rp.id} href={`/blog/${rp.slug}`} className="group block">
                   <div className="aspect-video relative rounded-lg overflow-hidden mb-sm shadow-[0_2px_8px_-2px_rgba(55,86,59,0.08)] bg-surface-container">
                     {rp.thumbnailUrl ? (
-                      <Image
-                        src={absoluteImageUrl(rp.thumbnailUrl) || rp.thumbnailUrl}
+                      <MediaImage
+                        src={rp.thumbnailUrl}
                         alt={rp.title}
                         fill
+                        cloudinaryWidth={600}
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />

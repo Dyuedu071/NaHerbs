@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { ProductSummary } from '@/services/generated/model';
+import MediaImage from '@/components/MediaImage';
 import FavoriteButton from './FavoriteButton';
 import AddToCartButton from './AddToCartButton';
+import { ProductSummary } from '@/services/generated/model';
 import { resolveImageUrl } from '@/lib/image-url';
 
 interface ProductCardProps {
@@ -20,11 +20,12 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
       <div className="relative mb-sm overflow-hidden rounded-xl bg-surface-container-low aspect-square flex-shrink-0">
         <Link href={productUrl} className="relative block w-full h-full">
           {thumbnailUrl ? (
-            <Image
-              src={thumbnailUrl}
+            <MediaImage
+              src={product.thumbnailUrl || thumbnailUrl}
               alt={product.name || 'Sản phẩm NaHerbs'}
               fill
               priority={priority}
+              cloudinaryWidth={600}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />

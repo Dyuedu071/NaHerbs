@@ -108,7 +108,38 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
           script: |
+            set -e
             cd ${{ secrets.VPS_DEPLOY_PATH }}
-            docker compose pull
-            docker compose up -d
+
+            docker compose pull naherb-api naherb-web
+            docker compose up -d --remove-orphans --force-recreate naherb-api naherb-web
+            docker compose up -d --remove-orphans redis nginx-proxy-manager
+
+            echo "Waiting for app containers..."
+            for i in $(seq 1 18); do
+              API_STATE=$(docker inspect -f '{{.State.Status}}' naherb_api 2>/dev/null || echo missing)
+              WEB_STATE=$(docker inspect -f '{{.State.Status}}' naherb_web 2>/dev/null || echo missing)
+              API_HEALTH=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' naherb_api 2>/dev/null || echo missing)
+              WEB_HEALTH=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' naherb_web 2>/dev/null || echo missing)
+              echo "[$i] api=$API_STATE/$API_HEALTH web=$WEB_STATE/$WEB_HEALTH"
+              if [ "$API_STATE" = "running" ] && [ "$WEB_STATE" = "running" ]; then
+                break
+              fi
+              sleep 10
+            done
+
+            docker compose ps
+
+            if [ "$(docker inspect -f '{{.State.Running}}' naherb_api 2>/dev/null || echo false)" != "true" ]; then
+              echo "naherb_api is not running:"
+              docker logs --tail 120 naherb_api || true
+              exit 1
+            fi
+            if [ "$(docker inspect -f '{{.State.Running}}' naherb_web 2>/dev/null || echo false)" != "true" ]; then
+              echo "naherb_web is not running:"
+              docker logs --tail 120 naherb_web || true
+              docker logs --tail 80 naherb_api || true
+              exit 1
+            fi
+
             docker image prune -f

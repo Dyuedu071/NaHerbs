@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
+import MediaImage from '@/components/MediaImage';
 
 import { formatMoney } from '@/lib/order-format';
 import { categoryPath } from '@/lib/product-listing';
@@ -192,12 +193,13 @@ export default function HomeClient() {
                                 className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
                                 href={categoryHref}
                             >
-                                <Image
-                                    src={resolveImageUrl(imageUrl, { width: 900 }) || imageUrl}
+                                <MediaImage
+                                    src={imageUrl}
                                     alt={category.name ?? "Danh mục NaHerbs"}
                                     fill
                                     sizes="(max-width: 768px) 100vw, 33vw"
                                     priority={index === 0}
+                                    cloudinaryWidth={900}
                                     className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent" />
@@ -245,12 +247,13 @@ export default function HomeClient() {
                                         </span>
                                     )}
                                     {imageUrl ? (
-                                        <Image
-                                            src={imageUrl}
+                                        <MediaImage
+                                            src={product.thumbnailUrl || imageUrl}
                                             alt={product.name ?? "Sản phẩm NaHerbs"}
                                             fill
                                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                                             priority={index < 2}
+                                            cloudinaryWidth={600}
                                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                                         />
                                     ) : (

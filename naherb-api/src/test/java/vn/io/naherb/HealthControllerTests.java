@@ -32,6 +32,14 @@ class HealthControllerTests {
     }
 
     @Test
+    void livenessReturnsOkWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/api/health/live"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.data.status", is("UP")));
+    }
+
+    @Test
     void protectedRouteStillRequiresAuthentication() throws Exception {
         mockMvc.perform(get("/api/auth/me")).andExpect(status().isUnauthorized());
     }

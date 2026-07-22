@@ -267,9 +267,22 @@ docker compose logs -f naherb_web
 Kiem tra nhanh:
 
 - `https://naherb.com.vn`
-- `https://api.naherb.com.vn/api/health`
+- `https://api.naherb.com.vn/api/health/live` (liveness — Docker healthcheck)
+- `https://api.naherb.com.vn/api/health` (readiness — DB/Redis)
 
-Neu `api/health` tra ve thanh cong, backend da len.
+Neu `api/health/live` OK ma `api/health` 503: container van healthy, nhung Redis/DB dang loi.
+Neu FE khong len sau deploy: thuong do API unhealthy + `depends_on` (da sua: FE chi can API started).
+
+Tren VPS:
+
+```bash
+docker compose ps
+docker inspect -f '{{.State.Health.Status}}' naherb_api naherb_web
+docker exec naherb_api wget -qO- http://127.0.0.1:8080/api/health/live
+docker exec naherb_api wget -qO- http://127.0.0.1:8080/api/health
+docker logs --tail 100 naherb_api
+docker logs --tail 100 naherb_web
+```
 
 ## 12. Khi can deploy lai
 

@@ -39,9 +39,13 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
-    const wsUrl = process.env.NEXT_PUBLIC_API_BASE_URL
-      ? process.env.NEXT_PUBLIC_API_BASE_URL.replace('http', 'ws').replace('/api', '/ws')
-      : 'ws://localhost:8080/ws';
+    const apiBase =
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+    // https://api.example.com/api → wss://api.example.com/ws
+    const wsUrl = apiBase
+      .replace(/^http:/i, "ws:")
+      .replace(/^https:/i, "wss:")
+      .replace(/\/api\/?$/i, "/ws");
 
     const stompClient = new Client({
       brokerURL: wsUrl,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
-import Image from 'next/image';
+import MediaImage from '@/components/MediaImage';
 import { ProductImage } from '@/services/generated/model';
 import { resolveImageUrl } from '@/lib/image-url';
 
@@ -49,11 +49,12 @@ export default function ProductGallery({ images, activeSkuUrl, productName }: Pr
     <div className="space-y-4">
       <div className="aspect-square relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100">
         {activeImage && (
-          <Image
+          <MediaImage
             src={activeImage}
             alt={activeAlt || mainAlt}
             fill
             priority
+            cloudinaryWidth={1000}
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"
           />
@@ -74,10 +75,11 @@ export default function ProductGallery({ images, activeSkuUrl, productName }: Pr
                 activeImage === img.url ? 'border-green-600' : 'border-transparent opacity-70 hover:opacity-100'
               }`}
             >
-              <Image
+              <MediaImage
                 src={img.url!}
                 alt={img.altText || `${mainAlt} thumbnail`}
                 fill
+                cloudinaryWidth={200}
                 sizes="80px"
                 className="object-cover"
               />

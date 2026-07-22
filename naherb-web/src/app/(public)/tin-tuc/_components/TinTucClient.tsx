@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useTransition } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import MediaImage from "@/components/MediaImage";
 import type { BlogCategory, BlogPageData, BlogPostSummary } from "@/lib/blog-api";
-import { absoluteImageUrl } from "@/lib/seo";
 import { AXIOS_INSTANCE } from "@/services/api-client";
 
 type TinTucClientProps = {
@@ -209,14 +208,12 @@ export default function TinTucClient({
               >
                 <div className="absolute inset-0">
                   {featuredPost.thumbnailUrl ? (
-                    <Image
-                      src={
-                        absoluteImageUrl(featuredPost.thumbnailUrl) ||
-                        featuredPost.thumbnailUrl
-                      }
+                    <MediaImage
+                      src={featuredPost.thumbnailUrl}
                       alt={featuredPost.title}
                       fill
                       priority
+                      cloudinaryWidth={1400}
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       sizes="100vw"
                     />
@@ -251,11 +248,12 @@ export default function TinTucClient({
                   >
                     <div className="relative w-full pt-[56.25%] overflow-hidden bg-surface-container-low">
                       {post.thumbnailUrl ? (
-                        <Image
+                        <MediaImage
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
                           alt={post.title}
-                          src={absoluteImageUrl(post.thumbnailUrl) || post.thumbnailUrl}
+                          src={post.thumbnailUrl}
                           fill
+                          cloudinaryWidth={600}
                           sizes="(max-width: 768px) 100vw, 33vw"
                         />
                       ) : (
