@@ -1,5 +1,6 @@
 import type { RecommendedProduct } from "@/services/generated/model/recommendedProduct";
 import { StockStatus } from "@/services/generated/model/stockStatus";
+import { resolveImageUrl } from "@/lib/image-url";
 import Link from "next/link";
 
 interface ChatProductCardProps {
@@ -41,9 +42,11 @@ export default function ChatProductCard({ product }: ChatProductCardProps) {
       <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-border-warm bg-herbal-beige">
         {product.thumbnailUrl ? (
           <img
-            src={product.thumbnailUrl}
+            src={resolveImageUrl(product.thumbnailUrl, { width: 112 }) || product.thumbnailUrl}
             alt={product.name ?? "Sản phẩm"}
             className="h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-outline">

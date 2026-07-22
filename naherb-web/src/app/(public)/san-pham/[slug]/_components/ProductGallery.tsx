@@ -16,11 +16,14 @@ export default function ProductGallery({ images, activeSkuUrl, productName }: Pr
   const normalizedImages = useMemo(
     () =>
       images
-        .map((img) => ({ ...img, url: resolveImageUrl(img.url) }))
+        .map((img) => ({
+          ...img,
+          url: resolveImageUrl(img.url, { width: 1000 }),
+        }))
         .filter((img) => Boolean(img.url)),
     [images],
   );
-  const normalizedActiveSkuUrl = resolveImageUrl(activeSkuUrl);
+  const normalizedActiveSkuUrl = resolveImageUrl(activeSkuUrl, { width: 1000 });
 
   const initial = normalizedImages.find((img) => img.isThumbnail) || normalizedImages[0];
   const [activeImage, setActiveImage] = useState(initial?.url || '');

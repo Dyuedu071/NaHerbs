@@ -21,10 +21,14 @@ export default function AboutPage() {
                     <div className="absolute inset-0 z-0">
                         <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/30 to-transparent z-10">
                         </div>
-                        <div className="w-full h-full bg-cover bg-center opacity-90"
-                            data-alt="A lush, serene medicinal herb garden at sunrise, with soft golden light filtering through sage green leaves and delicate white blossoms. The style is professional architectural photography with a focus on macro botanical details and a minimalist, clean aesthetic that feels organic and spa-like."
-                            style={{ backgroundImage: `url('/images/background/thaoduoc2.png')` }}>
-                        </div>
+                        <Image
+                            src="/images/background/thaoduoc2.webp"
+                            alt="Vườn thảo dược NaHerbs"
+                            fill
+                            priority
+                            sizes="100vw"
+                            className="object-cover opacity-90"
+                        />
                     </div>
                     <div className="max-w-container-max mx-auto px-gutter relative z-20">
                         <div className="max-w-2xl">
@@ -49,8 +53,9 @@ export default function AboutPage() {
                     <div className="rounded-xl overflow-hidden tonal-shadow border border-herbal-beige/30 relative aspect-[4/5] w-full">
                         <Image className="object-cover"
                             fill
+                            sizes="(max-width: 1024px) 100vw, 50vw"
                             alt="NaHerbs với thảo dược thiên nhiên"
-                            src="/images/background/Naherbs.png" />
+                            src="/images/background/Naherbs.webp" />
                     </div>
                             <div
                                 className="absolute -bottom-md -right-md bg-primary-container p-md rounded-xl text-on-primary-container shadow-lg hidden md:block">
@@ -207,8 +212,9 @@ export default function AboutPage() {
                                     <div className="aspect-square rounded-xl overflow-hidden border-4 border-white/20 tonal-shadow relative w-full h-full">
                                         <Image className="object-cover"
                                             fill
-                                            alt="A cinematic close-up of clear glass dropper bottles containing golden herbal oil"
-                                            src="/images/background/aboutnaherb.jpeg" />
+                                            sizes="(max-width: 1024px) 100vw, 40vw"
+                                            alt="Quy trình sản xuất thảo dược NaHerbs"
+                                            src="/images/background/aboutnaherb.webp" />
                                     </div>
                                 </div>
                             </div>

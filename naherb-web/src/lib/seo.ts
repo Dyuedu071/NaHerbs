@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { resolveImageUrl } from "@/lib/image-url";
 
 export const DEFAULT_SITE_URL = "https://naherb.com.vn";
 export const DEFAULT_STORE_NAME = "NaHerbs";
@@ -37,9 +38,11 @@ export function absoluteUrl(path: string): string {
 
 export function absoluteImageUrl(url?: string | null): string | undefined {
   if (!url) return undefined;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("//")) return `https:${url}`;
-  return absoluteUrl(url);
+  // Prefer transformed Cloudinary for OG (bounded size)
+  const resolved = resolveImageUrl(url, { width: 1200 });
+  if (resolved.startsWith("http://") || resolved.startsWith("https://")) return resolved;
+  if (resolved.startsWith("//")) return `https:${resolved}`;
+  return absoluteUrl(resolved);
 }
 
 type BuildMetadataOptions = {

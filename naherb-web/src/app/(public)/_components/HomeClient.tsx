@@ -1,34 +1,30 @@
 "use client";
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useChatbot } from '@/components/chatbot/ChatbotContext';
 
 import { formatMoney } from '@/lib/order-format';
 import { categoryPath } from '@/lib/product-listing';
+import { resolveImageUrl } from '@/lib/image-url';
 import {
   useGetProductCategories,
   useGetProducts,
 } from '@/services/generated/public-products/public-products';
 import type { ProductCategorySummary } from '@/services/generated/model/productCategorySummary';
 import type { ProductSummary } from '@/services/generated/model/productSummary';
-
-const fallbackProductImages = [
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCCHIGHpyiH_H6cd9_8Zslswa-mB_l-tp5H_0vn7u3WIMjMMnJY7Gl2AHTm2ZHsVUifzbG8EqLQm_Ixt9t8Vx6pOFbt6Dnyqw-ws8jjMUOL7dT-eoB0UiNVffG1mx5yV0Yt6PFc0k4DxdRLRW6XiG26G9nE62FJONsIsnH_ZG0o9R4e_TLJnVtJuj_Dbfde9XuaRyy8WboVSQRO9eDqyiGWc5DhIFUN4pvK2VY2a0BssBOHGBU4TU07jylZpmTjT4fMQUZiW3y9O4g",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBQvwT_9-iT2SOajLu-FldGTE-JS02fCYW4Vn3r6HDGFmBcZAE6J1z4YGOPZz5TFuYXNl6TxtI7FYYw8e-p0kSgd8TCry0ZfSEEWdlJTKExoQpQJEC_IskQDCVFWnzJfUEarDOkZcPk2qhcENY_ci_MusEhUOPLOsg7LMNYnCSAKGGfYs0A86_rAalkCY3Jwg7C1Xmt2xtKOj16IyETjLs3IvU1Ef23zXjwmR4eRtyupcA3jLaZEMx4bZeghMprhbXBI0wdkUio9nY",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuClRWBEUV4yi6_EIQr2oLX9IdPyqCpOZoTrmR7LsFQrQQgeS9fZB-qUANmy34zDMA4-7OJt7DTem0YGYmdsdKu5K077DJya5XIQ-Bjq70AzAp9cHyvOkwYA_7SdNDtaY-AjVSwUwVVT1ELVY7sS9iQJFijRu3yI8tzU9pGRDTqoIqVcJGu0eroB2H34q-jjESBDoWzt_xM8gxHU8W-SixGuonhHoyxGkVwkkelHBWgxAcmIHaLHGza_zoGne-MK5dbfaNN85jBqtXg",
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuDzCQwZw62I0hglOAs3IAoSmW3kupqhrDkCy-POmeYr7l2nw0YzDDf61GMar_cc4ynai-1Yt59GbzL6LwL-pOdqFzxmJQToKbBOJZP1a2DVmNF5xiz6bThlmXbFPblg_2TSUbMQn4NAXuP-XrJjllZ4y95M2KdVlBSciBebh7bjTn_qi8Ox5vqUjgYhviRF_Xw7V3fdUpR06DozgCYWFf6PbpuUElMUH3pX_cPNMP4z2lNegeXQ_3CTB472QRnEdaHhb0MGdJt3sAw",
-];
+import HeroVideo from './HeroVideo';
 
 const homepageCategoryImages = [
-  "/images/brand/DSCF5790.JPG",
-  "/images/brand/DSCF6394.JPG",
-  "/images/brand/DSCF6006.JPG",
+  "/images/brand/optimized/goi-co-vai-gay.webp",
+  "/images/brand/optimized/tui-goi-chuom.webp",
+  "/images/brand/optimized/xong-ngai-cuu.webp",
 ];
 
 const homepageCategoryImagesBySlug: Record<string, string> = {
-  "goi-co-vai-gay": "/images/brand/DSCF5790.JPG",
-  "tui-goi-chuom-thao-duoc": "/images/brand/DSCF6394.JPG",
-  "xong-ngai-cuu": "/images/brand/DSCF6006.JPG",
+  "goi-co-vai-gay": "/images/brand/optimized/goi-co-vai-gay.webp",
+  "tui-goi-chuom-thao-duoc": "/images/brand/optimized/tui-goi-chuom.webp",
+  "xong-ngai-cuu": "/images/brand/optimized/xong-ngai-cuu.webp",
 };
 
 const fallbackHomepageCategories: ProductCategorySummary[] = [
@@ -60,7 +56,10 @@ function getHomepageCategoryImage(category: ProductCategorySummary, index: numbe
   if (category.slug && homepageCategoryImagesBySlug[category.slug]) {
     return homepageCategoryImagesBySlug[category.slug];
   }
-  return category.imageUrl ?? homepageCategoryImages[index % homepageCategoryImages.length];
+  if (category.imageUrl) {
+    return resolveImageUrl(category.imageUrl, { width: 900 }) || category.imageUrl;
+  }
+  return homepageCategoryImages[index % homepageCategoryImages.length];
 }
 
 function unwrapApiData<T>(response: unknown, fallback: T): T {
@@ -119,17 +118,8 @@ export default function HomeClient() {
                         </Link>
                     </div>
                 </div>
-                <div className="h-full min-h-[400px] w-full relative">
-                    <video
-                        className="absolute inset-0 h-full w-full object-cover"
-                        src="/videos/hero-intro.mov"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        aria-label="Video mở đầu giới thiệu không gian thảo dược NaHerbs"
-                    />
+                <div className="h-full min-h-[400px] w-full relative bg-surface-container">
+                    <HeroVideo className="absolute inset-0 h-full w-full object-cover" />
                 </div>
             </div>
         </section>
@@ -202,9 +192,13 @@ export default function HomeClient() {
                                 className="group block relative overflow-hidden rounded-[1.5rem] aspect-[4/5] shadow-ambient-1 border border-border-warm bg-surface-container-low"
                                 href={categoryHref}
                             >
-                                <div
-                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                                    style={{ backgroundImage: `url('${imageUrl}')` }}
+                                <Image
+                                    src={resolveImageUrl(imageUrl, { width: 900 }) || imageUrl}
+                                    alt={category.name ?? "Danh mục NaHerbs"}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                    priority={index === 0}
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent" />
                                 <div className="absolute bottom-0 left-0 p-md w-full">
@@ -237,7 +231,7 @@ export default function HomeClient() {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
                     {featuredProducts.map((product: ProductSummary, index: number) => {
-                        const imageUrl = product.thumbnailUrl ?? fallbackProductImages[index % fallbackProductImages.length];
+                        const imageUrl = resolveImageUrl(product.thumbnailUrl, { width: 600 });
 
                         return (
                             <article
@@ -250,10 +244,20 @@ export default function HomeClient() {
                                             Bán chạy
                                         </span>
                                     )}
-                                    <div
-                                        className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                                        style={{ backgroundImage: `url('${imageUrl}')` }}
-                                    />
+                                    {imageUrl ? (
+                                        <Image
+                                            src={imageUrl}
+                                            alt={product.name ?? "Sản phẩm NaHerbs"}
+                                            fill
+                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                            priority={index < 2}
+                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center text-text-muted">
+                                            <span className="material-symbols-outlined text-[48px] opacity-30">spa</span>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="p-sm flex flex-col flex-grow gap-xs">
                                     <h3 className="font-body-lg text-body-lg text-primary font-medium line-clamp-2">
@@ -308,13 +312,17 @@ export default function HomeClient() {
             <div
                 className="px-gutter max-w-container-max mx-auto py-xl flex flex-col md:flex-row items-center gap-xl relative">
                 <div className="w-full md:w-1/2 relative">
-                    {/* Soft organic shape behind image */}
                     <div
                         className="absolute inset-0 bg-secondary-fixed rounded-[4rem] transform rotate-3 scale-105 opacity-50 blur-lg">
                     </div>
-                    <div className="relative w-full aspect-square md:aspect-[4/3] rounded-[2rem] bg-cover bg-center shadow-ambient-2 z-10 overflow-hidden border border-border-warm"
-                        data-alt="A portrait of a serene, friendly wellness advisor or a beautifully styled abstract representation of 'AI guidance' using organic shapes and soft glowing lights. The color scheme is predominantly deep green, soft sage, and warm cream. The mood is helpful, intelligent, and deeply connected to nature."
-                        style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAyC3tCxgSnOoak_X9p8zInjIivp7FNw94ldwnAkYtB3Jr8_rUDcKgB8-7Otm205LBjJpvQzydbIR7c1-fZ93PufLuGyyqhuMpqDQaJ4E3Hcw80Qd2GTB2x89yzrygFrXbBYsaFryf10w6JIg8CV5PzW3OEkMqAnkQF3WAC01PoJqPfq2xed1501uVJ0YviuvVUsd2XCcDQbR9h9OdpeseC0WpIb7B_0Nc6AytP_C8LSr3OifTK2k7VUY6UvMv-yrET0BDTveVQXX4')" }}>
+                    <div className="relative w-full aspect-square md:aspect-[4/3] rounded-[2rem] shadow-ambient-2 z-10 overflow-hidden border border-border-warm bg-surface-container-low">
+                        <Image
+                            src="/images/brand/optimized/ai-advisor.webp"
+                            alt="Trợ lý AI tư vấn liệu pháp thảo dược NaHerbs"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="object-cover"
+                        />
                     </div>
                 </div>
                 <div className="w-full md:w-1/2 flex flex-col gap-md z-10">

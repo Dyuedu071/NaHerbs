@@ -13,7 +13,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, priority = false }: ProductCardProps) {
   const isOutOfStock = product.stockStatus === 'OUT_OF_STOCK';
   const productUrl = `/san-pham/${product.slug}`;
-  const thumbnailUrl = resolveImageUrl(product.thumbnailUrl);
+  const thumbnailUrl = resolveImageUrl(product.thumbnailUrl, { width: 600 });
 
   return (
     <div className="bg-surface-container-lowest rounded-xl p-sm shadow-[0_4px_20px_-2px_rgba(46,77,57,0.12)] group block h-full flex flex-col transition-shadow hover:shadow-[0_8px_30px_-4px_rgba(46,77,57,0.2)]">

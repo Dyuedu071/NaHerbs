@@ -3,6 +3,7 @@
 import { extractApiErrorMessage } from "@/lib/api-error";
 import { extractSessionUser } from "@/lib/current-user";
 import { formatMoney } from "@/lib/order-format";
+import { resolveImageUrl } from "@/lib/image-url";
 import {
   getGetCartQueryKey,
   useDeleteCart,
@@ -263,7 +264,9 @@ export default function CartPage() {
                           <img
                             className="w-full h-full object-cover"
                             alt={item.productName ?? "Sản phẩm"}
-                            src={item.thumbnailUrl}
+                            src={resolveImageUrl(item.thumbnailUrl, { width: 256 }) || item.thumbnailUrl}
+                            loading="lazy"
+                            decoding="async"
                           />
                         ) : (
                            <span className="material-symbols-outlined text-[40px] text-outline">

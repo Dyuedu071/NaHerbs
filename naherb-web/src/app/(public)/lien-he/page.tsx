@@ -170,8 +170,9 @@ export default async function ContactPage() {
                             <div className="rounded-xl overflow-hidden h-48 custom-shadow border border-herbal-beige/30 relative">
                                 <Image className="object-cover"
                                     fill
-                                    alt="A minimalist and high-end lifestyle photograph of a variety of dried organic herbs and green tea leaves stored in clear glass apothecary jars"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCefUvm5Ktk4tugRDKVdF_kNLv-DdLNznuFuZ0dZMZoyZexHd-9dv-rA7BU4_G-vo08CCiFNpzY-ulWXr70M3OaML22FXc2YOjc8vuE4xAFFgjR9xXmUdViGw_WG4Ioa5uEFFLcC-PBL-H7DN6bEdfRcghzi1j9rseu6c9nOH-EuuEnSSm6ornLxi9QkXTGrxLxXhRwQp_5swnhZsBPPdh7vZhoJ7GccFODCd3DYlQxszHGX-SIV6CLZXVd1Q7eSDApVgsDg5uMhG0" />
+                                    sizes="(max-width: 1024px) 100vw, 400px"
+                                    alt="Thảo dược khô và trà xanh NaHerbs"
+                                    src="/images/brand/optimized/ai-advisor.webp" />
                             </div>
                         </div>
                     </div>
